@@ -1,0 +1,295 @@
+{% load cmt_helper %}
+{% for cm in cms %}
+{% if request.user|has_group:"BP Team" or request.user.is_superuser %}
+{% get_portfolio_files cm as files %}
+<div class="card px-0">
+    <h5 class="card-header py-1 px-0 bg-grey bg-lighten-4">{{ cm }} Portfolio Files <a class="info font-small-3 text-bold-600 float-right" href="{%url 'download_portfolio_kickstart' {{ cm }} %}"> <u>Download Kickstart Template</u></a></h5> 
+    <div class="card-body px-0 pt-0 font-small-3">
+            <form action="{%url 'portfolio_file_operations' 'form'%}" method="POST" class="upload_form">
+                {%csrf_token%}
+                <input type="hidden" name="cm" value="{{ cm }}">
+            <div class="row">
+                <div class="col-12">
+                    <p>Select file to replace or select 'Add file' to add new file</p>
+                    <p>Note: Make sure you upload XLSX file format</p>
+                    <fieldset class="form-group position-relative">
+                        <select class="form-control form-control-sm" name='file_To_Replace' required>
+                            <option >Select file </option>
+                            <option selected value="add">+ ADD File</option>
+                            {%for x in files%}
+                            <option value="{{x.0}}">{{x.0}}</option>
+                            {%endfor%}
+                        </select>
+                    </fieldset>
+                </div>
+                <div class="col-12">
+                    <p>Choose File</p>
+                    <input type="file" name="files" required>
+                    <button type="submit" class="btn btn-outline btn-outline-success btn-sm square mt-1 float-right">Upload</button>
+                </div>
+            </div>
+        </form>
+            <div class="row" style="max-height:200px;overflow-y: auto;">
+                {%for x in files%}
+                <div class="col-9 mb-1">
+                    {{x.0}},size:{{x.1}}Kb
+                </div>
+                
+                <div class="col-3 mb-1">
+                    <a class="btn btn-icon btn-outline btn-outline-success" target="_blank" href="{%url 'portfolio_file_operations' 'download'%}?name={{ cm }}/{{x.0}}"><i class="fas fa-download"></i></a>
+                    {%if request.user.is_superuser or request.user|has_group:"BP Team" %}<button class="btn btn-icon btn-outline btn-outline-danger delete" CM_loc='{{ cm }}' file="{{x.0}}"><i class="fas fa-trash"></i></button>{%endif%}
+                </div>
+                {%endfor%}
+                
+            </div>
+            <hr>
+            <div class="row">
+            <div class="col-12">
+                <small class="red"> <p >* For processing we consider only the top most file, So make sure the files is on top. </p></small>
+                            
+                <button class="btn btn-sm btn-outline btn-outline-info mx-1 render_button" CM_loc='{{ cm }}' >Load Portfolio {{ cm }}</button>
+                <button class="btn btn-sm btn-outline btn-outline-danger mx-1" onclick="load_upload()" >Reset</button>
+            
+            </div>
+        </div>
+        </div>
+</div>
+{%endif%}
+{% endfor %}
+<script>
+  $(document).ready(function() {
+        $('.render_button').on('click',function(){
+            CM_loc=$(this).attr('CM_loc')
+            Swal.fire({
+                title: `Are you sure ? `,
+                text: `This process will take some time. Until then this page will be blocked. We will notify you when it is done`,
+                icon: "warning",
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Add Parts',
+                denyButtonText: `Refresh Parts`,
+                cancelButtonText: `Refresh cancel`,
+                }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.get("{% url 'render_portfolio' %}",{CM_loc:CM_loc}, function(data, status) {
+                        if (data.status=='success'){
+                            Swal.fire(data.message, {
+                                icon: "success",
+                                timer: 2500
+                            });
+                            check_re_render()
+                        }
+                        else if (data.status=='error'){
+                            Swal.fire(data.message, {
+                            icon: "error",
+                            buttons: true
+                        
+                            });
+                            check_re_render()
+                        }
+                        window.location.reload();
+                    });
+                } else if (result.isDenied) {
+                    $.get("{%url 'render_portfolio'%}?refresh=True",{CM_loc:CM_loc}, function(data, status) {
+                        if (data.status=='success'){
+                            Swal.fire(data.message, {
+                            icon: "success",
+                            timer: 2500
+                        });
+                        check_re_render()
+
+                        }
+                        else if (data.status=='error'){
+                            Swal.fire(data.message, {
+                            icon: "error",
+                            buttons: true
+                        
+                    });
+                    check_re_render()
+                    window.location.reload();
+                }
+                    });
+                }
+                else{
+                    Swal.fire("Cancelled", {
+                        icon: "error",
+                        timer: 1000
+                    });
+                }
+            })
+
+        });
+        $('.delete').on('click',function(){
+            alert('kk')
+            var file_name=$(this).attr('file')
+            var cm=$(this).attr('CM_loc')
+
+            Swal.fire({
+                title: `Are you sure ?`,
+                text: `Once deleted, you will not be able to recover it the file ${file_name}`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    $.get("{%url 'portfolio_file_operations' 'delete'%}", {
+                        file_name: file_name,cm:cm
+                    }, function(data) {
+                        if (data.status=='success'){
+                            Swal.fire("File has been Removed from the system!", {
+                                icon: "success",
+                                timer: 2500
+                            });
+                        load_upload()
+                        }
+                        else{
+                            Swal.fire("Error something wrong, reload may fix", {
+                                icon: "error",
+                                buttons: true
+                            });
+                        }
+                    });
+                    
+                } else {
+                    Swal.fire("Cancelled", {
+                        icon: "error",
+                        timer: 1000
+                    });
+                }
+            });
+        })
+    $(".upload_form").submit(function(e) {
+    e.preventDefault();
+    var form = $(this);
+    var url = form.attr('action');
+    var formData = new FormData(this);
+    
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData, // serializes the form's elements.
+            success: function(data) {
+                load_upload()
+            },
+            error: function(exception) {
+
+                swal('Upload a valid excel!', {
+                    icon: 'error',
+                    button: True,
+                })
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    });
+
+
+    });
+</script>
+<script>
+    function quote_message(message){
+        swal.fire(message)
+    }
+    function checkbox(id) {
+
+        if (id != 0) {
+            var checkbox_value = $(id).is(':checked')
+            var data = {
+                id: id.value,
+                State: checkbox_value,
+                option: 'check_box'
+            }
+        } else {
+            var data = {
+                id: 00,
+                State: 'status',
+                option: 'check_box'
+            }
+
+        }
+
+        console.log(data)
+        $.ajax({
+            type: "GET",
+            url: "",
+            data: data,
+            success: function(data, status, xhr) {
+                if (data.status !== 200) {
+                    alert('Session Timeout:Re-Login In')
+                    location.reload()
+                }
+                $("#select_count").text('Selected Rows: ' + (data.selected ==0 ? 'All':data.selected));
+            },
+
+            error: function(data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+        console.log(checkbox_value)
+    }
+    function select_all(data) {
+        console.log($(data).is(':checked'))
+        if ($(data).is(':checked')) {
+            $("#check_box_all_flag").val('true')
+            $('#Portfolio_table').DataTable().draw(false);
+
+
+        } else {
+            $("#check_box_all_flag").val('false')
+
+            $('#Portfolio_table').DataTable().draw(false);
+
+
+
+        }
+
+    }
+    function load_upload(){
+        $.get('{%url "portfolio_file_operations" "load"%}',(data)=>{
+                $('#upload_placeholder').html(data)
+            })
+
+    }
+    function check_re_render(){
+
+    $.get('{%url "portfolio_file_operations" "check_render"%}',(data)=>{
+        //console.log(data)
+        if (data.status==true){
+
+            $('#main').hide()
+            $('#blockmessage').show()
+            $('#name').html(data.name)
+    }
+    else{
+        $('#main').show();
+        $('#blockmessage').hide();
+
+    }
+
+        })
+}
+    $(document).ready(function() {
+        
+        check_re_render()
+        setInterval(check_re_render, 10000);
+        $(".loadUploadComponent").hover(function(){
+            load_upload()
+            this.outerHTML= $(this).html()
+
+        })
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        $($.fn.dataTable.tables(true)).DataTable()
+           .columns.adjust()
+           .responsive.recalc();
+        });
+
+        
+       
+    });
+    
+
+</script>

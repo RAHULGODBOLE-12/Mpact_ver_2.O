@@ -1,0 +1,74 @@
+{% load static %}
+<div id="kt_app_sidebar" class="app-sidebar flex-column" data-kt-drawer="true" data-kt-drawer-name="app-sidebar" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="250px" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_app_sidebar_mobile_toggle">
+    <!--begin::Main-->
+    <div class="d-flex flex-column justify-content-between h-100 hover-scroll-overlay-y my-2 mx-5 d-flex flex-column" id="kt_app_sidebar_main" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_header" data-kt-scroll-wrappers="#kt_app_main" data-kt-scroll-offset="5px">
+        <!--begin::Sidebar menu-->
+        <div id="#kt_app_sidebar_menu" data-kt-menu="true" data-kt-menu-expand="false" class="flex-column-fluid menu menu-sub-indention menu-column menu-rounded menu-active-bg mb-7">
+            <!--begin:Menu item-->
+            <div class="menu-item">
+                <!--begin:Menu link-->
+                <a class="menu-link" href="{% url 'portfolio' 'GSM' %}">
+                    <span class="menu-icon">
+                        <i class="ki-duotone ki-element-11 fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                        </i>
+                    </span>
+                    <span class="menu-title">Portfolio</span>
+                </a>
+                <!--end:Menu link-->
+            </div>
+            <div class="menu-item">
+                <!--begin:Menu link-->
+                <a class="menu-link" href="{%url 'contactlist' 'GSM' %}">
+                    <span class="menu-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layout-text-sidebar-reverse" viewBox="0 0 16 16">
+                            <path d="M12.5 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h5zm0 3a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h5zm.5 3.5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5zm-.5 2.5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1h5z"/>
+                            <path d="M16 2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2zM4 1v14H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h2zm1 0h9a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5V1z"/>
+                          </svg>
+                    </span>
+                    <span class="menu-title">Supplier Contact</span>
+                </a>
+                <!--end:Menu link-->
+            </div>
+            <!-- <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+                <span class="menu-link">
+                    <span class="menu-icon">
+                        <i class="ki-duotone ki-element-11 fs-1">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                            <span class="path3"></span>
+                            <span class="path4"></span>
+                        </i>
+                    </span>
+                    <span class="menu-title">Dashboards</span>
+                    <span class="menu-arrow"></span>
+                </span>
+
+                <div class="menu-sub menu-sub-accordion">
+
+                    <div class="menu-item">
+
+                        <a class="menu-link active" href="../dist/index.html">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">Default</span>
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div> -->
+        </div>
+        <!--end::Sidebar menu-->
+        <!--begin::Footer-->
+        <div class="app-sidebar-project-default app-sidebar-project-minimize text-center min-h-lg-400px flex-column-auto d-flex flex-column justify-content-end" id="kt_app_sidebar_footer">
+        </div>
+        <!--end::Footer-->
+    </div>
+    <!--end::Main-->
+</div>

@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+	<!--begin::Head-->
+	<head>
+		<title>Slate</title>
+		<meta charset="utf-8" />
+		<meta name="description" content="Saul HTML Pro - Bootstrap 5 HTML Multipurpose Admin Dashboard Theme" />
+		<meta name="keywords" content="Saul, bootstrap, bootstrap 5, dmin themes, free admin themes, bootstrap admin, bootstrap dashboard" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:type" content="article" />
+		<meta property="og:url" content="https://keenthemes.com/products/saul-html-pro" />
+		<meta property="og:site_name" content="Keenthemes | Saul HTML Pro" />
+		<link rel="shortcut icon" href="{% static 'media/logos/favicon.ico' %}" />
+		<!--begin::Fonts(mandatory for all pages)-->
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+		<!--end::Fonts-->
+		<!--begin::Vendor Stylesheets(used for this page only)-->
+		<link href="{% static 'plugins/custom/fullcalendar/fullcalendar.bundle.css' %}" rel="stylesheet" type="text/css" />
+		<link href="{% static 'plugins/custom/datatables/datatables.bundle.css' %}" rel="stylesheet" type="text/css" />
+		<!--end::Vendor Stylesheets-->
+		<!--begin::Global Stylesheets Bundle(mandatory for all pages)-->
+		<link href="{% static 'plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css" />
+		<link href="{% static 'css/style.bundle.css' %}" rel="stylesheet" type="text/css" />
+		<!--end::Global Stylesheets Bundle-->
+		<script>// Frame-busting to prevent site from being loaded within a frame without permission (click-jacking) if (window.top != window.self) { window.top.location.replace(window.self.location.href); }</script>
+	</head>
+	<!--end::Head-->
+	<!--begin::Body-->
+	<body id="kt_app_body" data-kt-app-header-fixed="true" data-kt-app-header-fixed-mobile="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" data-kt-app-aside-enabled="true" data-kt-app-aside-fixed="true" data-kt-app-aside-push-toolbar="true" data-kt-app-aside-push-footer="true" class="app-default">
+	
+		<script>var defaultThemeMode = "light"; var themeMode; if ( document.documentElement ) { if ( document.documentElement.hasAttribute("data-bs-theme-mode")) { themeMode = document.documentElement.getAttribute("data-bs-theme-mode"); } else { if ( localStorage.getItem("data-bs-theme") !== null ) { themeMode = localStorage.getItem("data-bs-theme"); } else { themeMode = defaultThemeMode; } } if (themeMode === "system") { themeMode = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } document.documentElement.setAttribute("data-bs-theme", themeMode); }</script>
+
+		<div class="d-flex flex-column flex-root app-root" id="kt_app_root">
+
+			<div class="app-page flex-column flex-column-fluid" id="kt_app_page">
+				
+				{% include 'header.html'%}
+
+				<div class="app-wrapper flex-column flex-row-fluid" id="kt_app_wrapper">
+		
+					{% include 'sidebar.html' %}
+	
+					<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+						
+						<div class="d-flex flex-column flex-column-fluid">
+					
+							<div id="kt_app_toolbar" class="app-toolbar pt-5">
+								
+								<div id="kt_app_toolbar_container" class="app-container container-fluid d-flex align-items-stretch">
+								
+									<div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
+										{% block title %}{% endblock %}
+									</div>
+							
+								</div>
+						
+							</div>
+					
+							<div id="kt_app_content" class="app-content flex-column-fluid">
+						
+								<div id="kt_app_content_container" class="app-container container-fluid">
+									{% block content %}{% endblock %}
+								</div>
+					
+							</div>
+						
+						</div>
+		
+						<div id="kt_app_footer" class="app-footer align-items-center justify-content-center justify-content-md-between flex-column flex-md-row py-3">
+					
+							<div class="text-dark order-2 order-md-1">
+								<span class="text-muted fw-semibold me-1">Powered By</span>
+								<a href="https://inesssolutions.com" target="_blank" class="text-gray-800 text-hover-primary">InESS Solutions, inc.</a>
+							</div>
+	
+
+						</div>
+				
+					</div>
+
+					<div id="kt_app_aside" class="app-aside flex-column" data-kt-drawer="true" data-kt-drawer-name="app-aside" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="auto" data-kt-drawer-direction="end" data-kt-drawer-toggle="#kt_app_aside_mobile_toggle">
+				
+						<div id="kt_app_aside_wrapper" class="d-flex flex-column align-items-center hover-scroll-y scroll-ms py-5 py-lg-0 gap-4" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-height="auto" data-kt-scroll-dependencies="#kt_app_header" data-kt-scroll-wrappers="#kt_app_aside_wrapper" data-kt-scroll-offset="5px">
+						
+						</div>
+					
+					</div>
+				
+				</div>
+			
+			</div>
+	
+		</div>
+
+		<div id="kt_scrolltop" class="scrolltop" data-kt-scrolltop="true">
+			<i class="ki-duotone ki-arrow-up">
+				<span class="path1"></span>
+				<span class="path2"></span>
+			</i>
+		</div>
+
+		<script src="{% static 'plugins/global/plugins.bundle.js' %}"></script>
+		<script src="{% static 'js/scripts.bundle.js' %}"></script>
+
+		<script src="{% static 'plugins/custom/fullcalendar/fullcalendar.bundle.js' %}"></script>
+		<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+		<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+		<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+		<script src="https://cdn.amcharts.com/lib/5/radar.js"></script>
+		<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+		<script src="{% static 'plugins/custom/datatables/datatables.bundle.js' %}"></script>
+
+		<script src="{% static 'js/widgets.bundle.js' %}"></script>
+
+		
+		
+		<script>
+			$(document).ready(function() {
+				$('#kt_app_sidebar_toggle').trigger('click')
+			})	
+		</script>
+
+
+        {% for msg in messages %}
+        <script>
+            toastr["{{ msg.tags }}"]("{{msg}}")
+        </script>
+        {% endfor %}
+
+		{% block scripts %} {% endblock %}
+	</body>
+
+</html>

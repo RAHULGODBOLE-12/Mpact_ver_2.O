@@ -3,7 +3,7 @@
 {% if request.user|has_group:"BP Team" or request.user.is_superuser %}
 {% get_portfolio_files cm as files %}
 <div class="card px-0">
-    <h5 class="card-header py-1 px-0 bg-grey bg-lighten-4">{{ cm }} Portfolio Files <a class="info font-small-3 text-bold-600 float-right" href="{%url 'download_portfolio_kickstart' {{ cm }} %}"> <u>Download Kickstart Template</u></a></h5> 
+    <h5 class="card-header py-1 px-0 bg-grey bg-lighten-4">{{ cm }} Portfolio Files <a class="info font-small-3 text-bold-600 float-right" href="{%url 'download_portfolio_kickstart' cm  %}"> <u>Download Kickstart Template</u></a></h5> 
     <div class="card-body px-0 pt-0 font-small-3">
             <form action="{%url 'portfolio_file_operations' 'form'%}" method="POST" class="upload_form">
                 {%csrf_token%}

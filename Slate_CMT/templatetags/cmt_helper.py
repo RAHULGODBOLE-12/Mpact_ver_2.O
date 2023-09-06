@@ -437,7 +437,7 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
                 msg.attach(Attach_file[0], Attach_file[1], 'application/ms-excel')
                 
             msg.extra_headers['Message-ID'] = make_msgid()
-            status=msg.send()
+            # status=msg.send()
             print("before save data: base_url==production")
             try:
                 mail_sent_by = request.user.first_name+" "+request.user.last_name
@@ -462,7 +462,7 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
         except Exception as e:
                 print(e)
                 status=EmailMessage('Email Failed to send',body=message,from_email=f'Failed from MPAT <srv-masterpricing@arista.com>', to=['skarthick@inesssolutions.com'])
-                status=msg.send()
+                # status=msg.send()
     else:
         message = render_to_string('email/genric_template.html',{'title':title.replace('\n','<br>'),'body':body.replace('\n','<br>'),'base_url':base_url})
         try:
@@ -476,7 +476,7 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
             if Attach_file:
                 msg.attach(Attach_file[0], Attach_file[1], 'application/ms-excel')
             msg.extra_headers['Message-ID'] = make_msgid()
-            status=msg.send()
+            # status=msg.send()
             print("before save data: >>>")
             
             try:
@@ -500,7 +500,7 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
         except Exception as e:
                 print(e)
                 status=EmailMessage('Email Failed to send',body=message,from_email=f'Failed from MPAT <srv-masterpricing@arista.com>', to=['skarthick@inesssolutions.com'])
-                status=msg.send()
+                # status=msg.send()
 def get_url(request):
     return get_current_site(request).domain
 
@@ -536,6 +536,7 @@ def send_push_notification(user,subject='You Have notifcation',text='No text',ur
     payload = {'head': 'Master Pricing Tool', 'body': subject, 'url': url}
     send_user_notification(user, payload=payload, ttl=1000)
     return True
+
 @multi_threading
 def send_logger_tele(text):
     # try:
@@ -554,7 +555,7 @@ def error_handle(func):
             tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
             print(tb_str)
             msg=EmailMessage(subject='Error with traceback',body=tb_str,from_email=f'Error from MPAT <srv-masterpricing@arista.com>', to=['skarthick@inesssolutions.com'])
-            msg.send()
+            # msg.send()
             send_logger_tele(tb_str)
             return None
     return inner
@@ -679,9 +680,6 @@ def find_partial_quote(portfolio,to_cal=False):
     sent_dist=sent_r.filter(quarter=get_Next_quarter(q=1)[0]).values_list('sent_to',flat=True)
     sent_dist_Q=sent_r.filter(quarter=Current_quarter()).values_list('sent_to',flat=True)
 
-
-    # print(sent_r,'find_partial_quotefind_partial_quotefind_partial_quote')
-
     send_count=sent_r.count()
     
     sent_supplier_q1=RFX.objects.filter(sent_to='supplier').filter(portfolio=portfolio,sent_quater=Current_quarter(),quarter=get_Next_quarter(q=1)[0]).count()
@@ -741,7 +739,6 @@ def check_rfx_global(items_id):
     for item_id in items_id:
         instance=Portfolio.objects.get(id=item_id)
         if not if_raised_Global(instance):
-
             data.append(item_id)
         else:
             pass

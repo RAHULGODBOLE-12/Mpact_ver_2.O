@@ -388,7 +388,6 @@
         
                                                                         <option value="refreshed_comment">Refreshed Comment</option>
                                                                         <option value="refreshed_on">Refreshed on</option>
-                                                                        <option value="refreshed_on">Refreshed on</option>
                                                                         <option value="Rev">{{columns_name|dict_key:"Rev"}}</option>
                                                                         <option value="rfq_sent_flag_supplier">RFQ Sent Status</option>
                                                                         <option value="Delivery_Based_Total_OH_sum_OPO_this_quarter">{{columns_name|dict_key:"Delivery_Based_Total_OH_sum_OPO_this_quarter"}}</option>
@@ -405,7 +404,7 @@
                                                         <tr>
                                                             <td class="pt-0" style="width: 50%">
                                                                 <fieldset class="form-group">
-                                                                    <select class="form-control fields select2" name="fields[]" onchange="getVal(this)" style="width: 100%;">
+                                                                    <select class="form-control input-sm fields select2" name="fields[]" onchange="getVal(this)" style="width: 100%;">
                                                                         <option value="Number">{{columns_name|dict_key:"Number"}}</option>
                                                                         <option value="Lifecycle_Phase">{{columns_name|dict_key:"Lifecycle_Phase"}}</option>
                                                                         <option value="Arista_Part_Number">{{columns_name|dict_key:"Arista_Part_Number"}}</option>
@@ -689,7 +688,7 @@
         e.preventDefault();
         var formData = new FormData(this);
         $.ajax({
-            url: "",
+            url: "{%url 'advance_filter' 'GSM Team' 'filter_form' 'all_data' %}",
             type: 'POST',
             data: formData,
             success: function(data) {
@@ -710,7 +709,7 @@
         var field = $(r).closest('td').find('select').val();
         $(r).closest('td').next('td').find('.appendvalue').html('<select class="form-control attrib" name="' + field + '_value[]" multiple style="width: 100%" data-placehlder="Select Values"><option disabled value="">Select Value</option></select>');
         $.ajax({
-            url: '' + field,
+            url: '/portfolio/portfolio/filter/advancefilter/GSM Team/get_value/' + field,
             dataType: 'json',
             type: 'get',
             contentType: 'application/json',

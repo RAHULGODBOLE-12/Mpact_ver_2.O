@@ -27,6 +27,34 @@ from django.db.models import Value as V
 from django.db.models.functions import Concat   
 
 
+
+def agile_data_rename(agile_data):
+    agile_data.rename(columns={
+    'id':'id',
+    'ampart':'Number',
+    'ampart_rev':'Rev',
+    'ampart_lifecycle':'Lifecycle Phase',
+    'ampart_desc':'Agile Item Desc',
+    'mfr_name':'Mfr. Name (Manufacturers)',
+    'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
+    'mfr_qualification_status':'Qualification Status (Manufacturers)',
+    'mfr_part_number':'Mfr. Part Number (Manufacturers)',
+    'mfrdescription':'mfrdescription',
+    'updateddate':'updateddate',
+    },inplace=True)
+    agile_filter=[
+    'Number', #ampart
+    'Lifecycle Phase',#ampart_lifecycle
+    'Rev',#ampart_rev
+    'Agile Item Desc',#Agile Item Desc
+    'Mfr. Name (Manufacturers)',#mfr_name
+    'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
+    'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
+    'Qualification Status (Manufacturers)', #mfr_qualification_status
+    ]
+
+    agile_data=agile_data.filter(agile_filter)
+    return agile_data
 def portfolio_creation(request,CM_loc='SGD'):
     '''
     ######Portfolio Creator######
@@ -69,6 +97,41 @@ def portfolio_creation(request,CM_loc='SGD'):
 
     '''
     refresh_flag=request.GET.get('refresh')
+    global db_header2
+    db_header2=[
+        "Number",
+        "Lifecycle_Phase",
+        "Rev",
+        "Mfr_Name",
+        "Mfr_Part_Lifecycle_Phase",
+        "Mfr_Part_Number",
+        "Qualification_Status",
+        "cm_Part_Number",
+        "Arista_Part_Number",
+        "Cust_consign",
+        "Parts_controlled_by",
+        "Item_Desc",
+        "LT",
+        "MOQ",
+        "Original_PO_Delivery_sent_by_Mexico",
+        "cm_Quantity_Buffer_On_Hand",
+        "cm_Quantity_On_Hand_CS_Inv",
+        "Open_PO_due_in_this_quarter",
+        "Open_PO_due_in_next_quarter",
+        "Delivery_Based_Total_OH_sum_OPO_this_quarter",
+        "PO_Based_Total_OH_sum_OPO",
+        "CQ_ARIS_FQ_sum_1_SANM_Demand",
+        "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
+        "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
+        "CQ_sum_3_ARIS_FQ_SANM_Demand",
+        "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
+        "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
+        "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
+        "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
+        "Blended_AVG_PO_Receipt_Price",
+        "Ownership",
+        "Arista_PIC",
+        ]
 
     #print(CM_loc)
     final_list=[]
@@ -338,31 +401,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         #print(len(agile_data))
         #print('data loaded from agile')
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-        'id':'id',
-        'ampart':'Number',
-        'ampart_rev':'Rev',
-        'ampart_lifecycle':'Lifecycle Phase',
-        'ampart_desc':'Agile Item Desc',
-        'mfr_name':'Mfr. Name (Manufacturers)',
-        'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-        'mfr_qualification_status':'Qualification Status (Manufacturers)',
-        'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-        'mfrdescription':'mfrdescription',
-        'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
 
         agile_data_filtered=agile_data[agile_data['Number'].isin(KICK_SGD["Arista Part Number"].to_list())]
@@ -370,43 +409,8 @@ def portfolio_creation(request,CM_loc='SGD'):
         portfolio['Item Desc']=portfolio['Agile Item Desc']
         del portfolio['Agile Item Desc']
 
-        db_header={
-        portfolio.columns[0]:"Number",
-        portfolio.columns[1]:"Lifecycle_Phase",
-        portfolio.columns[2]:"Rev",
-        portfolio.columns[3]:"Mfr_Name",
-        portfolio.columns[4]:"Mfr_Part_Lifecycle_Phase",
-        portfolio.columns[5]:"Mfr_Part_Number",
-        portfolio.columns[6]:"Qualification_Status",
-
-        portfolio.columns[7]:"cm_Part_Number",
-        portfolio.columns[8]:"Arista_Part_Number",
-        portfolio.columns[9]:"Cust_consign",
-        portfolio.columns[10]:"Parts_controlled_by",
-        portfolio.columns[11]:"Item_Desc",
-        portfolio.columns[12]:"LT",
-        portfolio.columns[13]:"MOQ",
-        portfolio.columns[14]:"Original_PO_Delivery_sent_by_Mexico",
-        portfolio.columns[15]:"cm_Quantity_Buffer_On_Hand",
-        portfolio.columns[16]:"cm_Quantity_On_Hand_CS_Inv",
-        portfolio.columns[17]:"Open_PO_due_in_this_quarter",
-        portfolio.columns[18]:"Open_PO_due_in_next_quarter",
-        portfolio.columns[19]:"Delivery_Based_Total_OH_sum_OPO_this_quarter",
-        portfolio.columns[20]:"PO_Based_Total_OH_sum_OPO",
-        portfolio.columns[21]:"CQ_ARIS_FQ_sum_1_SANM_Demand",
-        portfolio.columns[22]:"CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
-        portfolio.columns[23]:"CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
-        portfolio.columns[24]:"CQ_sum_3_ARIS_FQ_SANM_Demand",
-        portfolio.columns[25]:"Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
-        portfolio.columns[26]:"ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
-        portfolio.columns[27]:"CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
-        portfolio.columns[28]:"Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
-        portfolio.columns[29]:"Blended_AVG_PO_Receipt_Price",
-        portfolio.columns[30]:"Ownership",
-        portfolio.columns[31]:"Arista_PIC",
-        }
         #print(db_header)
-        portfolio.rename(columns=db_header,inplace=True)
+        portfolio.rename(columns=db_header2,inplace=True)
         portfolio['Quarter']=this_quarter
         try:
             portfolio.loc[portfolio[f"Arista_PIC"].isin(gsm_Team),'Team' ]='GSM Team'
@@ -422,31 +426,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         agile_data=agile_data.filter(ampart__in=KICK_JPE["APN"].to_list()).to_dataframe()
         error_NotInagile_table=KICK_JPE[~KICK_JPE["APN"].isin(agile_data['ampart'])]
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-        'id':'id',
-        'ampart':'Number',
-        'ampart_rev':'Rev',
-        'ampart_lifecycle':'Lifecycle Phase',
-        'ampart_desc':'Agile Item Desc',
-        'mfr_name':'Mfr. Name (Manufacturers)',
-        'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-        'mfr_qualification_status':'Qualification Status (Manufacturers)',
-        'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-        'mfrdescription':'mfrdescription',
-        'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
         agile_data_filtered2=agile_data[agile_data['Number'].isin(KICK_JPE["APN"].to_list())]
         # To database
@@ -455,40 +435,6 @@ def portfolio_creation(request,CM_loc='SGD'):
         portfolio2['Item Desc']=portfolio2['Agile Item Desc']
         del portfolio2['Agile Item Desc']
 
-        db_header2=[
-        "Number",
-        "Lifecycle_Phase",
-        "Rev",
-        "Mfr_Name",
-        "Mfr_Part_Lifecycle_Phase",
-        "Mfr_Part_Number",
-        "Qualification_Status",
-        "cm_Part_Number",
-        "Arista_Part_Number",
-        "Cust_consign",
-        "Parts_controlled_by",
-        "Item_Desc",
-        "LT",
-        "MOQ",
-        "Original_PO_Delivery_sent_by_Mexico",
-        "cm_Quantity_Buffer_On_Hand",
-        "cm_Quantity_On_Hand_CS_Inv",
-        "Open_PO_due_in_this_quarter",
-        "Open_PO_due_in_next_quarter",
-        "Delivery_Based_Total_OH_sum_OPO_this_quarter",
-        "PO_Based_Total_OH_sum_OPO",
-        "CQ_ARIS_FQ_sum_1_SANM_Demand",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
-        "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
-        "CQ_sum_3_ARIS_FQ_SANM_Demand",
-        "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
-        "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
-        "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
-        "Blended_AVG_PO_Receipt_Price",
-        "Ownership",
-        "Arista_PIC",
-        ]
 
         # portfolio2.set_axis(db_header2,axis=1,inplace=True)
         print('gsm_Team',gsm_Team)
@@ -512,31 +458,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         print(KICK_FGN["APN"])
         print(agile_data,"Agile Data")
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-            'id':'id',
-            'ampart':'Number',
-            'ampart_rev':'Rev',
-            'ampart_lifecycle':'Lifecycle Phase',
-            'ampart_desc':'Agile Item Desc',
-            'mfr_name':'Mfr. Name (Manufacturers)',
-            'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-            'mfr_qualification_status':'Qualification Status (Manufacturers)',
-            'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-            'mfrdescription':'mfrdescription',
-            'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
         agile_data_filtered2=agile_data[agile_data['Number'].isin(KICK_FGN["APN"].to_list())]
         # To database
@@ -597,31 +519,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         agile_data=agile_data.filter(ampart__in=KICK_JSJ["APN"].to_list()).to_dataframe()
         error_NotInagile_table=KICK_JSJ[~KICK_JSJ["APN"].isin(agile_data['ampart'])]
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-        'id':'id',
-        'ampart':'Number',
-        'ampart_rev':'Rev',
-        'ampart_lifecycle':'Lifecycle Phase',
-        'ampart_desc':'Agile Item Desc',
-        'mfr_name':'Mfr. Name (Manufacturers)',
-        'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-        'mfr_qualification_status':'Qualification Status (Manufacturers)',
-        'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-        'mfrdescription':'mfrdescription',
-        'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
         agile_data_filtered2=agile_data[agile_data['Number'].isin(KICK_JSJ["APN"].to_list())]
         # To database
@@ -630,40 +528,6 @@ def portfolio_creation(request,CM_loc='SGD'):
         portfolio2['Item Desc']=portfolio2['Agile Item Desc']
         del portfolio2['Agile Item Desc']
 
-        db_header2=[
-        "Number",
-        "Lifecycle_Phase",
-        "Rev",
-        "Mfr_Name",
-        "Mfr_Part_Lifecycle_Phase",
-        "Mfr_Part_Number",
-        "Qualification_Status",
-        "cm_Part_Number",
-        "Arista_Part_Number",
-        "Cust_consign",
-        "Parts_controlled_by",
-        "Item_Desc",
-        "LT",
-        "MOQ",
-        "Original_PO_Delivery_sent_by_Mexico",
-        "cm_Quantity_Buffer_On_Hand",
-        "cm_Quantity_On_Hand_CS_Inv",
-        "Open_PO_due_in_this_quarter",
-        "Open_PO_due_in_next_quarter",
-        "Delivery_Based_Total_OH_sum_OPO_this_quarter",
-        "PO_Based_Total_OH_sum_OPO",
-        "CQ_ARIS_FQ_sum_1_SANM_Demand",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
-        "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
-        "CQ_sum_3_ARIS_FQ_SANM_Demand",
-        "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
-        "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
-        "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
-        "Blended_AVG_PO_Receipt_Price",
-        "Ownership",
-        "Arista_PIC",
-        ]
 
         # portfolio2.set_axis(db_header2,axis=1,inplace=True)
         portfolio2.columns = db_header2
@@ -685,31 +549,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         agile_data=agile_data.filter(ampart__in=KICK_JMX["APN"].to_list()).to_dataframe()
         error_NotInagile_table=KICK_JMX[~KICK_JMX["APN"].isin(agile_data['ampart'])]
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-        'id':'id',
-        'ampart':'Number',
-        'ampart_rev':'Rev',
-        'ampart_lifecycle':'Lifecycle Phase',
-        'ampart_desc':'Agile Item Desc',
-        'mfr_name':'Mfr. Name (Manufacturers)',
-        'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-        'mfr_qualification_status':'Qualification Status (Manufacturers)',
-        'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-        'mfrdescription':'mfrdescription',
-        'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
         agile_data_filtered2=agile_data[agile_data['Number'].isin(KICK_JMX["APN"].to_list())]
         # To database
@@ -718,40 +558,6 @@ def portfolio_creation(request,CM_loc='SGD'):
         portfolio2['Item Desc']=portfolio2['Agile Item Desc']
         del portfolio2['Agile Item Desc']
 
-        db_header2=[
-        "Number",
-        "Lifecycle_Phase",
-        "Rev",
-        "Mfr_Name",
-        "Mfr_Part_Lifecycle_Phase",
-        "Mfr_Part_Number",
-        "Qualification_Status",
-        "cm_Part_Number",
-        "Arista_Part_Number",
-        "Cust_consign",
-        "Parts_controlled_by",
-        "Item_Desc",
-        "LT",
-        "MOQ",
-        "Original_PO_Delivery_sent_by_Mexico",
-        "cm_Quantity_Buffer_On_Hand",
-        "cm_Quantity_On_Hand_CS_Inv",
-        "Open_PO_due_in_this_quarter",
-        "Open_PO_due_in_next_quarter",
-        "Delivery_Based_Total_OH_sum_OPO_this_quarter",
-        "PO_Based_Total_OH_sum_OPO",
-        "CQ_ARIS_FQ_sum_1_SANM_Demand",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
-        "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
-        "CQ_sum_3_ARIS_FQ_SANM_Demand",
-        "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
-        "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
-        "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
-        "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
-        "Blended_AVG_PO_Receipt_Price",
-        "Ownership",
-        "Arista_PIC",
-        ]
             
         portfolio2.set_axis(db_header2,axis=1,inplace=True)
         portfolio2.loc[portfolio2[f"Arista_PIC"].astype(str).str.split('/').str[0].isin(gsm_Team),'Team' ]='GSM Team'
@@ -772,31 +578,7 @@ def portfolio_creation(request,CM_loc='SGD'):
         agile_data=agile_data.filter(ampart__in=KICK_HBG["APN"].to_list()).to_dataframe()
         error_NotInagile_table=KICK_HBG[~KICK_HBG["APN"].isin(agile_data['ampart'])]
         agile_data.drop_duplicates(subset=['ampart','mfr_name','mfr_part_number'],inplace=True)
-        agile_data.rename(columns={
-            'id':'id',
-            'ampart':'Number',
-            'ampart_rev':'Rev',
-            'ampart_lifecycle':'Lifecycle Phase',
-            'ampart_desc':'Agile Item Desc',
-            'mfr_name':'Mfr. Name (Manufacturers)',
-            'mfr_lifecycle_phase':'Mfr. Part Lifecycle Phase (Manufacturers)',
-            'mfr_qualification_status':'Qualification Status (Manufacturers)',
-            'mfr_part_number':'Mfr. Part Number (Manufacturers)',
-            'mfrdescription':'mfrdescription',
-            'updateddate':'updateddate',
-        },inplace=True)
-        agile_filter=[
-        'Number', #ampart
-        'Lifecycle Phase',#ampart_lifecycle
-        'Rev',#ampart_rev
-        'Agile Item Desc',#Agile Item Desc
-        'Mfr. Name (Manufacturers)',#mfr_name
-        'Mfr. Part Lifecycle Phase (Manufacturers)', #ampart_lifecycle
-        'Mfr. Part Number (Manufacturers)', #mfr_PARTNUMBER
-        'Qualification Status (Manufacturers)', #mfr_qualification_status
-        ]
-
-        agile_data=agile_data.filter(agile_filter)
+        agile_data = agile_data_rename(agile_data)
 
         agile_data_filtered2=agile_data[agile_data['Number'].isin(KICK_HBG["APN"].to_list())]
         # To database
@@ -805,40 +587,6 @@ def portfolio_creation(request,CM_loc='SGD'):
         portfolio2['Item Desc']=portfolio2['Agile Item Desc']
         del portfolio2['Agile Item Desc']
 
-        db_header2=[
-            "Number",
-            "Lifecycle_Phase",
-            "Rev",
-            "Mfr_Name",
-            "Mfr_Part_Lifecycle_Phase",
-            "Mfr_Part_Number",
-            "Qualification_Status",
-            "cm_Part_Number",
-            "Arista_Part_Number",
-            "Cust_consign",
-            "Parts_controlled_by",
-            "Item_Desc",
-            "LT",
-            "MOQ",
-            "Original_PO_Delivery_sent_by_Mexico",
-            "cm_Quantity_Buffer_On_Hand",
-            "cm_Quantity_On_Hand_CS_Inv",
-            "Open_PO_due_in_this_quarter",
-            "Open_PO_due_in_next_quarter",
-            "Delivery_Based_Total_OH_sum_OPO_this_quarter",
-            "PO_Based_Total_OH_sum_OPO",
-            "CQ_ARIS_FQ_sum_1_SANM_Demand",
-            "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
-            "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
-            "CQ_sum_3_ARIS_FQ_SANM_Demand",
-            "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
-            "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
-            "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
-            "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
-            "Blended_AVG_PO_Receipt_Price",
-            "Ownership",
-            "Arista_PIC",
-        ]
 
         portfolio2.set_axis(db_header2,axis=1,inplace=True)
         portfolio2.loc[portfolio2[f"Arista_PIC"].astype(str).str.split('/').str[0].isin(gsm_Team),'Team' ]='GSM Team'
@@ -1224,17 +972,18 @@ def portfolio_creation(request,CM_loc='SGD'):
 
     email_to.append(request.user.email)
     if email_to:
-        send_notification(request,user_to=None,to=email_to,user_from='MASTER PRICING AUTOMATION TOOL',
-                body=f'''
-                        Hello,
+        print("don't send mail")
+        # send_notification(request,user_to=None,to=email_to,user_from='MASTER PRICING AUTOMATION TOOL',
+        #         body=f'''
+        #                 Hello,
 
-                        Your {CM_loc} Portfolio page has been been refreshed in Arista Master Pricing Automation tool. 
+        #                 Your {CM_loc} Portfolio page has been been refreshed in Arista Master Pricing Automation tool. 
 
-                        Regards,
-                        MASTER PRICING AUTOMATION TOOL
+        #                 Regards,
+        #                 MASTER PRICING AUTOMATION TOOL
 
-                                        ''',
-                    subject=f'''Parts Added to Portfolio''',title=None,)
+        #                                 ''',
+        #             subject=f'''Parts Added to Portfolio''',title=None,)
     print(error_NotInagile_table,'error_NotInagile_table')
 
     if not (error_NotInagile_table.empty and error_while_saving.empty and undefined_parts.empty):
@@ -1252,27 +1001,27 @@ def portfolio_creation(request,CM_loc='SGD'):
                 writer.save()
 
                 file_MIME=b.getvalue()
+                print("don't send mail")
+                # send_notification(request,user_to=None,to_mail_id=[request.user.email],user_from='MASTER PRICING AUTOMATION TOOL',
+                # body=f'''
+                # Hello {request.user.first_name},
 
-                send_notification(request,user_to=None,to_mail_id=[request.user.email],user_from='MASTER PRICING AUTOMATION TOOL',
-                body=f'''
-                Hello {request.user.first_name},
-
-                Portfolio has been been refreshed for {total_count} part(s) Successfully with the inputfile,
-                Unloaded parts are attached as excel (if any)
-
-
-                <i>Note: Don't Reply to this mail</i>
-
-                Regards,
-                MASTER PRICING AUTOMATION TOOL
+                # Portfolio has been been refreshed for {total_count} part(s) Successfully with the inputfile,
+                # Unloaded parts are attached as excel (if any)
 
 
+                # <i>Note: Don't Reply to this mail</i>
 
-                ''',
-                subject=f'''
-                Unaccepted part(s) during portfolio refresh
-                ''',
-                title=None,Attach_file=['Portfolio Un-uploaded.xlsx',file_MIME])
+                # Regards,
+                # MASTER PRICING AUTOMATION TOOL
+
+
+
+                # ''',
+                # subject=f'''
+                # Unaccepted part(s) during portfolio refresh
+                # ''',
+                # title=None,Attach_file=['Portfolio Un-uploaded.xlsx',file_MIME])
     #### Auto quote raisser for CM
     part_list=[]
     for portfolio_cat in final_list:

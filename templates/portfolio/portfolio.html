@@ -44,6 +44,7 @@
                                     <div class="card-body pt-2 pb-4 px-4">                 
                                         <div class="d-flex flex-stack">
                                             <div class="text-gray-700 fw-semibold fs-6 me-2">RFQ Raised</div>
+                                            <span class="text-gray-400 mt-1 fw-semibold fs-6" id='select_count'></span>
                                             <div class="d-flex align-items-senter">
                                                 <span class="badge badge-light-dark" style="min-width: 120px;">
                                                     <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
@@ -122,15 +123,6 @@
                 </div>
                 <div class="d-flex m-3">
                     <div class="d-flex align-items-center flex-column w-100">
-                        <div class="d-flex justify-content-between fw-bold fs-6 text-white w-100 mt-auto mb-2">
-                            <button value="Global" class="table_regional_filter_tab btn btn-sm btn-light-info active font-small-1"> <i class="fa fa-globe"></i> Global</button>
-                            <button  value="Regional" class="table_regional_filter_tab btn btn-sm btn-light-info font-small-1"> <i class="fa fa-map-pin"></i> Regional</button>
-                        </div>
-                        <div class="d-flex justify-content-between fw-bold fs-8 w-100 mt-auto mb-2">
-                            <button value="all" class="table_filter_tab btn btn-sm btn-light-info active fs-8"> <i class="fa fa-group"></i> GSM</button>
-                            <button  value="his_parts" class="table_filter_tab btn btn-sm btn-light-info fs-8"> <i class="fa fa-user"></i> My Portfolio</button>
-                            <button  value="his_parts_offcycle" class="table_filter_tab btn btn-sm btn-light-info fs-8">  <i class="fa fa-database"></i> Non AVL Parts</button>
-                        </div>
 
                         <div class="col-12 mb-2">
                             {% if request.user.is_superuser or request.user|has_group:"BP JPE Manager"  or request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP HBG Manager"  %}
@@ -492,7 +484,17 @@
 
 <div class="card" id="main">
     <div class="card-header p-5">
-        <h4>Portfolio</h4>
+        <div id="table_regional_filter_tab_parent">
+            <button value="Global" id='Global' class="table_regional_filter_tab btn btn-sm btn-light-info active font-small-1 float-left"> <i class="fa-solid fa-globe"></i> Global</button>
+            <button  value="Regional" id="Regional"  class="table_regional_filter_tab btn btn-sm btn-light-info font-small-1 float-left"> <i class="fa fa-map-pin"></i> Regional</button>
+        </div>
+        <div class="card-toolbar">
+            <div class="btn-group" id="table_filter_tab_parent" role="group" aria-label="Basic example">
+                <button value="all" class="table_filter_tab btn btn-sm btn-light-info active fs-8"><i class="fa-solid fa-user-group"></i>GSM</button>
+                <button  value="his_parts" class="table_filter_tab btn btn-sm btn-light-info fs-8"> <i class="fa fa-user"></i> My Portfolio</button>
+                <button  value="his_parts_offcycle" class="table_filter_tab btn btn-sm btn-light-info fs-8">  <i class="fa fa-database"></i> Non AVL Parts</button>
+            </div> 
+        </div>
     </div>
     <div class="card-body p-5">
         <div class="table-responsive">

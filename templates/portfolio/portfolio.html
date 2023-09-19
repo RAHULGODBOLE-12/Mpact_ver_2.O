@@ -30,6 +30,7 @@
             <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-center border-2 h-md-100 mb-5 mb-xl-10" >
                 <div class="card-header pt-5">
                     <div class="card-title d-flex flex-column">
+                        {%rfq_raise_count request=request Team='GSM Team' as RFQ_data%}
                         <span class="card-title">RFQ Section</span>
                     </div>
                     <div class="card-toolbar">

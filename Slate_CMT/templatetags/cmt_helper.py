@@ -160,7 +160,7 @@ def has_permission(user,group=None):
                 return True
             else:return False
     elif group=='Manager':
-            if user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) or user in User.objects.filter(groups=Group.objects.get(name='GSM Manager')):
+            if user in User.objects.filter(groups=Group.objects.get(name='GSM Manager')):# user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) or user in User.objects.filter(groups=Group.objects.get(name='GSM Manager'))
                 return True
             else:return False
     elif group=='Contract Manufacturer' :
@@ -179,10 +179,10 @@ def has_permission(user,group=None):
         if group=='GSM Manager':
             if user in User.objects.filter(groups=Group.objects.get(name='GSM Manager')) :
                 return True
-        elif group=='CMM Manager':
-            if user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) :
-                return True
-            else:return False
+        # elif group=='CMM Manager':
+        #     if user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) :
+        #         return True
+        #     else:return False
         elif group=='BP Team':
             if user in User.objects.filter(groups=Group.objects.get(name='BP Team'))  or user in User.objects.filter(groups=Group.objects.get(name='BP Manager')):
                 return True
@@ -191,10 +191,10 @@ def has_permission(user,group=None):
             if  user in User.objects.filter(groups=Group.objects.get(name='BP Manager')) or user in User.objects.filter(groups=Group.objects.get(name='BP JPE Manager')) or user in User.objects.filter(groups=Group.objects.get(name='BP SGD Manager')) or user in User.objects.filter(groups=Group.objects.get(name='BP FGN Manager')) or user in User.objects.filter(groups=Group.objects.get(name='BP HBG Manager')):
                 return True
             else:return False
-        elif group.startswith('CMM'):
-            if user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) or user in User.objects.filter(groups=Group.objects.get(name='Iness')):
-                return True
-            else:return False
+        # elif group.startswith('CMM'):
+        #     if user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or user in User.objects.filter(groups=Group.objects.get(name='CMM Manager')) or user in User.objects.filter(groups=Group.objects.get(name='Iness')):
+        #         return True
+        #     else:return False
         elif group.startswith('GSM'):
             if user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or user in User.objects.filter(groups=Group.objects.get(name='GSM Manager')) or user in User.objects.filter(groups=Group.objects.get(name='Iness')):
                 return True

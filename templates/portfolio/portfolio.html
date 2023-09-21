@@ -32,9 +32,10 @@
                     <div class="card-title d-flex flex-column">
                         {%rfq_raise_count request=request Team='GSM Team' as RFQ_data%}
                         <span class="card-title">RFQ Section</span>
+                        <span class="text-gray-400 mt-1 fw-semibold fs-6" id='select_count'></span>
                     </div>
                     <div class="card-toolbar">
-                        <button id='send_rfq_button_main' class="btn btn-light-info btn-sm float-end" type="button" onclick="send_rfq_bulk()"><i class="fas fs-8 fa-paper-plane"></i> Send RFQ</button>
+                        <button id='send_rfq_button_main' class="btn btn-light-info btn-sm float-end" type="button" onclick="send_rfx_model_initial()"><i class="fas fs-8 fa-paper-plane"></i> Send RFQ</button>
                     </div>
                 </div>
                 <div class="card-body d-flex align-items-end pt-0">
@@ -45,7 +46,6 @@
                                     <div class="card-body pt-2 pb-4 px-4">                 
                                         <div class="d-flex flex-stack">
                                             <div class="text-gray-700 fw-semibold fs-6 me-2">RFQ Raised</div>
-                                            <span class="text-gray-400 mt-1 fw-semibold fs-6" id='select_count'></span>
                                             <div class="d-flex align-items-senter">
                                                 <span class="badge badge-light-dark" style="min-width: 120px;">
                                                     <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
@@ -127,12 +127,12 @@
 
                         <div class="col-12 mb-2">
                             {% if request.user.is_superuser or request.user|has_group:"BP JPE Manager"  or request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP HBG Manager"  %}
-                            <button type="button" class="btn btn-float btn-square btn-light-info" data-toggle="modal" data-target="#offcycle_excel_import"><i class='fa fa-plus font-medium-1'></i> <span class="font-small-2">Add Parts for Non-AVL</span> </button>
+                            <button type="button" class="btn btn-float btn-square btn-light-info fs-6" data-toggle="modal" data-target="#offcycle_excel_import"><i class='fa fa-plus font-medium-1'></i> <span class="font-small-2">Add Parts for Non-AVL</span> </button>
                             {% endif %}
                         </div>
 
                         <div class="col-12 mb-2">
-                            <button type="button" class="btn  btn-square btn-light-info width-300 mt-1" data-toggle="modal" data-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
+                            <button type="button" class="btn  btn-square btn-light-info width-300 mt-1 fs-6" data-toggle="modal" data-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
                         </div>
                     </div>    
                 </div>
@@ -156,13 +156,14 @@
                                         <div class="menu-item px-3"> <a  onclick="download_filtered_excel()"> <button type="button" class="btn btn-float btn-light-success mr-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export Filtered parts </span></button></a></div>
                                         <div class="menu-item px-3"><a href="{%url 'download_portfolio' 'portfolio_SS'%}"> <button type="button" class="btn btn-float btn-light-success mt-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export All</span></button> </a></div>
                                     </div>
-                                    <button class="btn btn-square btn-sm btn-light-info fs-8 width-100 m-1" onclick="$('#Portfolio_table').DataTable().draw()"><i class="fa fa-refresh font-small-1"></i><span class="font-small-1"> Refresh</span></button>
-                                    <button class="btn btn-square btn-sm btn-light-danger fs-8  width-100 m-1 float-left" onclick="window.location.reload()"> <i class="fa fa-remove font-small-1"></i><span class="font-small-1"> Clear Filters</span></button>
-                                    </div>
-                                <div class="d-flex justify-content-between fw-bold fs-8 w-100 mt-auto">
+                                    <!-- <button class="btn btn-square btn-sm btn-light-info fs-8 width-100 m-1" onclick="$('#Portfolio_table').DataTable().draw()"><i class="fa fa-refresh font-small-1"></i><span class="font-small-1"> Refresh</span></button> -->
+                                    <!-- <button class="btn btn-square btn-sm btn-light-danger fs-8  width-100 m-1 float-left" onclick="window.location.reload()"> <i class="fa fa-remove font-small-1"></i><span class="font-small-1"> Clear Filters</span></button> -->
                                     {% if request.user.username == 'superadmin'%}
                                     <button type="button" class="btn btn-square btn-sm btn-success mt-1 fs-8  px-3" onclick="agile_refresh()"><span class="font-small-1">Agile Refresh</span></button>
                                     {%endif%}
+                                    </div>
+                                <div class="d-flex justify-content-between fw-bold fs-8 w-100 mt-auto">
+                   
                                 </div>
                             </div>  
                         </div>
@@ -562,6 +563,7 @@
 </div>
 
 <!-- #####send RFX modal intial#### -->
+{% include 'portfolio/quote_modal_gsm.html' %}
 
 
 <div id='blockmessage' class='p-5' style="display: none;" >
@@ -1234,7 +1236,7 @@
                        return data;
                    }
                }, {
-                   'data':null,'className': 'dt-body-center  py-0',render:function (data){
+                   'data':null,'className': 'dt-body-center  ',render:function (data){
 
                    // {% if request.user|has_group:"BP JPE Manager,BP SGD Manager,BP FGN Manager,BP HBG Manager,BP JSJ Manager,BP JMX Manager" or request.user.is_superuser %}
                    if (data.cm!='Global'){
@@ -1254,7 +1256,7 @@
                }, {
                    "data": "Item_Desc"
                }, {
-                   'data':null,'className': 'dt-body-center  py-0',render:function (data){
+                   'data':null,'className': 'dt-body-center  ',render:function (data){
                    // {% if request.user|has_group:"BP JPE Manager,BP SGD Manager,BP FGN Manager,BP HBG Manager,BP JSJ Manager,BP JMX Manager" or request.user.is_superuser %}
                    value=`<input type='text' portfolio_id='${data.id}' field='Ownership' class='portfolio_field_editable text-muted m-0 bg-transparent border-transparent ' value='${data.Ownership==null ?'':data.Ownership}'>`
                    if (data.cm=='SGD'){
@@ -1292,7 +1294,7 @@
                        }
                } ,
                {
-                   'data':null,'className': 'dt-body-center  py-0',render:function (data){
+                   'data':null,'className': 'dt-body-center  ',render:function (data){
                    // {% if request.user|has_group:"BP JPE Manager,BP SGD Manager,BP FGN Manager,BP HBG Manager,BP JSJ Manager,BP JMX Manager" or request.user.is_superuser %}
                    value=`<input type='text' portfolio_id='${data.id}' field='Arista_PIC' class='portfolio_field_editable text-muted m-0 bg-transparent border-transparent ' value='${data.Arista_PIC==null ?'':data.Arista_PIC}'>`
                    if (data.cm!='Global'){
@@ -1342,7 +1344,7 @@
                }, {
                    "data": "Qualification_Status"
                }, {
-                   'data':null,'className': 'dt-body-center  py-0',render:function (data){
+                   'data':null,'className': 'dt-body-center  ',render:function (data){
                    // {% if request.user|has_group:"BP JPE Manager,BP SGD Manager,BP FGN Manager,BP HBG Manager,BP JSJ Manager,BP JMX Manager" or request.user.is_superuser %}
                    if (data.cm!='Global'){
                    value=`
@@ -1362,7 +1364,7 @@
                    return value
                        }
                }, {
-                   'data':null,'className': 'dt-body-center  py-0',render:function (data){
+                   'data':null,'className': 'dt-body-center  ',render:function (data){
                        if (data.cm!='Global'){
                    // {% if request.user|has_group:"BP JPE Manager,BP SGD Manager,BP FGN Manager,BP HBG Manager,BP JSJ Manager,BP JMX Manager" or request.user.is_superuser %}
                        value=`
@@ -1425,7 +1427,7 @@
                }, {
                    "data": "Blended_AVG_PO_Receipt_Price"
                },
-               {'data':null,'className': 'dt-body-center  py-0',render:function (data){
+               {'data':null,'className': 'dt-body-center  ',render:function (data){
                    if (data.Arista_PIC.includes('{{request.user.first_name}}')){
 
                        text= `<textarea rows="1" cols="30" portfolio_id='${data.id}' class='arista_pic_comment_text_box m-0 bg-transparent border-transparent blue' value='${data.Arista_pic_comment==null ?'':data.Arista_pic_comment}'>${data.Arista_pic_comment==null ?'':data.Arista_pic_comment}</textarea>`
@@ -1471,9 +1473,9 @@
                        }
                    return `
                    {% if request.user|has_group:"BP Manager" or request.user|has_group:"Super User" or request.user|has_group:"Iness" %}
-                   <span class='btn btn-sm btn-outline-success font-small-1x' onclick='agile_refresh(${data.id})'><i class=' fa fa-refresh'></i> Refresh APN</span>
+                   <span class='btn btn-sm btn-light-success fs-9 font-small-1x' onclick='agile_refresh(${data.id})'><i class=' fa fa-refresh'></i> Refresh APN</span>
                    {%endif%}
-                   <span class='btn btn-sm btn-outline-danger' onclick='delete_portfolio(${data.id},"${data.Number}","${data.Mfr_Part_Number}")'><i class=' fa fa-trash-o'></i></span>
+                   <span class='btn btn-sm btn-light-danger' onclick='delete_portfolio(${data.id},"${data.Number}","${data.Mfr_Part_Number}")'><i class=' fa fa-trash'></i></span>
                    `
                }
 
@@ -1755,50 +1757,106 @@
 
 </script>
 <script>
-function delete_portfolio(get_value) {
-   var id= get_value.getAttribute('line_id')
-   var value = get_value.getAttribute('value')
+     function delete_portfolio(portfolio_id,apn,mpn){
+        swal.fire({
 
-       Swal.fire({
-               title: `Are you sure ? `,
-               text: `Delete`,
-               icon: "error",
-               showCancelButton: true,
-               confirmButtonText: 'Delete',
-               cancelButtonText: `Cancel`,
-               })
-   .then((result) => {
-       if (result.isConfirmed) {
-           $.get("", {
-               id: id,value : value
-           }, function(data) {
-               if (data.status==200){
-               $('#Portfolio_table').DataTable().ajax.reload(null, false);
-               Swal.fire({
-                   icon: "success",
-                   title: 'Success!',
-                   text: "Deleted Successfully!",
-               });
-               location.reload()
-           }
-           else{
-                   Swal.fire({
-                       icon: 'error',
-                       title: 'Failed!',
-                       text: 'Failed!',
-               })
-               }
-           });
-       } 
-       else{
-           Swal.fire( {
-               icon: "error",
-               text:"Cancelled",
-           });
-       }
-   });
+                    buttons: {
+                        delete_apn: "Delete APN",
+                        delete_mpn: "Delete MPN",
+                        cancel: 'cancel',
+                      },
+                    text:`Are you Sure, this process will permanently delete the part APN:${apn}, MPN:${mpn}  from portfolio and Delete the RFQ(s) if raised`, 
+
+                    icon: 'warning'
+
+                })
+                .then((willDelete) => {
+                    if (willDelete=='delete_apn') {
+                        
+                        $.get("{%url 'portfolio' 'extras'%}", {
+                                    id: portfolio_id,
+                                    option: 'delete_portfolio',
+                                },
+                                function(data, status) {
+                                    if (data.status==200){
+                                        swal(data.message, {
+                                    icon: 'success'
+                                })
+
+                                    }
+                                    else {
+                                        swal(data.message, {
+                                    icon: 'error'
+                                })
+
+                                    }
+                                    $('#Portfolio_table').DataTable().draw(false)
+                                })
+                            .fail(function(xhr, status, error) {
+                                swal('Error Session time out, Refresh the page', {
+                                    icon: 'error'
+                                })
+                            });
+
+                        $('#Portfolio_table').DataTable().draw(false)
+
+                    }else if(willDelete=='delete_mpn'){
+                        $.get("{%url 'portfolio' 'extras'%}", {
+                                    id: portfolio_id,
+                                    option: 'delete_portfolio',
+                                    mpn_delete: true,
+                                },
+                                function(data, status) {
+                                    if (data.status==200){
+                                        swal(data.message, {
+                                    icon: 'success'
+                                })
+
+                                    }
+                                    else {
+                                        swal(data.message, {
+                                    icon: 'error'
+                                })
+
+                                    }
+                                    $('#Portfolio_table').DataTable().draw(false)
+                                })
+                            .fail(function(xhr, status, error) {
+                                swal('Error Session time out, Refresh the page', {
+                                    icon: 'error'
+                                })
+                            });
+
+                        $('#Portfolio_table').DataTable().draw(false)
 
 
-}
+                    } else {
+                        swal('Cancelled', {
+                            icon: 'error',
+                            timer: 1000
+                        })
+                    }
+                })
+    }
 </script>
+<script>
+    // Stepper lement
+    // Stepper lement
+    var element = document.querySelector("#kt_stepper_example_basic");
+    
+    // Initialize Stepper
+    var stepper = new KTStepper(element);
+    
+    // Handle next step
+    stepper.on("kt.stepper.next", function (stepper) {
+        stepper.goNext(); // go next step
+    });
+    
+    // Handle previous step
+    stepper.on("kt.stepper.previous", function (stepper) {
+        stepper.goPrevious(); // go previous step
+    });
+    </script>
+
+{% include 'portfolio/rfx.js'  with Team='GSM Team' %}
 {% endblock %}

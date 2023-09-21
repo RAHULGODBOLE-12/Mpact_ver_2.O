@@ -19,5 +19,8 @@ path('portfolio/download/<str:Team>',file_operations, name="download_portfolio_k
 path('render_portfolio/', render_portfolio, name="render_portfolio"),
 path('get_data/', get_data, name="get_data"),
 path('portfolio_action', portfolio_action, name="portfolio_action"),
+path('portfolio/send_rfx/',send_rfx_input,name='send_rfx'),
+path('portfolio/distributor_selection/',distributor_selection, name="distributor_selection"),
+
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

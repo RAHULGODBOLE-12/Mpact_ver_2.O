@@ -1,0 +1,301 @@
+
+<div class="col-xl-12">
+    <div class="modal fade" id="send_rfx_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-top modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h3 class=" font-medium-2"> Send RFQ For : <span class="text-bold-600" id='count_of_rfx'></span> MPN </h3>
+                
+    
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body" >
+
+               <!--begin::Stepper-->
+    <div class="stepper stepper-pills" id="kt_stepper_example_basic">
+        <!--begin::Nav-->
+        <div class="stepper-nav flex-center flex-wrap mb-10">
+            <!--begin::Step 1-->
+            <div class="stepper-item mx-8 my-4 current" data-kt-stepper-element="nav">
+                <!--begin::Wrapper-->
+                <div class="stepper-wrapper d-flex align-items-center">
+                    <!--begin::Icon-->
+                    <div class="stepper-icon w-40px h-40px">
+                        <i class="stepper-check fas fa-check"></i>
+                        <span class="stepper-number">1</span>
+                    </div>
+                    <!--end::Icon-->
+        
+                    <!--begin::Label-->
+                    <div class="stepper-label">
+                        <h3 class="stepper-title">
+    RFQ Initialization                    </h3>
+        
+                        <div class="stepper-desc">
+                           
+                        </div>
+                    </div>
+                    <!--end::Label-->
+                </div>
+                <!--end::Wrapper-->
+        
+                <!--begin::Line-->
+                <div class="stepper-line h-40px "></div>
+                <!--end::Line-->
+            </div>
+            <!--end::Step 1-->
+        
+            <!--begin::Step 2-->
+            
+            <!--end::Step 2-->
+        
+            <!--begin::Step 3-->
+            <div class="stepper-item mx-8 my-4" data-kt-stepper-element="nav">
+                <!--begin::Wrapper-->
+                <div class="stepper-wrapper d-flex align-items-center">
+                     <!--begin::Icon-->
+                    <div class="stepper-icon w-40px h-40px">
+                        <i class="stepper-check fas fa-check"></i>
+                        <span class="stepper-number">2</span>
+                    </div>
+                    <!--begin::Icon-->
+        
+                    <!--begin::Label-->
+                    <div class="stepper-label">
+                        <h3 class="stepper-title">
+                        Supplier Details
+                        </h3>
+        
+                        <div class="stepper-desc">
+                        </div>
+                    </div>
+                    <!--end::Label-->
+                </div>
+                <!--end::Wrapper-->
+        
+                <!--begin::Line-->
+                <div class="stepper-line h-40px "></div>
+                <!--end::Line-->
+            </div>
+            <!--end::Step 3-->
+        
+            <!--begin::Step 4-->
+            <div class="stepper-item mx-8 my-4" data-kt-stepper-element="nav">
+                <!--begin::Wrapper-->
+                <div class="stepper-wrapper d-flex align-items-center">
+                     <!--begin::Icon-->
+                    <div class="stepper-icon w-40px h-40px">
+                        <i class="stepper-check fas fa-check"></i>
+                        <span class="stepper-number">3</span>
+                    </div>
+                    <!--begin::Icon-->
+        
+                    <!--begin::Label-->
+                    <div class="stepper-label">
+                        <h3 class="stepper-title">
+    Distributor Selection</h3>
+        
+                        <div class="stepper-desc">
+                        </div>
+                    </div>
+                    <!--end::Label-->
+                </div>
+                <!--end::Wrapper-->
+        
+                <!--begin::Line-->
+                <div class="stepper-line h-40px"></div>
+                <!--end::Line-->
+            </div>
+            <!--end::Step 4-->
+        </div>
+        <!--end::Nav-->
+        
+            <!--begin::Form-->
+            <form class="form w-lg-800px mx-auto" id='send_rfx_form' action="{%url 'send_rfx'%}" method="POST" >
+                {%csrf_token%}
+                <!--begin::Group-->
+                <div class="mb-5">
+                    <!--begin::Step 1-->
+                    <div class="flex-column current" data-kt-stepper-element="content">
+                        <!--begin::Input group-->
+                        <fieldset style="max-height: 80vh;overflow: auto;min-height: 52vh">
+                            <div class="container">
+        
+                                <div class="row mr-100px">
+                                    <div class="col-6">
+                                        <label class="text-black " for='supplier'>Send To:</label>
+                                        <!-- <input type="hidden" value="supplier" name="To" id="supplier"> <input type="text" class="form-control select " disabled value="Supplier"> <br> -->
+                                        <input type="hidden" value="distributor" name="To" id="distributor">  <input type="text" class="form-control select " disabled value="Supplier/Distributor"><br>
+                                        
+                                        <label for="due_date"><i class="fa fa-calendar "></i> Due Date:</label>
+                                        <input type="date"  class="form-control"  id="due_date" min='2020-12-1' name="due_date" required>
+                                    </div>
+                                    
+        
+                        
+                                    <div class="col-3 pt-3 form skin skin-square font-medium-3">
+                                        <div class="form-group">
+                                    
+                                            <input type="checkbox" class="input checkbox mt-2 mb-0" name="this_quarter" id="this_quarter" value="True">
+                                            <label for="">Current Quarter RFQ</label>
+                                        </div>
+                                        <div class="form-group">
+                                    
+                                            <input id="next_quarter" type="checkbox" class="input checkbox mt-2 mb-0" name="next_quarter" value="True">
+                                            <label for="">Q+1 RFQ </label>
+                                        </div>
+                                        <div class="form-group">
+                                    
+                                            <input id='notification' type="checkbox" class="checkbox" name="notification" value='Enabled'>
+                                            <label for="notification"> Notify Supplier </label>
+                                        </div>
+                                    </div>
+        
+                                </div>
+                            </div>
+                        </fieldset>
+                       
+                    </div>
+                    <!--begin::Step 1-->
+        
+                    <!--begin::Step 1-->
+                    <div class="flex-column" data-kt-stepper-element="content">
+                        <fieldset style="min-height: 52vh">
+                            <div class="row">
+                                <div class="col-6">
+                                    <h4 class="font-medium-3 fs-6 ">Below Listed supplier are Disabled in the Supplier page</h4>
+                
+                                    <table class="table table-xs font-small-3 table-striped table-borderless"  id='disabled_supplier'>
+                                    </table>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="font-medium-3 fs-6 ">Below Listed supplier have no Contact details</h4>
+                
+                                    <table class="table table-xs font-small-3 table-striped table-borderless"  id='suppliers_non_exists'>
+                                    </table>
+                                </div>
+                            </div>
+                        </fieldset>
+        
+                      
+                    </div>
+                    <!--begin::Step 1-->
+        
+                    <!--begin::Step 1-->
+                    <div class="flex-column" data-kt-stepper-element="content">
+                        <!--begin::Input group-->
+                        <fieldset style="min-height: 52vh;max-height: 80vh;overflow: auto;">
+                            <div>
+                                <button id='send_rfq_button' class="btn btn-success btn-sm float-end" type="submit"><i class="fa fa-paper-plane"></i> Send RFQ</button>
+                            </div>
+                            <div id='send_rfq_message' ></div>
+                            <div class="row">
+                                <div  id='distributor_selection_container'></div>
+                            </div>
+                        </fieldset>
+                        
+                        <!--end::Input group-->
+        
+                        <!--begin::Input group-->
+                        
+                        <!--end::Input group-->
+                    </div>
+                    <!--begin::Step 1-->
+        
+                    <!--begin::Step 1-->
+                    <div class="flex-column" data-kt-stepper-element="content">
+                        <!--begin::Input group-->
+                        <div class="fv-row mb-10">
+                            <!--begin::Label-->
+                            <label class="form-label d-flex align-items-center">
+                                <span class="required">Input 1</span>
+                                <i class="fas fa-exclamation-circle ms-2 fs-7" data-bs-toggle="tooltip" title="Example tooltip"></i>
+                            </label>
+                            <!--end::Label-->
+        
+                            <!--begin::Input-->
+                            <input type="text" class="form-control form-control-solid" name="input1" placeholder="" value=""/>
+                            <!--end::Input-->
+                        </div>
+                        <!--end::Input group-->
+        
+                        <!--begin::Input group-->
+                        <div class="fv-row mb-10">
+                            <!--begin::Label-->
+                            <label class="form-label">
+                                Input 2
+                            </label>
+                            <!--end::Label-->
+        
+                            <!--begin::Input-->
+                            <input type="text" class="form-control form-control-solid" name="input2" placeholder="" value=""/>
+                            <!--end::Input-->
+                        </div>
+                        <!--end::Input group-->
+        
+                        <!--begin::Input group-->
+                        <div class="fv-row mb-10">
+                            <!--begin::Label-->
+                            <label class="form-label">
+                                Input 3
+                            </label>
+                            <!--end::Label-->
+        
+                            <!--begin::Input-->
+                            <input type="text" class="form-control form-control-solid" name="input3" placeholder="" value=""/>
+                            <!--end::Input-->
+                        </div>
+                        <!--end::Input group-->
+                    </div>
+                    <!--begin::Step 1-->
+                </div>
+                <!--end::Group-->
+        
+                <!--begin::Actions-->
+                <div class="d-flex flex-stack">
+                    <!--begin::Wrapper-->
+                    <div class="me-2">
+                        <button type="button" class="btn btn-light btn-active-light-primary" data-kt-stepper-action="previous">
+                            Back
+                        </button>
+                        
+                    </div>
+                    <!--end::Wrapper-->
+        
+                    <!--begin::Wrapper-->
+                    <div>
+                        <!-- <button type="button" class="btn btn-primary" data-kt-stepper-action="submit"> -->
+                            <!-- <span class="indicator-label">
+                                Submit
+                            </span> -->
+                            <span class="indicator-progress">
+                                Please wait... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                            </span>
+                        </button>
+                        <button type="button" class="btn btn-primary" data-kt-stepper-action="next">
+                            Continue
+                        </button>
+                    </div>
+                    <!--end::Wrapper-->
+                </div>
+                <!--end::Actions-->
+            </form>
+            <!--end::Form-->
+        </div>
+        <!--end::Stepper-->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                </div>
+          </div>
+        </div>
+    </div>
+</div>
+    
+    
+    
+      
+    

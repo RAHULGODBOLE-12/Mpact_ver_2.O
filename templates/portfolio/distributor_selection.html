@@ -1,0 +1,92 @@
+{%load static%}
+<script src="{% static 'js/icheck/icheck.min.js' %}"></script>
+<script src="{% static 'js/icheck/icheck.min.js' %}"></script>
+
+<script src="{% static 'js/icheck/checkbox-radio.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/icheck/icheck.css'%}">
+
+<span class="btn btn-info btn-sm"><i class="fa fa-check-circle"></i></span> - Check visible rows
+<span class="btn btn-danger btn-sm"><i class="fa fa-minus-circle"></i></span> - Uncheck visible rows
+<span>
+    <p class='py-1 info text-bold-700'>* RFQ will not be repeated multiple times for a distributor.</p>
+</span>
+
+{{data|safe}} 
+           
+
+<script>
+    $(document).ready(function(){
+        var table = $('#distributor_selection_table').DataTable(
+            {
+                'order':false,
+                paging:false,
+                bSort:false,
+
+
+            }
+        );
+        
+        $('.mfr_search').on( 'keyup onchange paste', function () {
+            console.log(this.value)
+                    table
+                    .columns( 1 )
+                    .search( this.value.trim() )
+                    .draw();
+            } );
+            $('.APN_search').on( 'keyup onchange paste', function () {
+                console.log(this.value)
+                    table
+                    .columns( 0 )
+                    .search( this.value.trim() )
+                    .draw();
+            } );
+            $('.CM_search').on( 'keyup onchange paste', function () {
+                console.log(this.value)
+                    table
+                    .columns( 2 )
+                    .search( this.value.trim() )
+                    .draw();
+            } );
+ 
+
+        // $('.checkedbox:button').toggle(function(){
+
+        $('.distributor_selection_checkbox').attr('checked','checked');
+        
+    // },function(){
+    //     $('.distributor_selection_checkbox').removeAttr('checked');
+        
+    // })
+    $(window).on('shown.bs.modal', function(e) {
+            $($.fn.dataTable.tables(true)).DataTable().columns.adjust().responsive.recalc();
+        });
+})
+
+function check_all_with_row(id,element,value){
+    if (value=='check'){
+        $('.'+element+'_cb').prop('checked',true)
+    }
+    else {
+        $('.'+element+'_cb').prop('checked',false)
+    }
+    
+}
+
+ 
+    
+</script>
+
+
+<style>
+   .distributor_selection_table_class th {
+  background:#e8eeff;
+  position: sticky;
+  z-index:3;
+  top: -2px; /* Don't forget this, required for the stickiness */
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.123);
+}
+.distributor_selection_table_class td {
+    text-align:center;
+}
+
+</style>

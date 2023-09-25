@@ -797,3 +797,181 @@ def portfolio_action(request):
         request.session['Check_box_portfolio']=check_box
         request.session.modified = True
         return JsonResponse({'status':200,'selected':len(request.session['Check_box_portfolio'])},safe=False)
+    
+
+
+@login_required
+def send_rfx_input(request):
+    '''
+    Type:Function
+    Arg:request
+    ####process#####:
+    1.POST:
+        This will receive the parts id(from session['Check_box_portfolio'] or  ) here we need to validate the parts is really their part based on the pic name and send them list of parts
+        to create_rfx func.
+    else:
+        returns the selected part count, supplier not exists and the disabled supplier for the selected parts
+        
+    '''
+    if request.method=='POST':
+        #print('request.POST')
+        To=request.POST.getlist('To')
+        
+        Quote_Type=request.POST.get('Quote_Type')
+        notification=True if request.POST.get('notification') else False
+        if request.user.is_superuser:
+            
+            current_part=list(Portfolio.objects.exclude(rfq_sent_flag_supplier='Quote Raised').filter(id__in=request.session['current_filtered_portfolio']).values_list('id',flat=True))
+
+        else:
+            current_part=list(Portfolio.objects.exclude(rfq_sent_flag_supplier='Quote Raised').filter(id__in=request.session['current_filtered_portfolio'],Arista_PIC__icontains=f"{request.user.first_name} {request.user.last_name}").values_list('id',flat=True))
+
+        selected_part=request.session['Check_box_portfolio']
+        selected_part=current_part if selected_part==[] else selected_part
+        this_quarter=request.POST.get('this_quarter')
+        next_quarter=request.POST.get('next_quarter')
+        this=True if this_quarter =='True' else False
+        if this_quarter and next_quarter:
+            this=get_Next_quarter(1,this_quarter=True)
+        elif this_quarter:
+            this=[Current_quarter()]
+        else:
+            this=get_Next_quarter(1)
+        #print(request.POST)
+        create_rfx(request,parts=selected_part,To=To,created_by=request.user,Quote_Type=Quote_Type,Arista_pic_comment='No comments yet' if request.POST.get('Arista_pic_comment')=='' else request.POST.get('Arista_pic_comment'),this=this,notification=notification )
+        request.session['Check_box_portfolio']=[]
+       
+        return JsonResponse({'message':'RFQ process is in Queue. We will inform you through email once it is completed','Quote_Type':Quote_Type,'to':To,'count':len(selected_part)})
+
+
+    else:
+        selected_part=len(request.session.get('Check_box_portfolio',[]))
+        Team=request.GET.get('Team')
+        print(Team,selected_part)
+        if request.user.is_superuser:
+            current_part=Portfolio.objects.exclude(rfq_sent_flag_supplier='Quote Raised').filter(id__in=request.session.get('Check_box_portfolio') or check_rfx_global(request.session['current_filtered_portfolio']))
+        else:
+            current_part=Portfolio.objects.exclude(rfq_sent_flag_supplier='Quote Raised').filter(id__in=request.session.get('Check_box_portfolio') or check_rfx_global(request.session['current_filtered_portfolio']),Arista_PIC__icontains=f"{request.user.first_name} {request.user.last_name}")
+        if request.user.is_superuser:
+            user_owner=User.objects.annotate(full_name=Concat('first_name', V(' '),'last_name')).filter(full_name__in=current_part.values_list('Arista_PIC',flat=True))
+            disabled_suppliers=suppliers_detail.objects.filter(Supplier_Name__in=current_part.values_list('Mfr_Name',flat=True)).filter(User_created__in=user_owner).filter(Q(user_model__is_active=False) | Q(is_active=False))
+        else:
+            disabled_suppliers=suppliers_detail.objects.filter(User_created=request.user,Supplier_Name__in=current_part.values_list('Mfr_Name',flat=True)).filter(Q(user_model__is_active=False) | Q(is_active=False))
+        all_suppliers=list(current_part.distinct('Mfr_Name').values_list('Mfr_Name',flat=True))
+        if request.user.is_superuser:
+            suppliers_non_exists=[x for x in all_suppliers if not suppliers_detail.objects.filter(User_created__in=user_owner,Supplier_Name__icontains=x).count()]
+        else:
+            suppliers_non_exists=[x for x in all_suppliers if not suppliers_detail.objects.filter(User_created=request.user,Supplier_Name__icontains=x).count()]
+        #print(suppliers_non_exists,"Test")
+        json_disabled_suppliers=list(disabled_suppliers.values('Supplier_Name','Contact','Email'))
+        selected_part=selected_part or current_part.count()
+
+        return JsonResponse({'count':selected_part,'disabled_supplier':json_disabled_suppliers,'suppliers_non_exists':suppliers_non_exists})
+    
+
+
+def distributor_selection(request):
+    '''
+    Type:Static Function
+    Arg:request
+    ####process#####:
+    This function will return a html string of the table.
+    we get the parts from request.session['current_filtered_portfolio'] or request.session['Check_box_portfolio']
+    and fetch the distributors based on the user and users supplier page.
+    Created a table with check box for the ditributor columns with the quote data.
+    |partnumber|dist1|dist2 |dist3 |
+    |asy-xxx-12|     |raised|      |
+    |asy-xxx-13|  o  |raised|raised|
+    |asy-xxx-14|  o  |   o  |raised|
+    The example shown above is the required output in UI
+    o=checkbox(selectable)
+    empty=Dist not found for that part
+    raised=Quote raised for the parts already
+
+    '''
+    Team=request.GET.get('Team','CMM Team')
+    #print(Team)
+    current_part=request.session['current_filtered_portfolio']
+    selected_part=request.session['Check_box_portfolio']
+    selected_part=current_part if selected_part==[] else selected_part
+    portfolio_data=Portfolio.objects.filter(id__in=check_rfx_global(selected_part),Quarter=Current_quarter())
+    if request.user.is_superuser:
+        user_owner=User.objects.annotate(full_name=Concat('first_name', V(' '),'last_name')).filter(full_name__in=portfolio_data.values_list('Arista_PIC',flat=True))
+        supplier_data=suppliers_detail.objects.filter(User_created__in=user_owner,is_active=True,user_model__is_active=True,Supplier_Name__in=portfolio_data.values_list('Mfr_Name',flat=True)).filter(Distributor__isnull=False).exclude(Distributor__exact='').distinct('Supplier_Name','Distributor').values('Supplier_Name','Distributor','Team').to_dataframe()
+    else:
+        supplier_data=suppliers_detail.objects.filter(User_created=request.user,is_active=True,user_model__is_active=True,Supplier_Name__in=portfolio_data.values_list('Mfr_Name',flat=True)).filter(Distributor__isnull=False).exclude(Distributor__exact='').distinct('Supplier_Name','Distributor').values('Supplier_Name','Distributor','Team').to_dataframe()
+    #print(supplier_data)
+
+    supplier_data['Distributor']=supplier_data['Distributor']
+    data=portfolio_data.values('Number','Mfr_Name','cm').to_dataframe()
+    
+    
+    data_dict=portfolio_data.values('Number','id','cm','Mfr_Name').to_dataframe().to_dict(orient='records')
+    # data_dict={x['Number']:x['id'] for x in data_dict}
+    
+    data_dict={f"{x['cm']}__{x['Number']}__{x['Mfr_Name']}":x['id'] for x in data_dict}
+    data=data.merge(supplier_data,right_on='Supplier_Name',left_on='Mfr_Name',how='inner')
+    
+    data.dropna(subset=['Distributor'],inplace=True)
+    data['value']=data['Distributor']
+    # print(data)
+    # print(data_dict,'data_dictdata_dictdata_dictdata_dictdata_dictdata_dict')
+    def get_cell(x):
+        '''returns a data for a hml table cell with html tags'''
+        Number=data.loc[x.index.values[0],'Number']
+        cm=data.loc[x.index.values[0],'cm']
+        Mfr_Name=data.loc[x.index.values[0],'Mfr_Name']
+        quote_stat=[]
+        Quote_details=find_partial_quote(Portfolio.objects.get(id=data_dict.get(f"{cm}__{Number}__{Mfr_Name}")),to_cal=True)
+        quote_stat=Quote_details['sent_dist']
+        quote_stat_q=Quote_details['sent_dist_q']
+        status=[]
+        # print(x,Number,cm,'sent_dist_qsent_dist_qsent_dist_q')
+        if not x.empty and  x.to_list()[0] in quote_stat:
+            # print(quote_stat,'quote_statquote_statquote_statquote_stat')
+            status.append('Raised for Q+1')
+        if not x.empty and  x.to_list()[0] in quote_stat_q:
+            status.append('Raised for Q ')
+        # cell=f""" <input style='width:100%' type='checkbox' checked='checked' class='distributor_selection_checkbox {x.to_list()[0].replace(' ','_')}_cb' id='{x.index.values[0]}'  value='{x.to_list()[0]}' name='{cm}__{Number}' /> """ if not x.empty and not x.to_list()[0] in quote_stat else ('Quote Raised' if not x.empty else '')
+        if len(status)>=2:
+            cell="""Raised for Q+1 and Q """
+        else:
+            cell='<br>'.join(status)+f""" <br><input style='width:100%' type='checkbox' checked='checked' class='distributor_selection_checkbox {x.to_list()[0].replace(' ','_')}_cb' id='{x.index.values[0]}'  value='{x.to_list()[0]}' name='{cm}__{Number}' /> """ 
+        
+        return cell
+    try:
+        data['unique']=data['Number']+'##########'+data['Mfr_Name']+'##########'+data['cm']
+        # data=pd.pivot_table(data,values='value',index=['unique'],columns=['Distributor'],aggfunc=lambda x:f""" <input style='width:100%' type='checkbox' checked='checked' class='distributor_selection_checkbox' id='{x.index.values[0]}'  value='{x.to_list()[0]}' name='{data.loc[x.index.values[0],'Number']}' />  <label for="{x.index.values[0]}">{x.to_list()[0]}</label>""" if not x.empty else '')
+        data=pd.pivot_table(data,values='value',index=['unique'],columns=['Distributor'],aggfunc=lambda x:get_cell(x))
+        data.columns = [''.join(col).strip() for col in data.columns.values]
+        data.columns=[f'''
+        {x}<br><button  type=button class='header_cb btn btn-sm btn-info' onclick="check_all_with_row(this,'{x.replace(' ','_')}','check')"><i class="fa fa-check-circle"></i></button>
+        <button  type=button class='header_cb btn btn-sm btn-danger' onclick="check_all_with_row(this,'{x.replace(' ','_')}','uncheck')"><i class="fa fa-minus-circle"></i></button>
+        ''' for x in data.columns]
+        data = data.reset_index()
+        data[f'''
+        <input type="text" class="form-control input CM_search " placeholder="Search CM Site" /> <br>
+        CM Site''']=data['unique'].str.split('##########').str[2]
+        data[f'''
+        <input type="text" class="form-control input mfr_search " placeholder="Search MFR" /> <br>
+        Mfr Name''']=data['unique'].str.split('##########').str[1]
+        data[f'''
+        <input type="text" class="form-control input APN_search " placeholder="Search Part" /> <br>
+        APN''']=data['unique'].str.split('##########').str[0]
+        del data['unique']
+        data=data.filter(data.columns.to_list()[::-1])
+        data.fillna('-',inplace=True)
+
+        data=data.to_html(
+            index=False,
+            escape=False,
+            table_id='distributor_selection_table',
+            border=0,
+            classes='table table-xs font-small-3 table-striped table-borderless distributor_selection_table_class',
+            justify='center')
+    except Exception as e:
+        tb_str = ''.join(traceback.format_exception(None, e, e.__traceback__))
+        #print(tb_str)
+        data='<h2>No Distributor found for the selected Parts<h2>'
+    #print(data)
+    return render(request,'portfolio/distributor_selection.html',{'data':data})

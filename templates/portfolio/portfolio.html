@@ -675,6 +675,32 @@
 {% block scripts %}
 <script src="{% static 'plugins/custom/formrepeater/formrepeater.bundle.js' %}"></script>
 <script>
+    function download_filtered_excel() {
+        $('#download_flag').val("true");
+        $('#Portfolio_table').DataTable().draw(false);
+    }
+    function agile_refresh(id=null) {
+        var formData = new FormData();
+        formData.append('porfolio_id',id)
+        formData.append('csrfmiddlewaretoken','{{csrf_token}}')
+        $.ajax({
+            url: "{%url 'agile_refresh'%}",
+            type: 'POST',
+           
+            data: formData,
+            success: function(data) {
+                swal(data.message, {
+                        icon: "success",
+                        timer: 2500
+                    });
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+</script>
+<script>
     $("#newrow").click(function() {
         var n = $('#advance_filter_tr').html();
         $('#advance_filter_table').append('<tr class="search_select">' + n + '</tr>');
@@ -1527,7 +1553,21 @@
            "drawCallback": function(settings) {
 
                checkbox(0)
-
+               if ($('#download_flag').val() == "true") {
+                Swal.fire({
+                    title: `Downloading filtered excel `,
+                    icon: "success",
+                    buttons: false,
+                    timer: 1000
+                })
+                    $('#download_flag').val("false")
+                    var a = document.createElement('a');
+                    a.href = "{%url 'download_portfolio' 'filtered_portfolio'%}";
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    $('#Portfolio_table').DataTable().draw()
+                }
 
                if ($("#check_box_all_flag").val() === 'true' || $("#check_box_all_flag").val() === 'false') {
                    $("#check_box_all_flag").val('no_filter')

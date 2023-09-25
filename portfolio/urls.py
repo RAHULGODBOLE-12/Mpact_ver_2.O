@@ -11,7 +11,7 @@ urlpatterns = [
 
 path('portfolio/<str:team>',portfolio,name='portfolio'),
 path('portfolio/json/', login_required(json_for_table.Portfolio_data.as_view()), name="Portfolio_data"),
-path('top_component/download/<str:file>', file_operations, name="download_portfolio"),
+path('top_component/download/<str:file>', download_portfolio, name="download_portfolio"),
 path('portfolio/agile_refresh/',file_operations, name="agile_refresh"),
 path('portfolio/filter/advancefilter/<str:Team>/<str:section>/<str:field>/',advance_filter,name='advance_filter'),
 path('file_operations/<str:operation>/', file_operations, name="portfolio_file_operations"),

@@ -490,6 +490,70 @@ column_names_portfolio={
         "Parts_controlled_by":"Parts Controlled by",
         "rfq_sent_flag_supplier":"RFQ Sent Status",
     }
+
+@login_required
+def download_portfolio(request,file='',mail=False):
+    '''
+    Type:Static Function
+    Arg:request,date(o),Contract Manufacturer location
+    ####process#####:
+    1.This will return all data from portfolio as excel based on the request.user based on the file and permission
+    2.elif file =='filtered_portfolio':
+        This will return the excel file of portfolio which is filtered from session['current_filtered_portfolio'] id(s).
+    3.Other files:
+        This will return based on the team and permission
+            portfolio_CMM=CMM_Team
+            portfolio_SS=GSM_Team
+        
+    '''
+    Quarter=request.GET.get('Quarter',Current_quarter())
+    fields=[k for k,v in column_names_portfolio.items()]
+    alias=[v for k,v in column_names_portfolio.items()]
+    # alias=["Global/Regional","CM Part Number","Arista Part Number","Item Description","Ownership","Arista PIC",'Commodity Name',"Arista Lifecycle phase","Revision","Manufacturer Name","Manufacturer Lifecycle phase","Manufacturer Part Number","Arista Qualification status","Cust Consigned","PO / Delivery","CM Quantity Buffer On Hand","CM Quantity On Hand + CS Inv","Current Quarter","Open PO Due (Current Quarter)","Open PO Due  (Q+1)","Total OH + OPO (Current Quarter)","Total OH +OPO  (Q+1)", "Current Quarter Demand", "Q+1 Demand", "Q+2 Demand", "Q+3 Demand", "Delta = OH and OPO - DD", "Current Quarter Std cost","Sanmina Blended Avg PO Receipt Price ($)","Team",'Arista PIC comment to Suppliers',"Parts Controlled by","RFQ sent to suppliers", "RFQ sent to CM", "RFQ sent to Distributor"]
+    if file =='SS_Report' and has_permission(request.user,'GSM'):
+        return send_download_response(request,path=f"Reports/{get_Next_quarter()[0]} Sourcing Team Global demand.xlsx")
+    elif file =='CMM_Report' and has_permission(request.user,'CMM'):
+        return send_download_response(request,path=f"Reports/{get_Next_quarter()[0]} Operational Team Global demand.xlsx")
+
+    elif file =='filtered_portfolio':
+        df=Portfolio.objects.filter(id__in=request.session['current_filtered_portfolio']).values(*fields).order_by('Number').to_dataframe()
+        with BytesIO() as b:
+            with pd.ExcelWriter(b) as writer:
+                df.to_excel(writer,index=False,header=alias,columns=fields,sheet_name=f'{get_Next_quarter()[0]} Portfolio (filtered)')
+                writer.close()
+                response= HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'inline; filename={get_Next_quarter()[0]} Portfolio Filtered.xlsx'
+                return response
+
+    elif file=='portfolio_CMM' and (has_permission(request.user,'CMM') or has_permission(request.user,'BP Team')):
+
+        df=Portfolio.objects.filter(Quarter=Quarter).filter(Team='CMM Team').exclude(cm='Global').order_by('Number').values(*fields).to_dataframe()
+        # df.drop(['Number','LT','MOQ','CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD','Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1','bp_comment'],axis=1,inplace=True)
+
+        with BytesIO() as b:
+            with pd.ExcelWriter(b) as writer:
+                df.to_excel(writer,index=False,header=alias,columns=fields)
+                writer.close()
+                if mail:
+                    return b.getvalue(),f'{get_Next_quarter()[0]} Portfolio  CMM Team.xlsx'
+                response= HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'inline; filename={get_Next_quarter()[0]} Portfolio  CMM Team.xlsx'
+                return response
+
+    elif file=='portfolio_SS' and (has_permission(request.user,'GSM') or has_permission(request.user,'BP Team') ):
+        df=Portfolio.objects.filter(Quarter=Quarter).filter(Team='GSM Team').order_by('Number').values(*fields).to_dataframe()
+        with BytesIO() as b:
+            with pd.ExcelWriter(b) as writer:
+                df.to_excel(writer,index=False,header=alias,columns=fields)
+                writer.close()
+                if mail:
+                    return b.getvalue(),f'{get_Next_quarter()[0]} Portfolio  GSM Team.xlsx'
+                response= HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'inline; filename={get_Next_quarter()[0]} Portfolio  GSM Team.xlsx'
+                return response
+    else:
+        raise Http404
+
 @login_required
 def file_operations(request,operation):
     '''

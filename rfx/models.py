@@ -231,7 +231,7 @@ class RFX(models.Model):
                 self.std_cost=float(self.std_cost)
             except:
                 self.std_cost=None
-        from CMT import masterprice_helper
+        from Slate_CMT.templatetags import masterprice_helper
         if self.portfolio.Ownership=='Arista':
             '''for Customer part we make some calculation for po_delivery based on the count of po and delivery
              If count of delivery is greater than deivery than delivery will be returned else PO
@@ -256,3 +256,131 @@ class RFX(models.Model):
             if not (old_data==new_data and old_data['Quote_status']=='Non Quoted'):
                 data_old,data_new=compare_values_dict(old_data,new_data)
                 create_history(model_name='RFX',model_id=data,data_dict=str(old_data),comment=f'Changed values :{data_new}',user=user)
+
+
+
+class send_fx_queue_logger(models.Model):
+    to_create_count=models.IntegerField(null=True)
+    Created_count=models.IntegerField(null=True)
+    created_by=models.ForeignKey(User,on_delete=models.SET_NULL,null=True)
+    created_on=models.DateTimeField(auto_now=True)
+    modified_on=models.DateTimeField(auto_now_add=True)
+    error=models.TextField(max_length=1000,default='No Error')
+    def __str__(self):
+        return f'''to_create_count: {self.to_create_count}   Created_count: {self.Created_count}   created_by: {self.created_by} Error: {False if self.error == 'No Error' else True }'''
+
+
+def create_history(model_name=None,model_id=None,key=None,data_dict=None,value=None,comment=None,user=None):
+    '''This will create the history of the rfx based on the data dict'''
+    if model_name=='RFX':
+        instance=Master_history_rfx(model_id=model_id,data_dict=data_dict,comment=comment,modified_by=user)
+        instance.save()
+        return instance
+
+class Master_history_rfx(models.Model):
+    '''This table stores all the changes which made in RFX Table'''
+    model_id=models.ForeignKey(RFX,on_delete=models.CASCADE,null=True)
+    key=models.CharField(max_length=255,null=False)
+    value=models.CharField(max_length=255,null=False)
+    data_dict=models.TextField(null=False)
+    def _convert_to_dict(self):
+        return eval(self.data_dict)
+    data_dict_as_dict = property(_convert_to_dict)
+    comment=models.TextField(null=False)
+    modified_by=models.ForeignKey(User,on_delete=models.SET_NULL,null=True,editable=False)
+    modified_by_email=models.EmailField(null=True)
+    modified_on=models.DateTimeField(auto_now=True,null=False)  
+
+    def save(self,user=None, *args, **kwargs):
+        if not user==None:
+            self.modified_by=user
+            self.modified_by_email=user.email
+        super(Master_history_rfx, self).save(*args, **kwargs) 
+
+class LockAccessEmailNotification(models.Model):
+    """
+    This model stores email notified data
+    """
+    Arista_Part_Number = models.CharField(max_length=255,default=None,null=True)
+    Mfr_Part_Number = models.CharField(max_length=255,null=True)
+    Mfr_Name = models.CharField(max_length=255,default=None,null=True)
+    Arista_PIC = models.CharField(max_length=255,default=None,null=True)
+    team = models.CharField(max_length=255,default=None,null=True)
+    cm  = models.CharField(max_length=50, null=True,default=None)
+    sent_to = models.CharField(max_length=255,default=None,null=True)
+    lock_status = models.BooleanField(default=False,null=True)
+    status_updated_by = models.TextField(default=None,null=True)
+    created_at = models.TextField(default=None,null=True)
+    is_email_sent = models.BooleanField(default=False,null=True)
+    to = models.TextField(default=None,null=True)
+    supplier_email = models.TextField(default=None,null=True)
+    sgd_cm_email = models.TextField(default=None,null=True)
+    jpe_cm_email = models.TextField(default=None,null=True)
+    fgn_cm_email = models.TextField(default=None,null=True)
+    hbg_cm_email = models.TextField(default=None,null=True)
+    jsj_cm_email = models.TextField(default=None,null=True)
+    jmx_cm_email = models.TextField(default=None,null=True)
+    rfx_id = models.CharField(max_length=255,default=None,null=True)
+    current_url  = models.CharField(max_length=255,default=None,null=True)
+    logged_in_user_group  = models.CharField(max_length=255, null=True,default=None)
+    
+    
+
+class RfqCountData(models.Model):
+    """
+    This model stores email notified data
+    """
+    Arista_Part_Number = models.CharField(max_length=255,default=None,null=True)
+    Mfr_Part_Number = models.CharField(max_length=255,null=True)
+    Mfr_Name = models.CharField(max_length=255,default=None,null=True)
+    Arista_PIC = models.CharField(max_length=255,default=None,null=True)
+    team = models.CharField(max_length=255,default=None,null=True)
+    Total_ARISTA_Part_Count  = models.CharField(max_length=255, null=True,default=None)
+    Total_Part_Count = models.CharField(max_length=255,default=None,null=True)
+    RFQ_Initiated = models.CharField(max_length=255,default=None,null=True)
+    RFQ_NOT_Initiated = models.CharField(max_length=255,default=None,null=True)
+    Quoted = models.CharField(max_length=255,default=None,null=True)
+    Non_Quoted = models.CharField(max_length=255,default=None,null=True)
+    No_BID = models.CharField(max_length=255,default=None,null=True)
+    Locked = models.CharField(max_length=255,default=None,null=True)
+    Unlocked = models.CharField(max_length=255,default=None,null=True)
+    Award_Set = models.CharField(max_length=255,default=None,null=True)
+    commodity = models.CharField(max_length=255,default=None,null=True)
+    Not_To_Award = models.CharField(max_length=255,default=None,null=True)
+    dtmLastUpdate = models.DateTimeField(auto_now=True,null=False)  
+    LastUpdatedBy = models.CharField(max_length=255,default=None,null=True)
+    Chart_Name = models.CharField(max_length=255,default=None,null=True)
+    Remarks = models.TextField(default=None,null=True)
+    DevRemarks = models.TextField(default=None,null=True)
+    Deleted = models.CharField(max_length=255,default=None,null=True)
+
+
+class predefined_filter(models.Model):
+    'predefined_filter table is to store the filter excel which the user save as predefined'
+    name=models.CharField(max_length=255,null=True)
+    data=models.TextField(default='No Error')
+    created_by=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
+
+class CM_Quotes(models.Model):
+    """
+    This model stores CMM Team Quotes Details
+    """
+    rfq_id=models.CharField(max_length=255,default=None,null=True)
+    Item_Price=models.FloatField(null=True)
+    Lead_Time=models.IntegerField(null=True)
+    MOQ=models.IntegerField(null=True)
+    List=models.CharField(max_length=255,null=True,default=' ')
+    tarrif=models.CharField(max_length=255,null=True,default=' ')
+    NCNR=models.CharField(max_length=255,null=True,default='-')
+    PO_Delivery=models.CharField(max_length=255,null=True)
+    suggested_split=models.FloatField(null=True)
+    arista_suggested=models.FloatField(null=True)
+    manual_split=models.FloatField(null=True)
+    std_cost=models.FloatField(null=True)
+    CM_comments=models.TextField(null=True,default=' ')
+    arista_comments=models.TextField(null=True,default='')
+    Supplier_Distributor_name_from_cm=models.TextField(null=True)
+    CM_Manufacturer=models.TextField(null=True)
+    CM_mpn=models.TextField(null=True)
+    split_type=models.CharField(max_length=255,null=True,default='Automated')
+    Quote_status=models.CharField(max_length=255,null=True,default='Non Quoted')

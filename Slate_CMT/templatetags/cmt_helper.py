@@ -22,6 +22,7 @@ import random
 import string
 from portfolio.models import *
 import threading
+from Slate_CMT.models import *
 
 from portfolio.models import *
 import os
@@ -47,7 +48,7 @@ from django.db.models import Sum
 
 register = template.Library()
 # print(settings.PRODUCTION)
-# production=settings.PRODUCTION
+production=settings.PRODUCTION
 stage='arista-mpat.sandbox.inesssolutions.net'
 @register.simple_tag
 def Current_quarter(monthAsInt=int(date.today().strftime("%m"))):
@@ -411,10 +412,10 @@ Here is the file
     if base_url==production or base_url==stage :
         to_mail=request.user.email
     else:
-        to_mail='srinithin@inesssolutions.com'
+        to_mail='rahul@inesssolutions.com'
     try:send_push_notification(request.user, subject=subject, text=strip_tags(html), url=f"http://{base_url}{path}")
     except:pass
-    status=send_mail(subject=subject,message=body,html_message=html,from_email='iness@gmail.com',recipient_list=[to_mail,'srinithins@arista.com'])
+    status=send_mail(subject=subject,message=body,html_message=html,from_email='iness@gmail.com',recipient_list=[to_mail,'rahul@inesssolutions.com'])
     print(status)
 @multi_threading
 def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=None,body='',subject='',title=None,from_name='',Attach_file=None,**extra):
@@ -422,7 +423,6 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
     subject=subject.strip()
     title=title or subject.replace('\n','')
     base_url=get_current_site(request).domain
-    print(base_url,production)
 
     if base_url==production:
         message = render_to_string('email/genric_template.html',{'title':title.replace('\n','<br>'),'body':body.replace('\n','<br>'),'base_url':base_url})
@@ -481,18 +481,18 @@ def send_notification(request,user_to=None,to_mail_id=None,to=None,user_from=Non
             
             try:
                 mail_sent_by = request.user.first_name+" "+request.user.last_name
-                email_data = DataToHandleMailing(
-                        mail_status = 'Outbox',
-                        message_id = msg.extra_headers['Message-ID'],
-                        from_address = settings.EMAIL_HOST_USER,
-                        to_address = ['srinithin@inesssolutions.com'],
-                        cc_address = ['skarthick@inesssolutions.com'],
-                        mail_subject = subject,
-                        mail_content = message,
-                        mail_triggered_by = mail_sent_by
-                        )
-                print("mail_sent_by:", mail_sent_by)
-                email_data.save()
+                # email_data = DataToHandleMailing(
+                #         mail_status = 'Outbox',
+                #         message_id = msg.extra_headers['Message-ID'],
+                #         from_address = settings.EMAIL_HOST_USER,
+                #         to_address = ['srinithin@inesssolutions.com'],
+                #         cc_address = ['skarthick@inesssolutions.com'],
+                #         mail_subject = subject,
+                #         mail_content = message,
+                #         mail_triggered_by = mail_sent_by
+                #         )
+                # print("mail_sent_by:", mail_sent_by)
+                # email_data.save()
             except Exception as e:
                 print(e)
             if not status:
@@ -534,7 +534,7 @@ def send_push_notification(user,subject='You Have notifcation',text='No text',ur
     )
     instance.save()
     payload = {'head': 'Master Pricing Tool', 'body': subject, 'url': url}
-    send_user_notification(user, payload=payload, ttl=1000)
+    # send_user_notification(user, payload=payload, ttl=1000)
     return True
 
 @multi_threading

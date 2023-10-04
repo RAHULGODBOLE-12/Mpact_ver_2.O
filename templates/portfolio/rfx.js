@@ -145,14 +145,14 @@
                 data: formData, // serializes the form's elements.
                 success: function(data) {
                     $("#send_rfx_modal").modal('hide');
-                    swal(data.message, {
+                    swal.fire(data.message, {
                         icon: 'success',
                     })
                     
                     $('#Portfolio_table').DataTable().draw()
                 },
                 error: function(exception) {
-                    swal('Error session Time Out refresh the page', {
+                    swal.fire('Error session Time Out refresh the page', {
                         icon: 'error',
                         button: true,
                     })
@@ -163,7 +163,7 @@
             });
 
                 } else {
-                    swal("Cancelled", {
+                    swal.fire("Cancelled", {
                         timer: 1000
                     });
                 }

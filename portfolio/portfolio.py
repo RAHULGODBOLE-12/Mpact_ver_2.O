@@ -25,7 +25,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db.models import Value as V
 from django.db.models.functions import Concat   
-
+from rfx.views import *
 
 
 def agile_data_rename(agile_data):
@@ -1035,6 +1035,6 @@ def portfolio_creation(request,CM_loc='SGD'):
     ids6=list(Portfolio.objects.filter(Arista_Part_Number__in=part_list,Quarter=Current_quarter()).exclude(cm='Global').filter(Team='CMM Team').filter(cm='JMX').distinct('Arista_Part_Number').values_list('id',flat=True))
 
     ids=ids+ids2+ids3+ids4+ids5+ids6
-    # create_rfx(request,parts=ids,To=['cm'],created_by=request.user,Arista_pic_comment='')
+    create_rfx(request,parts=ids,To=['cm'],created_by=request.user,Arista_pic_comment='')
     auto_clean_rfx_cm()
     return part_list

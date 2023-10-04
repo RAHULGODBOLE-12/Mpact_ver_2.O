@@ -176,9 +176,9 @@
                 <div class="card-header">
                     <h3 class="card-title">Master Search</h3>
                     <div class="card-toolbar">
-                        <button class="btn btn-sm btn-link px-2" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="false" aria-controls="kt_accordion_1_body_1">
+                      <a href="#kt_accordion_1">  <button class="btn btn-sm btn-link px-2" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="false" aria-controls="kt_accordion_1_body_1">
                             Advance Filter <i class="fas fa-circle-chevron-down"></i>
-                        </button>
+                        </button></a>
                     </div>
                 </div>
                 <div class="card-body py-8 px-3">
@@ -263,7 +263,6 @@
                                             <li><input type="checkbox" class="toggle-vis" checked data-column="CQ_sum_3_ARIS_FQ_SANM_Demand">{{columns_name|dict_key:"CQ_sum_3_ARIS_FQ_SANM_Demand"}}</input>
                                             </li>
                                             <li><input type="checkbox" class="toggle-vis" checked data-column="Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista">{{columns_name|dict_key:"Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista"}}</input>
-                                            </li>
                                             </li>
                                             <li><input type="checkbox" class="toggle-vis" checked data-column="sgd_jpe_cost">{{columns_name|dict_key:"sgd_jpe_cost"}}</input>
                                             </li>
@@ -567,7 +566,7 @@
 
 
 <div id='blockmessage' class='p-5' style="display: none;" >
-    <span class='ft-loader icon-spin font-large-2 text-center col-12'></span>
+    <span class='fas fa-spinner fa-spin-pulse fa-spin-reverse fs-3x text-center col-12 mb-4' style="color: rgb(240, 225, 164);"></span>
     <div class="semibold text-center">The portfolio is loading. <br>We will notify you when it is ready,Please Refresh the page after page is ready.</div>
     </div>
 <style>
@@ -1796,88 +1795,89 @@
    
 
 </script>
+
 <script>
-     function delete_portfolio(portfolio_id,apn,mpn){
-        swal.fire({
+    function delete_portfolio(portfolio_id,apn,mpn){
+       swal.fire({
+                   showDenyButton: true,
+                   showCancelButton: true,
+                   confirmButtonText: 'Delete APN',
+                   denyButtonText: ` Delete MPN`,
+                   cancelButtonText: `Cancel`,
+                   
+                   text:`Are you Sure, this process will permanently delete the part APN:${apn}, MPN:${mpn}  from portfolio and Delete the RFQ(s) if raised`, 
 
-                    buttons: {
-                        delete_apn: "Delete APN",
-                        delete_mpn: "Delete MPN",
-                        cancel: 'cancel',
-                      },
-                    text:`Are you Sure, this process will permanently delete the part APN:${apn}, MPN:${mpn}  from portfolio and Delete the RFQ(s) if raised`, 
+                   icon: 'warning'
 
-                    icon: 'warning'
+               })
+               .then((result) => {
+                   if (result.isConfirmed) {
+                       
+                       $.get("{%url 'portfolio' 'extras'%}", {
+                                   id: portfolio_id,
+                                   option: 'delete_portfolio',
+                               },
+                               function(data, status) {
+                                   if (data.status==200){
+                                       swal.fire(data.message, {
+                                   icon: 'success'
+                               })
 
-                })
-                .then((willDelete) => {
-                    if (willDelete=='delete_apn') {
-                        
-                        $.get("{%url 'portfolio' 'extras'%}", {
-                                    id: portfolio_id,
-                                    option: 'delete_portfolio',
-                                },
-                                function(data, status) {
-                                    if (data.status==200){
-                                        swal(data.message, {
-                                    icon: 'success'
-                                })
+                                   }
+                                   else {
+                                       swal.fire(data.message, {
+                                   icon: 'error'
+                               })
 
-                                    }
-                                    else {
-                                        swal(data.message, {
-                                    icon: 'error'
-                                })
+                                   }
+                                   $('#Portfolio_table').DataTable().draw(false)
+                               })
+                           .fail(function(xhr, status, error) {
+                               swal.fire('Error Session time out, Refresh the page', {
+                                   icon: 'error'
+                               })
+                           });
 
-                                    }
-                                    $('#Portfolio_table').DataTable().draw(false)
-                                })
-                            .fail(function(xhr, status, error) {
-                                swal('Error Session time out, Refresh the page', {
-                                    icon: 'error'
-                                })
-                            });
+                       $('#Portfolio_table').DataTable().draw(false)
 
-                        $('#Portfolio_table').DataTable().draw(false)
+                   }else if(result.isDenied){
+                       $.get("{%url 'portfolio' 'extras'%}", {
+                                   id: portfolio_id,
+                                   option: 'delete_portfolio',
+                                   mpn_delete: true,
+                               },
+                               function(data, status) {
+                                   if (data.status==200){
+                                       swal.fire(data.message, {
+                                   icon: 'success'
+                               })
 
-                    }else if(willDelete=='delete_mpn'){
-                        $.get("{%url 'portfolio' 'extras'%}", {
-                                    id: portfolio_id,
-                                    option: 'delete_portfolio',
-                                    mpn_delete: true,
-                                },
-                                function(data, status) {
-                                    if (data.status==200){
-                                        swal(data.message, {
-                                    icon: 'success'
-                                })
+                                   }
+                                   else {
+                                       swal.fire(data.message, {
+                                   icon: 'error'
+                               })
 
-                                    }
-                                    else {
-                                        swal(data.message, {
-                                    icon: 'error'
-                                })
+                                   }
+                                   $('#Portfolio_table').DataTable().draw(false)
+                               })
+                           .fail(function(xhr, status, error) {
+                               swal.fire('Error Session time out, Refresh the page', {
+                                   icon: 'error'
+                               })
+                           });
 
-                                    }
-                                    $('#Portfolio_table').DataTable().draw(false)
-                                })
-                            .fail(function(xhr, status, error) {
-                                swal('Error Session time out, Refresh the page', {
-                                    icon: 'error'
-                                })
-                            });
-
-                        $('#Portfolio_table').DataTable().draw(false)
+                       $('#Portfolio_table').DataTable().draw(false)
 
 
-                    } else {
-                        swal('Cancelled', {
-                            icon: 'error',
-                            timer: 1000
-                        })
-                    }
-                })
-    }
+                   } else {
+                       swal.fire('Cancelled', {
+                           icon: 'error',
+                           timer: 1000
+                       })
+                   }
+               })
+   }
 </script>
 <script>
     // Stepper lement

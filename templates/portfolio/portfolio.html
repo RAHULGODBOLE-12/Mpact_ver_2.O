@@ -132,7 +132,7 @@
                         </div>
 
                         <div class="col-12 mb-2">
-                            <button type="button" class="btn  btn-square btn-light-info width-300 mt-1 fs-6" data-toggle="modal" data-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
+                            <button type="button" class="btn  btn-square btn-light-info width-300 mt-1 fs-6" data-bs-toggle="modal" data-bs-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
                         </div>
                     </div>    
                 </div>
@@ -200,7 +200,7 @@
                                 <div class="col-md-2">
                                     <h5 class=" text-uppercase my-1"><i class="fas fa-eye"></i> Fields Visible
                                     </h5>
-                                    <div id="mega-menu-carousel-example">
+                                        <div id="mega-menu-carousel-example" style="height:180px; overflow-y: scroll;">
                                         <ul class="list-group" style="list-style-type: none; font-size: 12px;">
                                             <li><input type="checkbox" class="toggle-vis" checked data-column="Number">{{columns_name|dict_key:"Number"}}</input>
                                             </li>
@@ -561,6 +561,32 @@
     </div>
 </div>
 
+<div class="modal fade text-left" id="Pic_comment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel20">Upload PIC Comment <a class="font-small-3 badge badge-info" href="{url 'portfolio' 'extra'}?Team=GSM Team&option=PIC_Comment_download">Download template</a></h4>
+                
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+            </div>
+
+                <form id='upload_comments' class="form form-horizontal float-right mt-1" method="POST" enctype="multipart/form-data" action="{url 'portfolio' 'extra'}?Team=GSM Team&option=PIC_Comment_upload">
+
+                {% csrf_token %}
+                <div class="modal-body">
+                   <input type="file"  required name='Upload_Excel'>
+                     
+                      </div>
+                <div class="modal-footer text-right">
+                    <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <!-- #####send RFX modal intial#### -->
 {% include 'portfolio/quote_modal_gsm.html' %}
 

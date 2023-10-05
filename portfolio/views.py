@@ -130,22 +130,22 @@ def portfolio(request,team):
         elif option=='PIC_Comment_download':
             team_name=request.GET.get('Team')
 
-            if team_name=='CMM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='CMM Manager'))  :
-                data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
-                df=data.exclude(cm='Global').values('Number','cm','Arista_PIC','Arista_pic_comment').distinct('Number','cm').to_dataframe()
+            # if team_name=='CMM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='CMM Manager'))  :
+            #     data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
+            #     df=data.exclude(cm='Global').values('Number','cm','Arista_PIC','Arista_pic_comment').distinct('Number','cm').to_dataframe()
 
-            elif team_name=='GSM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='GSM Manager'))  :
+            if team_name=='GSM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='GSM Manager'))  :
                 data=Portfolio.objects.filter(Team='GSM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
                 df=data.values('Number','cm','Arista_PIC','Arista_pic_comment').distinct('Number','cm').to_dataframe()        
 
-            elif team_name=='CMM Team' and ( has_permission(request.user,'Super User') or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
-                f_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('first_name',flat=True)
-                l_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('last_name',flat=True)
-                team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
-                data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter())
-                df=data.exclude(cm='Global').values('Number','cm','Arista_PIC','Arista_pic_comment').distinct('Number','cm').to_dataframe()
+            # elif team_name=='CMM Team' and ( has_permission(request.user,'Super User') or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
+            #     f_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('first_name',flat=True)
+            #     l_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('last_name',flat=True)
+            #     team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
+            #     data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter())
+            #     df=data.exclude(cm='Global').values('Number','cm','Arista_PIC','Arista_pic_comment').distinct('Number','cm').to_dataframe()
 
-            elif team_name=='GSM Team' and ( has_permission(request.user,'Super User') or  request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
+            if team_name=='GSM Team' and ( has_permission(request.user,'Super User') or  request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
                 f_name=User.objects.filter(groups=Group.objects.get(name='GSM Team')).values_list('first_name',flat=True)
                 l_name=User.objects.filter(groups=Group.objects.get(name='GSM Team')).values_list('last_name',flat=True)
                 team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
@@ -157,7 +157,7 @@ def portfolio(request,team):
             with BytesIO() as b:
                 with pd.ExcelWriter(b) as writer:
                     df.to_excel(writer,index=False,sheet_name=f'PIC Comments')
-                    writer.save()
+                    writer.close()
                     response= HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
                     response['Content-Disposition'] = f'inline; filename=PIC Comments Upload.xlsx'
                     return response
@@ -165,22 +165,22 @@ def portfolio(request,team):
 
             Team=request.GET.get('Team')
             team_name=request.GET.get('Team')
-            if team_name=='CMM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='CMM Manager'))  :
-                data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
+            # if team_name=='CMM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='CMM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='CMM Manager'))  :
+            #     data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
 
 
-            elif team_name=='GSM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='GSM Manager'))  :
+            if team_name=='GSM Team' and request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='GSM Manager'))  :
                 data=Portfolio.objects.filter(Team='GSM Team',Quarter=Current_quarter()).filter(Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}')
 
 
-            elif team_name=='CMM Team' and ( has_permission(request.user,'Super User') or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
-                f_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('first_name',flat=True)
-                l_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('last_name',flat=True)
-                team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
-                data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter())
+            # elif team_name=='CMM Team' and ( has_permission(request.user,'Super User') or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
+            #     f_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('first_name',flat=True)
+            #     l_name=User.objects.filter(groups=Group.objects.get(name='CMM Team')).values_list('last_name',flat=True)
+            #     team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
+            #     data=Portfolio.objects.filter(Team='CMM Team',Quarter=Current_quarter())
 
 
-            elif team_name=='GSM Team' and ( has_permission(request.user,'Super User') or  request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
+            if team_name=='GSM Team' and ( has_permission(request.user,'Super User') or  request.user in User.objects.filter(groups=Group.objects.get(name='GSM Team')) or request.user in User.objects.filter(groups=Group.objects.get(name='Director')) or request.user.is_superuser):
                 f_name=User.objects.filter(groups=Group.objects.get(name='GSM Team')).values_list('first_name',flat=True)
                 l_name=User.objects.filter(groups=Group.objects.get(name='GSM Team')).values_list('last_name',flat=True)
                 team_member_list=[f'''{(list(f_name)[x])} {list(l_name)[x]}''' for x in range(len(f_name)) ]
@@ -490,6 +490,456 @@ column_names_portfolio={
         "Parts_controlled_by":"Parts Controlled by",
         "rfq_sent_flag_supplier":"RFQ Sent Status",
     }
+
+def create_global(request,portfolio_id,offcycle=True):
+    '''
+    1.Get the all the parts with portfolio_id filter from all  CM
+        2.Convert them to dataframe and append to the newly created dataframe after joining.
+        3.Groups all the portfolio(created from input and fetched from portfolio) Row(s) based [Mfr_Name,Number,Mfr_Part_Number,Ownership], with  the group.sum() of:
+                cm_Quantity_Buffer_On_Hand,
+                cm_Quantity_On_Hand_CS_Inv,
+                Open_PO_due_in_this_quarter,
+                Open_PO_due_in_next_quarter,
+                Delivery_Based_Total_OH_sum_OPO_this_quarter,
+                PO_Based_Total_OH_sum_OPO,
+                CQ_ARIS_FQ_sum_1_SANM_Demand,
+                CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand,
+                CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand,
+                CQ_sum_3_ARIS_FQ_SANM_Demand,
+                Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista,
+                CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD,
+                Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1,
+                Blended_AVG_PO_Receipt_Price,
+                ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std
+        4.Save the all dataframe to Portfolio Table
+    '''
+    columns=[
+            "Number",
+            "Lifecycle_Phase",
+            "Rev",
+            "Mfr_Name",
+            "Mfr_Part_Lifecycle_Phase",
+            "Mfr_Part_Number",
+            "Qualification_Status",
+            "cm_Part_Number",
+            "Arista_Part_Number",
+            "Cust_consign",
+            "Parts_controlled_by",
+            "Item_Desc",
+            "LT",
+            "MOQ",
+            "Original_PO_Delivery_sent_by_Mexico",
+            "cm_Quantity_Buffer_On_Hand",
+            "cm_Quantity_On_Hand_CS_Inv",
+            "Open_PO_due_in_this_quarter",
+            "Open_PO_due_in_next_quarter",
+            "Delivery_Based_Total_OH_sum_OPO_this_quarter",
+            "PO_Based_Total_OH_sum_OPO",
+            "CQ_ARIS_FQ_sum_1_SANM_Demand",
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
+            "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
+            "CQ_sum_3_ARIS_FQ_SANM_Demand",
+            "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
+            "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
+            "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
+            "Blended_AVG_PO_Receipt_Price",
+            "Ownership",
+            "Arista_PIC",
+            "Original_PO_Delivery_sent_by_Mexico",
+            "file_from",]
+    join_field=[
+        'unique_field',
+        'cm_Quantity_Buffer_On_Hand', 'cm_Quantity_On_Hand_CS_Inv',
+        'Open_PO_due_in_this_quarter', 'Open_PO_due_in_next_quarter',
+        'Delivery_Based_Total_OH_sum_OPO_this_quarter',
+        'PO_Based_Total_OH_sum_OPO', 'CQ_ARIS_FQ_sum_1_SANM_Demand',
+        'CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand',
+        'CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand', 'CQ_sum_3_ARIS_FQ_SANM_Demand',
+        'Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista',
+        'ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std',
+        'CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD',
+        'Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1',
+        'Blended_AVG_PO_Receipt_Price',
+        "Original_PO_Delivery_sent_by_Mexico",
+        'file_from',
+        ]
+    portfolio=Portfolio.objects.filter(Quarter=Current_quarter(),Number=str(portfolio_id.Number),Mfr_Name=portfolio_id.Mfr_Name,Ownership=portfolio_id.Ownership,Mfr_Part_Number=portfolio_id.Mfr_Part_Number,cm__in=['SGD','FGN','HBG','JSJ','JMX']).exclude(cm='Global').values(*columns).to_dataframe()
+    portfolio2=Portfolio.objects.filter(Quarter=Current_quarter(),Number=str(portfolio_id.Number),Mfr_Name=portfolio_id.Mfr_Name,Ownership=portfolio_id.Ownership,Mfr_Part_Number=portfolio_id.Mfr_Part_Number,cm='JPE').exclude(cm='Global').values(*columns).to_dataframe()
+    #print(portfolio)
+    #print(portfolio2)
+    portfolio_bak=portfolio.copy()
+    portfolio2_bak=portfolio2.copy()
+    portfolio_bak['unique_field']=portfolio_bak['Mfr_Name'].astype(str)+'###'+portfolio_bak['Number'].astype(str)+'###'+portfolio_bak['Mfr_Part_Number'].astype(str)+'###'+portfolio_bak['Ownership'].astype(str)
+    portfolio2_bak['unique_field']=portfolio2_bak['Mfr_Name'].astype(str)+'###'+portfolio2_bak['Number'].astype(str)+'###'+portfolio2_bak['Mfr_Part_Number'].astype(str)+'###'+portfolio2_bak['Ownership'].astype(str)
+
+    #portfolio_global_bak=portfolio_bak.append(portfolio2_bak,ignore_index=True)
+    portfolio_global_bak = pd.concat([portfolio2_bak,portfolio_bak],ignore_index=True)
+    portfolio_global_bak.drop(join_field[1:],axis=1,inplace=True)
+    #print(portfolio_global_bak)
+    if not portfolio_global_bak.empty:
+        portfolio['unique_field']=portfolio['Mfr_Name'].astype(str)+'###'+portfolio['Number'].astype(str)+'###'+portfolio['Mfr_Part_Number'].astype(str)+'###'+portfolio['Ownership'].astype(str)
+        portfolio2['unique_field']=portfolio2['Mfr_Name'].astype(str)+'###'+portfolio2['Number'].astype(str)+'###'+portfolio2['Mfr_Part_Number'].astype(str)+'###'+portfolio2['Ownership'].astype(str)
+        # portfolio['file_from']='SGD'
+        # portfolio2['file_from']='JPE'
+        def concat_cm(s):
+            s=s.to_list()
+            return json.dumps(s)
+        def order(price_list,cm_list):
+            price_list=json.loads(price_list)[:2]
+            cm_list=json.loads(cm_list)[:2]
+            try:
+                place_sgd=cm_list.index('SGD')
+                sgd_price=round(price_list[place_sgd],5)
+            except:
+                sgd_price='-'
+            try:
+                place_jpe=cm_list.index('JPE')
+                jpe_price=round(price_list[place_jpe],5)
+            except:
+                jpe_price='-'
+            try:
+                place_fgn=cm_list.index('FGN')
+                fgn_price=round(price_list[place_fgn],5)
+            except:
+                fgn_price='-'
+            try:
+                place_hbg=cm_list.index('HBG')
+                hbg_price=round(price_list[place_hbg],5)
+            except:
+                hbg_price='-'
+            try:
+                place_jsj=cm_list.index('JSJ')
+                jsj_price=round(price_list[place_jsj],5)
+            except:
+                jsj_price='-'
+            try:
+                place_jmx=cm_list.index('JMX')
+                jmx_price=round(price_list[place_jmx],5)
+            except:
+                jmx_price='-'
+            data=f'{sgd_price}/{jpe_price}/{fgn_price}/{hbg_price}/{jsj_price}/{jmx_price}'
+            return data.replace('None','-')
+        def po_delivery(s):
+            '''
+            Po / Delivery logic based on the max count in the group_by values if PO count is greater than delivery then it
+            will return po else it will return Delivery and vice versa,if equal it will be PO
+            '''
+            po_count=(s == 'PO').sum()
+            Delivery_count=(s == 'Delivery').sum()
+            if Delivery_count>po_count:
+                return 'Delivery'
+            else:
+                return 'PO'
+        #portfolio_global=portfolio.append(portfolio2,ignore_index=True)
+        portfolio_global = pd.concat([portfolio2,portfolio],ignore_index=True)
+        portfolio_global=portfolio_global.groupby('unique_field').agg(
+            {
+            # "cm_Quantity_Buffer_On_Hand":'sum',
+            "cm_Quantity_On_Hand_CS_Inv":'sum',
+            "Open_PO_due_in_this_quarter":'sum',
+            "Open_PO_due_in_next_quarter":'sum',
+            "Delivery_Based_Total_OH_sum_OPO_this_quarter":'sum',
+            "PO_Based_Total_OH_sum_OPO":'sum',
+            "CQ_ARIS_FQ_sum_1_SANM_Demand":'sum',
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand":'sum',
+            "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand":'sum',
+            "CQ_sum_3_ARIS_FQ_SANM_Demand":'sum',
+            "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista":'sum',
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD":'sum',
+            "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1":'sum',
+            "Blended_AVG_PO_Receipt_Price":'sum', 
+            "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std":['sum',concat_cm],
+             "Original_PO_Delivery_sent_by_Mexico":po_delivery,
+            "file_from":concat_cm
+            }
+        )
+        portfolio_global.columns = [
+                "cm_Quantity_On_Hand_CS_Inv",
+                "Open_PO_due_in_this_quarter",
+                "Open_PO_due_in_next_quarter",
+                "Delivery_Based_Total_OH_sum_OPO_this_quarter",
+                "PO_Based_Total_OH_sum_OPO",
+                "CQ_ARIS_FQ_sum_1_SANM_Demand",
+                "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
+                "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
+                "CQ_sum_3_ARIS_FQ_SANM_Demand",
+                "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
+                "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
+                "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
+                "Blended_AVG_PO_Receipt_Price",
+                "ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std",
+                "std_cost",
+                'Original_PO_Delivery_sent_by_Mexico',
+                "file_from",
+        ]
+        def po_delivery_cal(Original_PO_Delivery_sent_by_Mexico,Delivery_Based_Total_OH_sum_OPO_this_quarter,PO_Based_Total_OH_sum_OPO,CQ_ARIS_FQ_sum_1_SANM_Demand,CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand):
+            '''This will return a value by calucluating 
+            if its po (PO_Based_Total_OH_sum_OPO-(CQ_ARIS_FQ_sum_1_SANM_Demand+CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand))
+            if its delivery PO_Based_Total_OH_sum_OPO-(CQ_ARIS_FQ_sum_1_SANM_Demand+CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand)
+            '''
+            if not str(CQ_ARIS_FQ_sum_1_SANM_Demand).isdigit():
+                CQ_ARIS_FQ_sum_1_SANM_Demand=0
+            if not str(CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand).isdigit():
+                CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand=0
+            if Original_PO_Delivery_sent_by_Mexico == 'PO':
+                data=PO_Based_Total_OH_sum_OPO-(CQ_ARIS_FQ_sum_1_SANM_Demand+CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand)
+            else:
+                data=Delivery_Based_Total_OH_sum_OPO_this_quarter-(CQ_ARIS_FQ_sum_1_SANM_Demand+CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand)
+            #print('po_delivery_cal',data)
+
+
+            return data
+        portfolio_global = portfolio_global.reset_index()
+        portfolio_global['sgd_jpe_cost']=portfolio_global.apply(lambda x:order(x.std_cost,x.file_from),axis=1)
+        portfolio_global['Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista']=portfolio_global.apply(lambda x:po_delivery_cal(x.Original_PO_Delivery_sent_by_Mexico,x.Delivery_Based_Total_OH_sum_OPO_this_quarter,x.PO_Based_Total_OH_sum_OPO,x.CQ_ARIS_FQ_sum_1_SANM_Demand,x.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand),axis=1)
+        del portfolio_global['std_cost']
+        del portfolio_global['file_from']
+        portfolio_global.fillna(0,inplace=True)
+        
+
+        #print('global')
+
+        portfolio_global_final=portfolio_global_bak.merge(portfolio_global,on='unique_field')
+        portfolio_global_final.drop_duplicates(subset=['unique_field'],inplace=True )
+        portfolio_global_final.drop(['unique_field'],axis=1,inplace=True)
+        portfolio_global_final['cm']='Global'
+        portfolio_global_final['cm_Part_Number']=''
+        
+        if offcycle:
+            portfolio_global_final['offcycle']=True
+        else:
+            portfolio_global_final['offcycle']=False
+        portfolio_global_final['Team']=portfolio_id.Team
+        portfolio_global_final['refreshed_on']=timezone.localtime(timezone.now())
+        for index, row in portfolio_global_final.iterrows():
+            data,created=Portfolio.objects.get_or_create(Number=str(row['Number']),Mfr_Name=row['Mfr_Name'],Mfr_Part_Number=row['Mfr_Part_Number'],cm='Global',Ownership=row['Ownership'],Quarter=Current_quarter())
+            if created:
+                row['refreshed_comment']='Added'
+            Portfolio.objects.filter(id=data.id).update(**row.to_dict())
+    else:
+        #print('Deleting global....')
+        global_folio=Portfolio.objects.filter(Number=str(portfolio_id.Number),Mfr_Name=portfolio_id.Mfr_Name,Mfr_Part_Number=portfolio_id.Mfr_Part_Number,cm='Global',Ownership=portfolio_id.Ownership,Quarter=Current_quarter())
+        RFX.objects.filter(portfolio__in=global_folio).delete()
+        global_folio.delete()
+
+
+def agile_refresh(request=None):
+    '''
+    Type:Static Function
+    Arg:request
+    ####process#####:
+    this is user side trigger for agile_refresh_worker which can trigger all parts to refresh or single part
+    '''
+    portfolio_instance=None
+
+    porfolio_id=request.POST.get('porfolio_id',None)
+    print(porfolio_id,"porfolio_id type")
+    if porfolio_id !="null":
+        instance=Portfolio.objects.get(id=int(porfolio_id))
+        portfolio_instance=Portfolio.objects.filter(Number=instance.Number,cm=instance.cm,Quarter=instance.Quarter)
+    agile_refresh_worker_threaded(portfolio_instance,request)
+    if portfolio_instance:
+        return JsonResponse({'message':f'Agile data is updating for {portfolio_instance[0].Number}'})
+    else:
+        return JsonResponse({'message':'Agile data is updating...'})
+
+@multi_threading
+def agile_refresh_worker_threaded(portfolio_parts=None,request=None):
+    agile_refresh_worker(portfolio_parts,request)
+    
+
+def agile_refresh_worker(portfolio_parts=None,request=None):
+    '''
+    Type:Static Function
+    Arg:request
+    ####process#####:
+    this will refresh the data which fetched from agile based on the input value in portfolio_parts
+    Updated fields from Agile: Lifecycle_Phase,Rev,Item_Desc,Mfr_Name,Mfr_Part_Lifecycle_Phase,Mfr_Part_Number,Qualification_Status
+
+    '''
+    bulk=[]
+    new_bulk=[]
+    new_bulk_id=[]
+    bulk_deleted=[]
+    bulk_updated=[]
+
+    if portfolio_parts:
+        current_portfolio=portfolio_parts
+    else:
+        current_portfolio=Portfolio.objects.filter(Quarter=Current_quarter())
+        #print(current_portfolio)
+    agile_data=DimAgileAmpartMfrIness.objects.using('inputdb').filter(ampart__in=list(current_portfolio.distinct('Number').values_list('Number',flat=True))).to_dataframe()
+    agile_data['unique']=agile_data['ampart'].astype(str)+'####'+agile_data['mfr_name'].astype(str)+'####'+agile_data['mfr_part_number'].astype(str)
+    for portfolio in current_portfolio:
+        
+        agile_parts=agile_data.loc[
+            (agile_data.ampart == portfolio.Number) & (agile_data.mfr_name == portfolio.Mfr_Name) & (agile_data.mfr_part_number==portfolio.Mfr_Part_Number)
+            ]
+         ####portfolio creation new
+        
+
+        if not agile_parts.empty:
+            if portfolio.Lifecycle_Phase!=agile_parts.iloc[0].ampart_lifecycle or portfolio.Rev!=agile_parts.iloc[0].ampart_rev or portfolio.Item_Desc!=agile_parts.iloc[0].ampart_desc or portfolio.Mfr_Name!=agile_parts.iloc[0].mfr_name or portfolio.Mfr_Part_Lifecycle_Phase!=agile_parts.iloc[0].mfr_lifecycle_phase or portfolio.Mfr_Part_Number!=agile_parts.iloc[0].mfr_part_number or portfolio.Qualification_Status!=agile_parts.iloc[0].mfr_qualification_status:
+                portfolio.Lifecycle_Phase=agile_parts.iloc[0].ampart_lifecycle
+                portfolio.Rev=agile_parts.iloc[0].ampart_rev
+                portfolio.Item_Desc=agile_parts.iloc[0].ampart_desc
+                portfolio.Mfr_Name=agile_parts.iloc[0].mfr_name
+                portfolio.Mfr_Part_Lifecycle_Phase=agile_parts.iloc[0].mfr_lifecycle_phase
+                portfolio.Mfr_Part_Number=agile_parts.iloc[0].mfr_part_number
+                portfolio.Qualification_Status=agile_parts.iloc[0].mfr_qualification_status
+                portfolio.refreshed_comment='Updated'
+
+                portfolio.refreshed_on=timezone.localtime(timezone.now())
+                portfolio.save()
+                bulk_updated.append(portfolio)
+                #print(portfolio.Number)
+            else:
+                portfolio.refreshed_comment='No Change'
+                portfolio.refreshed_on=timezone.localtime(timezone.now())
+                portfolio.save()
+                bulk.append(portfolio)
+                #print(f'No Change in {portfolio.Number}')
+                pass
+        else:
+            #print('deleted')
+            if portfolio.refreshed_comment!='Deleted from Agile':
+                portfolio.refreshed_comment='Deleted from Agile'
+                portfolio.refreshed_on=timezone.localtime(timezone.now())
+                portfolio.save()
+
+                bulk_deleted.append(portfolio.id)
+
+        if portfolio.cm!='Global':
+            new_parts=agile_data.loc[agile_data.ampart == portfolio.Number].loc[~agile_data.unique.isin(list(current_portfolio.filter(cm=portfolio.cm,Number=portfolio.Number).annotate(unique=Concat('Number', V('####'), 'Mfr_Name', V('####'),'Mfr_Part_Number')).values_list('unique',flat=True)))]
+            #print(new_parts)
+            for index,new_part in new_parts.iterrows():
+                new_port=Portfolio.objects.get(id=portfolio.id) 
+                new_port.id=None
+                new_port.pk=None
+                new_port.Mfr_Part_Number=new_part.mfr_part_number
+                new_port.Rev=new_part.ampart_rev
+                new_port.Item_Desc=new_part.ampart_desc
+                new_port.Mfr_Name=new_part.mfr_name
+                new_port.Mfr_Part_Lifecycle_Phase=new_part.mfr_lifecycle_phase
+                new_port.Qualification_Status=new_part.mfr_qualification_status
+                new_port.refreshed_comment='Auto Added'
+                new_port.file_from=portfolio.file_from
+                new_port.save()
+                new_bulk.append(new_port)
+
+    # updated_portfolio=Portfolio.objects.bulk_update(bulk_updated,fields=[
+    #     "Lifecycle_Phase",
+    #     "Rev",
+    #     "Item_Desc",
+    #     "Mfr_Name",
+    #     "Mfr_Part_Lifecycle_Phase",
+    #     "Mfr_Part_Number",
+    #     "Qualification_Status",
+    #     "refreshed_comment",
+    #     "refreshed_on",
+    # ],batch_size=1000) or []
+    # print(updated_portfolio)
+    # Portfolio.objects.bulk_update(bulk,fields=[
+    #     "Lifecycle_Phase",
+    #     "Rev",
+    #     "Item_Desc",
+    #     "Mfr_Name",
+    #     "Mfr_Part_Lifecycle_Phase",
+    #     "Mfr_Part_Number",
+    #     "Qualification_Status",
+    #     "refreshed_comment",
+    #     "refreshed_on",
+    # ],batch_size=1000)
+    # created_=Portfolio.objects.bulk_create(new_bulk,batch_size=1000,ignore_conflicts=True) or []
+    created_=new_bulk
+
+    for x in new_bulk:
+        create_global(None,x,False)
+    new_df=Portfolio.objects.filter(id__in=[x.id for x in created_]).values(
+        "Number",
+        "Lifecycle_Phase",
+        "Rev",
+        "Item_Desc",
+        "Mfr_Name",
+        "Mfr_Part_Lifecycle_Phase",
+        "Mfr_Part_Number",
+        "Qualification_Status",
+        "refreshed_comment",
+        ).to_dataframe() 
+    deleted_df=Portfolio.objects.filter(id__in=bulk_deleted).values(
+        "Number",
+        "Lifecycle_Phase",
+        "Rev",
+        "Item_Desc",
+        "Mfr_Name",
+        "Mfr_Part_Lifecycle_Phase",
+        "Mfr_Part_Number",
+        "Qualification_Status",
+        "refreshed_comment",
+    ).to_dataframe() 
+    updated_df=Portfolio.objects.filter(id__in=[x.id for x in bulk_updated]).values(
+        "Number",
+        "Lifecycle_Phase",
+        "Rev",
+        "Item_Desc",
+        "Mfr_Name",
+        "Mfr_Part_Lifecycle_Phase",
+        "Mfr_Part_Number",
+        "Qualification_Status",
+        "refreshed_comment",
+    ).to_dataframe() 
+    print("hi i am here")
+    if deleted_df.empty==False or new_df.empty==False or  updated_df.empty==False :
+        if settings.SERVER_TYPE == settings.PRODUCTION:
+            if request:
+                email = [request.user.email]
+            else:
+                email = list(User.objects.filter(groups__name__in=['BP Team',
+                    'GSM Manager',]).values_list('email',flat=True))
+                email.append('sathya@inesssolutions.com')
+
+            
+        else:
+            email =['skarthick@inesssolutions.com','sathya@inesssolutions.com']
+
+        msg=EmailMessage(subject='MPAT Automatic weekly Agile Refresh',body=f''' 
+Hello Arista Team,
+
+
+
+{'Arista MPAT portfolio data has been refreshed Manually for the selected part,' if portfolio_parts else 'MPAT portfolio data has been automatically refreshed with recent Agile information over the weekend.' }
+
+
+
+Please find attached excel to identify the list of parts which are updated, deleted and added in the recent Agile refresh.
+
+Kindly raise RFQ in MPAT for the newly added parts.
+
+Regards,
+
+ARISTA MASTER PRICING AUTOMATION TOOL
+        
+        '''.replace('\n','<br>'),from_email=f'Portfolio Auto Refresh <srv-masterpricing@arista.com>', to=email)
+        msg.content_subtype = 'html'
+        if new_df.empty==False:
+            msg.attach('New Parts.xlsx',df_to_excel_b(new_df.drop_duplicates(subset=['Lifecycle_Phase','Mfr_Name','Mfr_Part_Number'],)), 'application/ms-excel')
+        if deleted_df.empty==False:
+            msg.attach('deleted from agile.xlsx',df_to_excel_b(deleted_df.drop_duplicates(subset=['Lifecycle_Phase','Mfr_Name','Mfr_Part_Number'],)), 'application/ms-excel')
+        if updated_df.empty==False:
+            msg.attach('Updated Parts.xlsx',df_to_excel_b(updated_df.drop_duplicates(subset=['Lifecycle_Phase','Mfr_Name','Mfr_Part_Number'],)), 'application/ms-excel')
+        msg.extra_headers['Message-ID'] = make_msgid()
+        status=msg.send()
+        #print(status,'mail sent')
+
+def df_to_excel_b(df,):
+    #print('df_to_excel_b',df)
+    with BytesIO() as b:
+        with pd.ExcelWriter(b) as writer:
+            df.to_excel(writer, index=False,)
+            writer.save()
+            file_MIME=b.getvalue()
+            return file_MIME
 
 @login_required
 def download_portfolio(request,file='',mail=False):

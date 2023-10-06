@@ -14,6 +14,7 @@ urlpatterns = [
     path('accounts/logout/',logout_view,name='logout'),
     path('accounts/',logins,name='logins'),
     path('',home,name='home'),
+    path('RFX/', include('rfx.urls')),
     path('portfolio/',include('portfolio.urls')),
     path('supplier/',include('Supplier.urls')),
     path('login_via_admin/user/<int:id>', login_via_admin, name="login_via_admin"),

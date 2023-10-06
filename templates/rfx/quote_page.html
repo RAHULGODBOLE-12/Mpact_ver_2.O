@@ -1,0 +1,429 @@
+{% extends 'main.html' %} {% load cmt_helper%} {% block content %}{% load static %}
+ <script src="{% static 'vendors/js/extensions/listjs/list.min.js'%}"></script>
+    <script src="{% static 'vendors/js/extensions/listjs/list.fuzzysearch.min.js'%}"></script>
+    <script src="{% static 'vendors/js/extensions/listjs/list.pagination.min.js'%}"></script>
+<div class="content-fluid app-content">
+ 
+    <div class="card">
+        <div class="card-body py-1">
+             <h4 class=" text-bold-400">Submit Quote {%which_login user as logged_in_Team%} {%if logged_in_Team%} <span class='badge badge-success font-small-2' >{{logged_in_Team}}</span>{%endif%} <span class="float-right m-0">
+                 
+ {%if request.user|has_group:"Contract Manufacturer" %}
+        <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal  Menu(CM).pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+
+{%else%}
+        <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal Menu.pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+{%endif%}
+
+    {%if not request.user|has_group:"Contract Manufacturer"  %}
+    <a class="btn btn-sm btn-round btn-success"  href="{%url 'download_upload_quote' 'Download'%}?award_letter=download"><i class="ft-download"></i> Export Award Letter</a>
+
+    {%endif%}
+
+ </span></h4>
+            <div class="row">
+                <div class="col-6 pl-0">
+                    {%if request.user|has_group:"Contract Manufacturer"  %}
+                    <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download_cm'%}"><i class="ft-download"></i> Export All Details (cm)</a>
+                     <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_cm_filtered"><i class="ft-download"></i> Export Filtered Details (cm)  </a>
+                     {%endif%}
+                     {%if not request.user|has_group:"Contract Manufacturer"  %}
+                    <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download'%}"><i class="ft-download"></i> Export All Details  </a>
+                    <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_filtered"><i class="ft-download"></i> Export Filtered Details</a>
+                    {%endif%}
+                    <span id="tab_filter_tab_parent" class="btn-group btn-group-xs ml-1" id="Group">
+                    <button  value="All" class="tab_filter_tab btn btn-sm btn-outline-info active">All</button>
+                    <button  value="Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn1">Quoted</button>
+                    <button  value="Non Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn2">Non Quoted</button>
+                    <button  value="No BID" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn3">No BID</button>
+                    </span>
+                   
+                   
+
+               
+                </div>
+
+                {% if request.user|has_group:"Contract Manufacturer" %}
+                <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'upload_cm_quote' %}">
+                    {% csrf_token %}
+
+
+                    <div class="form-group mb-0">
+
+                        <div class="col-sm-20 col-12 float-right">
+                            <label class="font-medium-1" for="Upload_quote"></label>
+                            <input type="file" class="input-sm" required name='Upload_Excel'>
+                            <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import CM Quote</button>
+
+                        </div>
+                    </div>
+
+                </form>
+                <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload_cm'%}">
+                    {% csrf_token %}
+
+
+                    <div class="form-group mb-0">
+
+                        <div class="col-sm-20 col-12 float-right">
+                            <label class="font-medium-1" for="Upload_quote"></label>
+                            <input type="file" class="input-sm" required name='Upload_Excel'>
+                            <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote (CM)</button>
+
+                        </div>
+                    </div>
+
+                </form>
+                {%endif%}
+                {%if not request.user|has_group:"Contract Manufacturer" %}
+               
+                    <form class="Upload_quote col-5 text-right pr-0 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload'%}">
+                        {% csrf_token %}
+
+
+                    <div class="form-group mb-0">
+
+                        <div class="col-sm-20 col-12 float-right">
+                            <label class="font-medium-1" for="Upload_quote"></label>
+                            <input type="file" class="input-sm" required name='Upload_Excel'>
+                            <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote</button>
+
+                        </div>
+                    </div>
+
+                </form>
+                    {%endif%}
+
+                    
+
+            </div>
+        </div>
+
+    </div>
+    <!-- tabcontents -->
+    <div class="row ">
+        <div class="col-3">
+            <div class="card box-shadow-5">
+
+                <div class="card-body " id='masterpartlistsidebar'>
+                    <div class="card-body" style="min-height: 600px;">
+                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"><i class="ft ft-loader icon-spin font-medium-5"></i> <br> Fetching Your Quotes</h3></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="card box-shadow-5">
+                <div class="card-body px-0 pt-0" id='details'>
+                    <div class="card-body" style="min-height: 600px;">
+                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"><i class="ft ft-loader icon-spin font-medium-5"></i> <br> Fetching Quote Details</h3></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- error dialog box -->
+<div class="modal fade" style="z-index: 1302;" id="dialog_message" role="dialog">
+    <div class="modal-dialog modal-xl" >
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Quote Response</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h5 id='message_title'></h5>
+                <p>Please verify these rows which has incorrect data (Mandatory quote fields are not updated properly).</p>
+                {%if request.user|has_group:"Contract Manufacturer"  %}
+                <p>Please make sure business split % is 100%</p>
+                {% endif %}
+                <div id='message_div'></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %} {% block scripts %}
+
+<script>
+    $(document).ready(function() {
+
+    var options = {
+        valueNames: ['parts', 'status']
+    };
+
+    var userList = new List('part_for_supplier', options);
+
+    $('.tab_filter_tab').on('click', function() {
+            //$('#tab_filter_tab').val(this.value)
+            var status=$(this).attr('value')
+            $('#tab_filter_tab_parent').children().removeClass('active');
+            $(this).addClass('active');
+            window.swal({
+                title: "Loading Parts...",
+                text: "Please wait",
+                icon: "{% static 'images/loader.gif' %}",
+                buttons: false,
+                allowOutsideClick: false,
+                closeOnClickOutside: false
+            });
+            if(status != "All"){
+                var redirect = `{% url 'his_parts' %}?filter_parameter=Quote_status&value=${status}` ;
+
+            }else{
+                var redirect = "{% url 'his_parts' %}?" ;
+            }
+            if ($('#Mfr_filter').val() != null & $('#Mfr_filter').val() != '' ){
+                var data={'Mfr_Name': $('#Mfr_filter').val() }
+            }
+            else{
+                var data={}
+
+            }
+            $.ajax({
+            url: redirect,
+                type: 'GET',
+                data:data,
+                success: function(data) {
+                    swal.close();
+                    $('#masterpartlistsidebar').html(data);
+                    $(".detail_id").click(function() {
+                        var block_ele = $('#details').closest('.card');
+                        $('.list-group-item').removeClass('active');
+
+                        $(this).addClass('active');
+                        $(block_ele).block({
+                            message: '<div class="ft-refresh-cw icon-spin font-medium-2"></div>',
+
+                            overlayCSS: {
+                                backgroundColor: '#fff',
+                                opacity: 0.8,
+                                cursor: 'wait'
+                            },
+                            css: {
+                                border: 0,
+                                padding: 0,
+                                backgroundColor: 'transparent'
+                            }
+                        });
+                        var urls = "{%url 'this_part_quote_page'%}";
+
+                        $.get(urls, {
+                            part: $(this).attr('part_id')
+                        }, function(data) {
+                            $('#details').html(data);
+                            $(block_ele).unblock();
+
+
+                        });
+
+
+                    });
+                    try{
+                        $('.list-group-item')[0].click()
+                        
+                    }
+                    catch{
+                        $('#details').html(`
+                <div class="card-body" style="min-height: 600px;">
+                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"> <br> Sorry No Quotes Found</h3></div>
+                </div>
+                `);
+                        
+
+                    }
+                    console.log(status)
+                    swal({
+                        title: "Success!",
+                        icon: "success",
+                        text: "Parts are Loaded Successfully",
+                        timer: 5000,
+                        showConfirmButton: false
+                    });
+                    //location.reload(true);
+                }
+            });
+
+
+        $('#tab_filter_tab_parent').children().removeClass('active');
+        $(this).addClass('active');
+        $("button[value|=status]").addClass('active');
+    });
+    $('.filter_download').on('click', function() {
+
+            var status= $(".tab_filter_tab.active").val();
+
+
+            if(status != "All"){
+                // {% if request.user|has_group:"Contract Manufacturer" %}
+                var redirect =  `{%url 'download_upload_quote' 'Download_cm'%}?status=${status}`;
+                // {% else %}
+                var redirect =  `{%url 'download_upload_quote' 'Download'%}?status=${status}`;
+                // {%endif%}
+
+            }
+            else{
+                // {% if request.user|has_group:"Contract Manufacturer" %}
+                var redirect ="{%url 'download_upload_quote' 'Download_cm'%}";
+                // {% else %}
+                var redirect ="{%url 'download_upload_quote' 'Download'%}";
+                // {%endif%}
+            }
+            window.location.href = redirect;
+
+    });
+});
+
+</script>
+<script>
+    function loading() {
+        $.get("{%url 'his_parts'%}", function(data) {
+
+            $('#masterpartlistsidebar').html(data)
+
+
+            $(".detail_id").click(function() {
+                var block_ele = $('#details').closest('.card');
+                $('.list-group-item').removeClass('active');
+
+                $(this).addClass('active');
+                $(block_ele).block({
+                    message: '<div class="ft-refresh-cw icon-spin font-medium-2"></div>',
+
+                    overlayCSS: {
+                        backgroundColor: '#fff',
+                        opacity: 0.8,
+                        cursor: 'wait'
+                    },
+                    css: {
+                        border: 0,
+                        padding: 0,
+                        backgroundColor: 'transparent'
+                    }
+                });
+                var urls = "{%url 'this_part_quote_page'%}";
+
+                $.get(urls, {
+                    part: $(this).attr('part_id')
+                }, function(data) {
+                    $('#details').html(data);
+                    $(block_ele).unblock();
+
+
+                });
+
+
+            });
+            try{
+                $('.list-group-item')[0].click()
+            }
+            catch{
+                $('#details').html(`
+                <div class="card-body" style="min-height: 600px;">
+                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"> <br> Sorry No Quotes Found</h3></div>
+                </div>
+                `);
+
+            }
+
+        });
+    }
+
+    $(document).ready(function() {
+        loading()
+
+    });
+
+    $(".Upload_quote").submit(function(e) {
+        e.preventDefault();
+        $.blockUI({
+            message: '<div class="semibold"><span class="ft-refresh-cw icon-spin text-left"></span>&nbsp;  Uploading Quote Data...</div>',
+
+            overlayCSS: {
+                backgroundColor: '#FFF',
+                opacity: 0.8,
+                cursor: 'wait'
+            },
+            css: {
+                border: 0,
+                padding: 0,
+            }
+        });
+        var form = $(this);
+        var url = form.attr('action');
+        var formData = new FormData(this);
+        console.log(url)
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData, // serializes the form's elements.
+            success: function(data) {
+                $.unblockUI();
+                console.log(data)
+                if (data.status == 'error') {
+                    $("#message_title").html(`Quote has been updated for ${data.success_count} Parts`);
+                    $("#message_div").html(data.error_table);
+                    $("#dialog_message").modal('show');
+                    $('.compact').DataTable({
+                        dom: 'Bfrtip',
+                        lengthMenu: [
+                            [10, 25, 50, -1],
+                            ['10 rows', '25 rows', '50 rows', 'Show all']
+                        ],
+                        buttons: [{
+                                extend: 'excelHtml5',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            'pageLength',
+                        ],
+                        orderCellsTop: true,
+                    });
+                }
+                else if (data.status=="Invalid"){
+                    swal(`Invalid File format,Download and edit the excel file which is provide`, {
+                        icon: "error",
+                        timer: 2500
+                    });
+                }
+                else if (data.status=="success") {
+                    swal(`Quote Has been Updated for ${data.success_count} parts`, {
+                        icon: "success",
+                        timer: 2500
+                    });
+                    notify_sound()
+                }
+                else{
+                    swal(`Something went wrong,Refresh the page`, {
+                        icon: "error",
+                        timer: 2500
+                    });
+                }
+
+                loading()
+            },
+            error: function(exception) {
+                $.unblockUI();
+                swal("Upload a correct format excel file which had been downloaded from system", {
+                    icon: "error",
+                    button: true
+                });
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        $(".Upload_quote").trigger("reset");
+    });
+</script>
+
+{% endblock scripts %}

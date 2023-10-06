@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from portfolio import json_for_table
 from django.contrib.auth.decorators import login_required
-from rfx import json_for_table
+# from rfx import json_for_table
 from rfx.views import *
 
 urlpatterns = [
@@ -16,7 +16,7 @@ urlpatterns = [
     path('quote_page/file_serve', file_serve, name="file_serve"),
     ####Analysis page
     path('Analysis_page/<str:team>/', Analysis_page, name="Analysis_page"),
-    path('Analysis_page/table/json', login_required(json_for_table.Analysis_data.as_view()), name="Analysis_data"),
+    # path('Analysis_page/table/json', login_required(json_for_table.Analysis_data.as_view()), name="Analysis_data"),
     path('Analysis_page/history/table/json/<str:id>', history, name="rfx_history"),
     path('Analysis_page/set/manual_split_set/', manual_split_set, name="manual_split_set"),
     path('Analysis_page/set/cm_manual_split_set/', cm_manual_split_set, name="cm_manual_split_set"),

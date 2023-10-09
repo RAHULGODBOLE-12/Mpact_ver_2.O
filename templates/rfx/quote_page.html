@@ -2,35 +2,54 @@
  <script src="{% static 'vendors/js/extensions/listjs/list.min.js'%}"></script>
     <script src="{% static 'vendors/js/extensions/listjs/list.fuzzysearch.min.js'%}"></script>
     <script src="{% static 'vendors/js/extensions/listjs/list.pagination.min.js'%}"></script>
+
+    <div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
+    <div class="page-title d-flex flex-column gap-1 me-3 mb-2">
+
+        <h4 class=" text-bold-400">Submit Quote {%which_login user as logged_in_Team%} {%if logged_in_Team%} <span class='badge badge-success font-small-2' >{{logged_in_Team}}</span>{%endif%} <span class="float-right m-0">
+                 
+            <!-- {%if request.user|has_group:"Contract Manufacturer" %}
+                   <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal  Menu(CM).pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+           
+           {%else%}
+                   <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal Menu.pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+           {%endif%}
+           
+               {%if not request.user|has_group:"Contract Manufacturer"  %}
+               <a class="btn btn-sm btn-round btn-success"  href="{%url 'download_upload_quote' 'Download'%}?award_letter=download"><i class="ft-download"></i> Export Award Letter</a>
+           
+               {%endif%}
+           
+            </span></h4> -->
+            
+
+</div>
+<div>
+    <button type="button" class="btn btn-sm btn-outline btn-light-primary justify-content-end m-1" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Export  <i class="fas fa-download"></i></button>
+   <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+        {%if request.user|has_group:"Contract Manufacturer"  %}
+        <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download_cm'%}"><i class="ft-download"></i> Export All Details (cm)</a>
+        <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_cm_filtered"><i class="ft-download"></i> Export Filtered Details (cm)  </a>
+        {%endif%}
+        {%if not request.user|has_group:"Contract Manufacturer"  %}
+        <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download'%}"><i class="ft-download"></i> Export All Details  </a>
+        <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_filtered"><i class="ft-download"></i> Export Filtered Details</a>
+        {%endif%}
+   </div>
+   <button type="button" class="btn btn-sm btn-outline btn-light-primary justify-content-end m-1" data-bs-toggle="modal" data-bs-target="#kt_modal_1">Upload cm quote  <i class="fas fa-download"></i></button>
+   <!-- <button class="btn btn-square btn-sm btn-light-info fs-8 width-100 m-1" onclick="$('#Portfolio_table').DataTable().draw()"><i class="fa fa-refresh font-small-1"></i><span class="font-small-1"> Refresh</span></button> -->
+   <!-- <button class="btn btn-square btn-sm btn-light-danger fs-8  width-100 m-1 float-left" onclick="window.location.reload()"> <i class="fa fa-remove font-small-1"></i><span class="font-small-1"> Clear Filters</span></button> -->
+</div>   
+</div>
+    
 <div class="content-fluid app-content">
  
     <div class="card">
         <div class="card-body py-1">
-             <h4 class=" text-bold-400">Submit Quote {%which_login user as logged_in_Team%} {%if logged_in_Team%} <span class='badge badge-success font-small-2' >{{logged_in_Team}}</span>{%endif%} <span class="float-right m-0">
-                 
- {%if request.user|has_group:"Contract Manufacturer" %}
-        <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal  Menu(CM).pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
-
-{%else%}
-        <a class="btn btn-sm btn-round btn-warning" href="{%url 'file_serve'%}?file=Instructions for Quoting Portal Menu.pdf"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
-{%endif%}
-
-    {%if not request.user|has_group:"Contract Manufacturer"  %}
-    <a class="btn btn-sm btn-round btn-success"  href="{%url 'download_upload_quote' 'Download'%}?award_letter=download"><i class="ft-download"></i> Export Award Letter</a>
-
-    {%endif%}
-
- </span></h4>
-            <div class="row">
-                <div class="col-6 pl-0">
-                    {%if request.user|has_group:"Contract Manufacturer"  %}
-                    <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download_cm'%}"><i class="ft-download"></i> Export All Details (cm)</a>
-                     <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_cm_filtered"><i class="ft-download"></i> Export Filtered Details (cm)  </a>
-                     {%endif%}
-                     {%if not request.user|has_group:"Contract Manufacturer"  %}
-                    <a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download'%}"><i class="ft-download"></i> Export All Details  </a>
-                    <a class='filter_download btn btn-sm btn-outline-info float-left font-small-3 ml-1' value="Download_filtered"><i class="ft-download"></i> Export Filtered Details</a>
-                    {%endif%}
+             
+            <div class="row justify-content-end">
+                <div class="col-4 d-flex justify-content-end">
+                    
                     <span id="tab_filter_tab_parent" class="btn-group btn-group-xs ml-1" id="Group">
                     <button  value="All" class="tab_filter_tab btn btn-sm btn-outline-info active">All</button>
                     <button  value="Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn1">Quoted</button>
@@ -43,32 +62,18 @@
                
                 </div>
 
-                {% if request.user|has_group:"Contract Manufacturer" %}
+
+                <!-- {% if request.user|has_group:"Contract Manufacturer" %}
                 <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'upload_cm_quote' %}">
                     {% csrf_token %}
 
 
-                    <div class="form-group mb-0">
+                    <div class="form-group ms-3 px-4 py-3">
 
                         <div class="col-sm-20 col-12 float-right">
                             <label class="font-medium-1" for="Upload_quote"></label>
                             <input type="file" class="input-sm" required name='Upload_Excel'>
                             <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import CM Quote</button>
-
-                        </div>
-                    </div>
-
-                </form>
-                <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload_cm'%}">
-                    {% csrf_token %}
-
-
-                    <div class="form-group mb-0">
-
-                        <div class="col-sm-20 col-12 float-right">
-                            <label class="font-medium-1" for="Upload_quote"></label>
-                            <input type="file" class="input-sm" required name='Upload_Excel'>
-                            <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote (CM)</button>
 
                         </div>
                     </div>
@@ -81,7 +86,7 @@
                         {% csrf_token %}
 
 
-                    <div class="form-group mb-0">
+                    <div class="form-group ms-3 px-4 py-3">
 
                         <div class="col-sm-20 col-12 float-right">
                             <label class="font-medium-1" for="Upload_quote"></label>
@@ -92,11 +97,64 @@
                     </div>
 
                 </form>
-                    {%endif%}
+                    {%endif%} -->
 
+                <!--<div class="col-3 pl-0 text-right"> 
                     
+                     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                        {% if request.user|has_group:"Contract Manufacturer" %}
+                        <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'upload_cm_quote' %}">
+                            {% csrf_token %}
 
-            </div>
+
+                            <div class="form-group mb-0">
+
+                                <div class="col-sm-20 col-12 float-right">
+                                    <label class="font-medium-1" for="Upload_quote"></label>
+                                    <input type="file" class="input-sm" required name='Upload_Excel'>
+                                    <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import CM Quote</button>
+
+                                </div>
+                            </div>
+
+                        </form>
+                        <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload_cm'%}">
+                            {% csrf_token %}
+
+
+                            <div class="form-group mb-0">
+
+                                <div class="col-sm-20 col-12 float-right">
+                                    <label class="font-medium-1" for="Upload_quote"></label>
+                                    <input type="file" class="input-sm" required name='Upload_Excel'>
+                                    <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote (CM)</button>
+
+                                </div>
+                            </div>
+
+                        </form>
+                        {%endif%}
+                        {%if not request.user|has_group:"Contract Manufacturer" %}
+                    
+                            <form class="Upload_quote col-5 text-right pr-0 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload'%}">
+                                {% csrf_token %}
+
+
+                            <div class="form-group mb-0">
+
+                                <div class="col-sm-20 col-12 float-right">
+                                    <label class="font-medium-1" for="Upload_quote"></label>
+                                    <input type="file" class="input-sm" required name='Upload_Excel'>
+                                    <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote</button>
+
+                                </div>
+                            </div>
+
+                        </form>
+                            {%endif%}
+                   </div> 
+                </div>-->
+                </div>
         </div>
 
     </div>
@@ -123,6 +181,30 @@
             </div>
         </div>
 
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="kt_modal_1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Upload cm quote</h3>
+
+                <!--begin::Close-->
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                <!--end::Close-->
+            </div>
+
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
     </div>
 </div>
 <!-- error dialog box -->

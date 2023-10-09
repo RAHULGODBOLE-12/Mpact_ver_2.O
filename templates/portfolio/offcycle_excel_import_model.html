@@ -1,0 +1,52 @@
+{%load static%}
+<div class="modal fade text-left" id="offcycle_excel_import" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+    <div class="modal-dialog modal-xs" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel20">Upload Non AVL Part&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a class="font-small-3 badge badge-info" href="{% url 'offcycle' Team=Team option='download_template' %}">Download Template</a></h4>
+                
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+        </button>
+            </div>
+            <form id='offcycle_excel_import_form' method="POST" action="{% url 'offcycle' Team=Team option='excel_import' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                   
+                    <input type="file" class="input-md xcel" title="Upload excel file" required name="excel_file">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- error dialog box -->
+<div class="modal fade" id="dialog_message" role="dialog">
+    <div class="modal-dialog modal-xl">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Update with some Error</h4>
+                <button type="button" class="btn btn-sm btn-primary " data-dismiss="modal">&times;</button>
+            </div>
+            <h5 id='message_title'></h5>
+            <p>This PartNumber with same Manufacturer are already exists in Portfolio
+            </p>
+            <div class="modal-body">
+                <div id='message_div'></div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+

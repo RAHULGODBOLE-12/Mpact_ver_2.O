@@ -21,6 +21,6 @@ path('get_data/', get_data, name="get_data"),
 path('portfolio_action', portfolio_action, name="portfolio_action"),
 path('portfolio/send_rfx/',send_rfx_input,name='send_rfx'),
 path('portfolio/distributor_selection/',distributor_selection, name="distributor_selection"),
-
+path('portfolio/offcycle/<str:Team>/<str:option>/',offcycle,name='offcycle'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

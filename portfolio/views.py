@@ -1425,3 +1425,265 @@ def distributor_selection(request):
         data='<h2>No Distributor found for the selected Parts<h2>'
     #print(data)
     return render(request,'portfolio/distributor_selection.html',{'data':data})
+
+@login_required
+def offcycle(request,Team,option):
+    '''
+    Type:Static Function
+    Arg:request
+    ####process#####:
+    this process is for loading portfolio parts but without agile data auto fetch here agile data is loaded in the excel it self
+    same process as portfolio Creation
+    if option=='excel_import':
+        this will Load the excel which has the partnumber 
+    elif option=='download_template':
+        To download the offcycle template
+    '''
+    column_names_portfolio_avl={
+        "cm":"Global/Regional *",
+        "cm_Part_Number":"CM Part Number *",
+        "Arista_Part_Number":"Arista Part Number *",
+        "Item_Desc":"Item Description",
+        "Ownership":"Ownership *",
+        "Arista_PIC":"Arista PIC *",
+        'commodity':'Commodity Name',
+        "Lifecycle_Phase":"Arista Lifecycle phase",
+        "Rev":"Revision",
+        "Mfr_Name":"Manufacturer Name *",
+        "Mfr_Part_Lifecycle_Phase":"Manufacturer Lifecycle phase",
+        "Mfr_Part_Number":"Manufacturer Part Number *",
+        "Qualification_Status":"Arista Qualification status",
+        "Cust_consign":"Cust Consigned *",
+        "Original_PO_Delivery_sent_by_Mexico":"PO / Delivery",
+        "cm_Quantity_Buffer_On_Hand":"CM Quantity Buffer On Hand",
+        "cm_Quantity_On_Hand_CS_Inv":"CM Quantity On Hand + CS Inv",
+        "Quarter":"Current Quarter",
+        "Open_PO_due_in_this_quarter":"Open PO Due (Current Quarter)",
+        "Open_PO_due_in_next_quarter":"Open PO Due  (Q+1)",
+        "Delivery_Based_Total_OH_sum_OPO_this_quarter":"CM Total OH + OPO (Current Quarter)",
+        "PO_Based_Total_OH_sum_OPO":"CM Total OH + OPO(Q & Q+1)",
+        "CQ_ARIS_FQ_sum_1_SANM_Demand":"Current Quarter Demand",
+        "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand":"Q+1 Demand",
+        "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand":"Q+2 Demand",
+        "CQ_sum_3_ARIS_FQ_SANM_Demand":"Q+3 Demand",
+        "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista":"Delta = OH and OPO - DD",
+        "sgd_jpe_cost":"Current Qtr Std Cost (SGD / JPE / FGN / HBG / JSJ / JMX) $",
+        "Blended_AVG_PO_Receipt_Price":"Sanmina Blended Avg PO Receipt Price ($)",
+        "Team":"Team",
+        'Arista_pic_comment':'Arista PIC comment to Suppliers',
+        "Parts_controlled_by":"Parts Controlled by*",
+        "rfq_sent_flag_supplier":"RFQ sent to suppliers",
+        "rfq_sent_flag_cm":"RFQ sent to CM",
+        "rfq_sent_flag_distributor":"RFQ sent to Distributor",
+        "rfq_sent_flag_distributor":"RFQ sent to Distributor",
+        "bp_comment":'BP Comments',
+        "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD":'Current Qtr +1 std cost ($)',
+        "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1":"Delta std cost ($)",
+    }
+    if option=='excel_import':
+        error_index=[]
+        error=False
+        data=request.FILES['excel_file']
+        df=pd.read_excel(data)
+        column_names_decode={v:k for k,v in column_names_portfolio_avl.items()}
+        df.rename(columns=column_names_decode,inplace=True)
+        df=df.replace({np.nan: None})
+        created=[]
+        
+        pic_list = []
+        
+        for index, row in df.iterrows():
+
+            if User.objects.filter(groups__name__icontains='GSM').annotate(full_name=Concat('first_name', V(' '),'last_name')).filter(full_name__icontains=row['Arista_PIC'].split('/')[0]).exists():
+                Team='GSM Team'
+            elif User.objects.filter(groups__name__icontains='CMM').annotate(full_name=Concat('first_name', V(' '),'last_name')).filter(full_name__icontains=row['Arista_PIC'].split('/')[0]).exists():
+                Team='CMM Team'
+            else:
+                error=True
+                error_index.append(index)
+            datas=Portfolio.objects.filter(Team=Team).filter(Quarter=Current_quarter(),Arista_Part_Number=row['Arista_Part_Number'],Mfr_Name=row['Mfr_Name'],cm=row['cm'])
+            if datas.exists() and error:
+                error_index.append(index)
+                
+            elif datas.exists():
+                datas.update(
+                    Mfr_Part_Lifecycle_Phase=row['Mfr_Part_Lifecycle_Phase'],
+                    Mfr_Part_Number=row['Mfr_Part_Number'],
+                    Qualification_Status=row['Qualification_Status'],
+                    Cust_consign=row['Cust_consign'],
+                    Item_Desc=row['Item_Desc'],
+                    LT=row['LT'],
+                    MOQ=row['MOQ'],
+                    Original_PO_Delivery_sent_by_Mexico=row['Original_PO_Delivery_sent_by_Mexico'],
+                    cm_Quantity_Buffer_On_Hand=row['cm_Quantity_Buffer_On_Hand'],
+                    cm_Quantity_On_Hand_CS_Inv=row['cm_Quantity_On_Hand_CS_Inv'],
+                    Open_PO_due_in_this_quarter=row['Open_PO_due_in_this_quarter'],
+                    Open_PO_due_in_next_quarter=row['Open_PO_due_in_next_quarter'],
+                    Delivery_Based_Total_OH_sum_OPO_this_quarter=row['Delivery_Based_Total_OH_sum_OPO_this_quarter'],
+                    PO_Based_Total_OH_sum_OPO=row['PO_Based_Total_OH_sum_OPO'],
+                    CQ_ARIS_FQ_sum_1_SANM_Demand=row['CQ_ARIS_FQ_sum_1_SANM_Demand'],
+                    CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand=row['CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand'],
+                    CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand=row['CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand'],
+                    CQ_sum_3_ARIS_FQ_SANM_Demand=row['CQ_sum_3_ARIS_FQ_SANM_Demand'],
+                    Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista=row['Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista'],
+                    ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std=row['sgd_jpe_cost'],
+                    sgd_jpe_cost=f"{row['sgd_jpe_cost']}/-".replace('None','-') if row['cm']=='SGD' else f"-/{row['sgd_jpe_cost']}".replace('None','-') ,
+                    CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD=row['CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD'],
+                    Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1=row['Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1'],
+                    Blended_AVG_PO_Receipt_Price=row['Blended_AVG_PO_Receipt_Price'],
+                    bp_comment=row['bp_comment'],
+                    file_from=row['cm'],
+
+                )
+                #print('Updated with new values')
+                create_global(request,datas[0])
+
+            else:
+                #print('############################',row['Arista_Part_Number'])
+                data=Portfolio(
+                    cm_Part_Number=row['cm_Part_Number'],
+                    Arista_Part_Number=row['Arista_Part_Number'],
+                    Number=row['Arista_Part_Number'],
+                    Quarter=Current_quarter(),
+                    cm=row['cm'],
+                    Ownership=row['Ownership'],
+                    Arista_PIC=row['Arista_PIC'],
+                    Parts_controlled_by=row['Parts_controlled_by'],
+                    Lifecycle_Phase=row['Lifecycle_Phase'],
+                    Rev=row['Rev'],
+                    Mfr_Name=row['Mfr_Name'],
+                    Mfr_Part_Lifecycle_Phase=row['Mfr_Part_Lifecycle_Phase'],
+                    Mfr_Part_Number=row['Mfr_Part_Number'],
+                    Qualification_Status=row['Qualification_Status'],
+                    Cust_consign=row['Cust_consign'],
+                    Item_Desc=row['Item_Desc'],
+                    LT=row['LT'],
+                    MOQ=row['MOQ'],
+                    Original_PO_Delivery_sent_by_Mexico=row['Original_PO_Delivery_sent_by_Mexico'],
+                    cm_Quantity_Buffer_On_Hand=row['cm_Quantity_Buffer_On_Hand'],
+                    cm_Quantity_On_Hand_CS_Inv=row['cm_Quantity_On_Hand_CS_Inv'],
+                    Open_PO_due_in_this_quarter=row['Open_PO_due_in_this_quarter'],
+                    Open_PO_due_in_next_quarter=row['Open_PO_due_in_next_quarter'],
+                    Delivery_Based_Total_OH_sum_OPO_this_quarter=row['Delivery_Based_Total_OH_sum_OPO_this_quarter'],
+                    PO_Based_Total_OH_sum_OPO=row['PO_Based_Total_OH_sum_OPO'],
+                    CQ_ARIS_FQ_sum_1_SANM_Demand=row['CQ_ARIS_FQ_sum_1_SANM_Demand'],
+                    CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand=row['CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand'],
+                    CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand=row['CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand'],
+                    CQ_sum_3_ARIS_FQ_SANM_Demand=row['CQ_sum_3_ARIS_FQ_SANM_Demand'],
+                    Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista=row['Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista'],
+                    ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std=row['sgd_jpe_cost'],
+                    sgd_jpe_cost=f"{row['sgd_jpe_cost']}/-/-".replace('None','-') if row['cm']=='SGD' else (f"-/{row['sgd_jpe_cost']}/-".replace('None','-') if row['cm']=='JPE' else f"-/-/{row['sgd_jpe_cost']}".replace('None','-') ),
+                    CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD=row['CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD'],
+                    Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1=row['Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1'],
+                    Blended_AVG_PO_Receipt_Price=row['Blended_AVG_PO_Receipt_Price'],
+                    bp_comment=row['bp_comment'],
+                    Team=Team,
+                    file_from=row['cm'],
+
+                )
+                data.created_by=request.user
+                data.offcycle=True
+                data.save()
+                create_global(request,data)
+                created.append(data.id)
+                pic_list.append(row['Arista_PIC'])
+        # non_avl_notified_mail(request, list(set(pic_list)))
+                
+        ids=list(Portfolio.objects.filter(Quarter=Current_quarter()).exclude(cm='Global').filter(Team='CMM Team').filter(cm__in=['SGD','FGN','HBG','JSJ','JMX']).distinct('Arista_Part_Number').filter(id__in=created).values_list('id',flat=True))
+        id2=list(Portfolio.objects.filter(Quarter=Current_quarter()).exclude(cm='Global').filter(Team='CMM Team').filter(cm='JPE').distinct('Arista_Part_Number').filter(id__in=created).values_list('id',flat=True))
+        ids.extend(id2)
+        ids=list(set(ids))
+        if ids:
+            create_rfx(request,parts=ids,To=['cm'],created_by=None,Arista_pic_comment='')
+            auto_clean_rfx_cm()
+        if error_index:
+            table=df[df.index.isin(error_index)].fillna('').to_html(classes='table table-xs text-nowarp font-small-2 table-responsive table-striped')
+
+            return JsonResponse({'data':table})
+        return JsonResponse({'data':'success'})
+
+    elif option=='download_template':
+        with BytesIO() as b:
+            data=Portfolio.objects.none().values(
+
+            "cm_Part_Number",
+            "Arista_Part_Number",
+            "cm",
+            "Ownership",
+            "Arista_PIC",
+            "Parts_controlled_by",
+            "Lifecycle_Phase",
+            "Rev",
+            "Mfr_Name",
+            "Mfr_Part_Lifecycle_Phase",
+            "Mfr_Part_Number",
+            "Qualification_Status",
+            "Cust_consign",
+            "Item_Desc",
+            "LT",
+            "MOQ",
+            "Original_PO_Delivery_sent_by_Mexico",
+            "cm_Quantity_Buffer_On_Hand",
+            "cm_Quantity_On_Hand_CS_Inv",
+            "Open_PO_due_in_this_quarter",
+            "Open_PO_due_in_next_quarter",
+            "Delivery_Based_Total_OH_sum_OPO_this_quarter",
+            "PO_Based_Total_OH_sum_OPO",
+            "CQ_ARIS_FQ_sum_1_SANM_Demand",
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand",
+            "CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand",
+            "CQ_sum_3_ARIS_FQ_SANM_Demand",
+            "Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista",
+            "sgd_jpe_cost",
+            "CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD",
+            "Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1",
+            "Blended_AVG_PO_Receipt_Price",
+            "bp_comment",
+
+            ).to_dataframe()
+            with pd.ExcelWriter(b) as writer:
+                user=[ f'''{x.first_name} {x.last_name}''' for x in User.objects.filter(groups__in=[Group.objects.get(name='GSM Team')])]+[
+                                            "Kathy Ch'ng/Erlyn",
+                                            "Kathy Ch'ng/Huan",
+                                            "Kathy Ch'ng/Rima",
+                                            "Kathy Ch'ng/Susan",
+                                            "Kathy Ch'ng/Yonn",
+                                            "Kathy Ch'ng/Eduardo",
+                                            "Lai Chen Soong/John",
+                                            "Lai Chen Soong/Susan",
+                                            "Lai Chen Soong/Yonn",
+                                            "Lai Chen Soong/Erlyn",
+                                            "Lai Chen Soong/Eduardo",
+                                        ]
+                user_list=pd.DataFrame(user)                       
+                data.rename(columns=column_names_portfolio_avl,inplace=True)
+                data.to_excel(writer,index=False,sheet_name='Non-AVL template')
+                user_list.to_excel(writer,index=False,header=False,sheet_name='Sheet2')
+                worksheet = writer.sheets['Non-AVL template']
+                usersheet = writer.sheets['Sheet2']
+                usersheet.sheet_state = 'hidden'
+                worksheet.data_validation('C2:C1048576', {'validate': 'list',
+                                    'source': ['SGD','JPE','FGN','HBG','JSJ','JMX'],
+                                    })
+                worksheet.data_validation('D2:D1048576', {'validate': 'list',
+                                    'source': ['Arista','Sanmina','Jabil','Flex','Foxconn','Jabil San Jose','Jabil Mexico'],
+                                    })
+                worksheet.data_validation('M2:M1048576', {'validate': 'list',
+                                    'source': ['Y','N'],
+                                    })
+                worksheet.data_validation('Q2:Q1048576', {'validate': 'list',
+                                    'source': ['PO','Delivery'],
+                                    })
+                
+                #print(user)
+                worksheet.data_validation('E2:E1048576', {'validate': 'list',
+                                        'source': '=Sheet2!A:A'
+                                    })
+
+                writer.close()
+                response= HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = 'inline; filename=Non-AVL template.xlsx'
+                return response
+
+
+

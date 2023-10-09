@@ -127,12 +127,12 @@
 
                         <div class="col-12 mb-2">
                             {% if request.user.is_superuser or request.user|has_group:"BP JPE Manager"  or request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP HBG Manager"  %}
-                            <button type="button" class="btn btn-float btn-square btn-light-info fs-6" data-toggle="modal" data-target="#offcycle_excel_import"><i class='fa fa-plus font-medium-1'></i> <span class="font-small-2">Add Parts for Non-AVL</span> </button>
+                            <button type="button" class="btn btn-float btn-square btn-light-info fs-6" data-bs-toggle="modal" data-bs-target="#offcycle_excel_import"> <span class="font-small-2">Add Parts for Non-AVL</span> </button>
                             {% endif %}
                         </div>
 
                         <div class="col-12 mb-2">
-                            <button type="button" class="btn  btn-square btn-light-info width-300 mt-1 fs-6" data-bs-toggle="modal" data-bs-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
+                            <button type="button" class="btn btn-square btn-light-info width-300 mt-1 fs-6" data-bs-toggle="modal" data-bs-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
                         </div>
                     </div>    
                 </div>
@@ -565,10 +565,12 @@
     <div class="modal-dialog modal-xs" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel20">Upload PIC Comment <a class="font-small-3 badge badge-info" href="{url 'portfolio' 'extra'}?Team=GSM Team&option=PIC_Comment_download">Download template</a></h4>
+                <h4 class="modal-title" id="myModalLabel20">Upload PIC Comment&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a class="font-small-3 badge badge-info" href="{url 'portfolio' 'extra'}?Team=GSM Team&option=PIC_Comment_download">Download template</a></h4>
                 
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+                         
         </button>
             </div>
 
@@ -698,6 +700,9 @@
     </div>
     <!--end::Card-->
 </div>
+
+{% include 'portfolio/offcycle_excel_import_model.html' with Team='GSM Team'%}
+
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'plugins/custom/formrepeater/formrepeater.bundle.js' %}"></script>
@@ -817,7 +822,7 @@
             },
  
             error: function(data) {
-                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
             }
         })
         $('#Selected').attr('disabled', false)
@@ -846,7 +851,7 @@
             },
  
             error: function(data) {
-                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
             }
         })
             $(this).blur()
@@ -891,7 +896,7 @@
                 },
  
                 error: function(data) {
-                    swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                    swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
                 }
             })
                 $(this).blur()
@@ -920,20 +925,20 @@
                     $('.compact').DataTable();
                 }
                 else if (data.status==415){
-                    swal(`Invalid File format,Download and edit the excel file which is provide`, {
+                    swal.fire(`Invalid File format,Download and edit the excel file which is provide`, {
                         icon: "error",
                         timer: 2500
                     });
                 }
                 else if (data.status==200) {
-                    swal(data.message, {
+                    swal.fire(data.message, {
                         icon: "success",
                         timer: 2500
                     });
                     table.draw();
                 }
                 else{
-                    swal(`Something went wrong,Refresh the page`, {
+                    swal.fire(`Something went wrong,Refresh the page`, {
                         icon: "error",
                         timer: 2500
                     });
@@ -942,7 +947,7 @@
             },
             error: function(exception) {
                 $.unblockUI();
-                swal("Upload a correct format excel file which had been downloaded from Tool", {
+                swal.fire("Upload a correct format excel file which had been downloaded from Tool", {
                     icon: "error",
                     button: true
                 });
@@ -955,7 +960,7 @@
  
         });
     $(document).on("change", '.pic_field_editable', function(event) {
-        swal({
+        swal.fire({
                 title: "Are you sure?",
                 text: "If PIC name is changed from one team to another team then the RFQ created will be deleted automatically.",
                 icon: "warning",
@@ -999,13 +1004,13 @@
                 },
  
                 error: function(data) {
-                    swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                    swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
                 }
             })
             }, 2000)
  
                 } else {
-                    swal("cancelled", {
+                    swal.fire("cancelled", {
                         timer: 1000
                     });
                 }
@@ -1924,5 +1929,56 @@
     });
     </script>
 
+<script>
+
+    $(document).ready(function() {
+    
+        $("#offcycle_excel_import_form").submit(function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Uploading Non-AVL Parts ...",
+                text: "Please wait",
+                icon: "{% static 'images/loader.gif' %}",
+                buttons: false,
+            });
+            var form = $(this);
+            var url = form.attr('action');
+            var formData = new FormData(this);
+    
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData, // serializes the form's elements.
+                success: function(data) {
+                    swal.close();
+                    $("#offcycle_excel_import").modal('hide')
+                    if (data.data !== 'success') {
+                        $("#message_div").html(data.data);
+                        $("#dialog_message").modal('show');
+                    } else {
+                        swal.fire("Off-Cycle Parts added", {
+                            icon: "success",
+                            timer: 2500
+                        });
+                    }
+                    $("#offcycle_excel_import_form").trigger("reset");
+                    
+                    $('#Portfolio_table').DataTable().draw();
+                },
+                error: function(exception) {
+                    swal.close();
+                    swal.fire("Upload a correct format excel file which had been downloaded from system", {
+                        icon: "error",
+                        button: true
+                    });
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    });
+</script>
 {% include 'portfolio/rfx.js'  with Team='GSM Team' %}
+
 {% endblock %}

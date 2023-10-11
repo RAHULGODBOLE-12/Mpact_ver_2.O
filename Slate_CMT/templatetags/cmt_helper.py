@@ -520,7 +520,7 @@ def make_as_read_notification(request):
     unread=Master_notification.objects.filter(user=request.user).update(notification_read=True)
     return JsonResponse({'message':'success'})
 
-def send_push_notification(user,subject='You Have notifcation',text='No text',url='/',args=[]):
+def send_push_notification(user,subject='You Have notification',text='No text',url='/',args=[]):
     try:
         url=reverse(url,args=args)
     except Exception as e:

@@ -39,6 +39,8 @@ from django.db.models.functions import Concat
 from Supplier.models import *
 from email.mime.base import MIMEBase
 from portfolio.portfolio import *
+from MasterPricing.models import *
+
 
 
 
@@ -1138,7 +1140,7 @@ def render_portfolio_task(request,CM_loc):
         try:
             parts_created=portfolio_creation(request,CM_loc)
             instance.comments="Portfolio Updated successfully,"
-            # send_push_notification(request.user,subject='Success, Portfolio Refresh',text='Portfolio has been refreshed successfully',url='#')
+            send_push_notification(request.user,subject='Success, Portfolio Refresh',text='Portfolio has been refreshed successfully',url='#')
             instance.status=True
             instance.completed_status=True
             instance.save()
@@ -1150,10 +1152,8 @@ def render_portfolio_task(request,CM_loc):
             instance.status=False
             instance.completed_status=True
             instance.save()
-            # send_push_notification(request.user,subject='Error in Portfolio Refresh',text='Portfolio refresh Failed, Please check the file.If any help needed contact suppport',url='#')
+            send_push_notification(request.user,subject='Error in Portfolio Refresh',text='Portfolio refresh Failed, Please check the file.If any help needed contact support',url='#')
             LOGGER.error("LOG_MESSAGE", exc_info=1)
-            
-
         # try:
         #     part_all_list=parts_detail.objects.values_list('cpn',flat=True)
         #     qr=Portfolio.objects.filter(Number__in=parts_created).distinct('Number').values_list('Number',flat=True)
@@ -1203,9 +1203,7 @@ def render_portfolio(request):
     if (has_permission(request.user,'Super User') or request.user.is_superuser) and not logger_portfolio.objects.filter(completed_status=False).exists():
 
         CM_loc=request.GET.get('CM_loc')
-        print(CM_loc,'aaaa')
-        render_portfolio_task(request,CM_loc)
-        
+        render_portfolio_task(request,CM_loc)     
         return JsonResponse({'status':'success','message':'Task Started, we will notify you'})
     elif logger_portfolio.objects.filter(completed_status=False).exists():
         return JsonResponse({'status':'error','message':'Another process is running'})

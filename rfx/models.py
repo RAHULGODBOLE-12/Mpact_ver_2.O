@@ -361,6 +361,15 @@ class predefined_filter(models.Model):
     data=models.TextField(default='No Error')
     created_by=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
 
+class Split_award(models.Model):
+    ''' 
+    This is a Model
+    Which have the value for Supplier allocated split
+    '''
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
+    share_award=models.BooleanField(default=False)
+    share_time=models.DateTimeField(auto_now=True)
+
 class CM_Quotes(models.Model):
     """
     This model stores CMM Team Quotes Details

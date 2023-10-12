@@ -332,7 +332,7 @@ def download_upload_quote(request, action=''):
     if action == 'Download':
         if request.user.is_superuser or 'Director' in request.user.groups.values_list('name', flat=True) or 'Super User' in request.user.groups.values_list('name', flat=True):
             parts = RFX.objects.filter(sent_quater=Current_quarter(), quarter__in=get_Next_quarter(3, this_quarter=True)).order_by('id')
-            #print(parts)
+            # print(parts)
 
         else:
             if suppliers_detail.objects.filter(user_model=request.user).exists():
@@ -507,11 +507,10 @@ def download_upload_quote(request, action=''):
                                                             })
                 worksheet.data_validation('AK3:AK1048576', {'validate': 'list',
                                                             'source': RFX.val_soft_hard_tool,
-
                                                             })
-                worksheet.data_validation('AF3:AF1048576', {'validate': 'list',
-                                                            'source': RFX.val_COO,
-                                                            })
+                # worksheet.data_validation('AF3:AF1048576', {'validate': 'list',
+                #                                             'source': RFX.val_COO,
+                #                                             })
                 worksheet.data_validation('AG3:AG1048576', {'validate': 'list',
                                                             'source': RFX.val_Inco_Term,
                                                             })
@@ -527,7 +526,7 @@ def download_upload_quote(request, action=''):
                 # worksheet.data_validation('AJ3:AJ1048576', {'validate': 'list',
                 #                     'source': RFX.val_Geo,
                 #                     })
-                writer.save()
+                writer.close()
                 response = HttpResponse(b.getvalue(), content_type='application/vnd.ms-excel')
                 response['Content-Disposition'] = 'inline; filename="Submit Quote.xlsx"'
                 return response
@@ -755,7 +754,7 @@ def download_upload_quote(request, action=''):
                 # worksheet.data_validation('AK3:AK1048576', {'validate': 'list',
                 #                     'source': RFX.val_Geo,
                 #                     })
-                writer.save()
+                writer.close()
                 response = HttpResponse(
                     b.getvalue(), content_type='application/vnd.ms-excel')
                 response['Content-Disposition'] = 'inline; filename="Submit Quote CM.xlsx"'
@@ -767,7 +766,7 @@ def download_upload_quote(request, action=''):
         #print(column_names_decode)
         file = request.FILES['Upload_Excel']
         df = pd.read_excel(file, header=1,keep_default_na=False)
-        df = df.replace({pd.np.nan: None})
+        df = df.replace({np.nan: None})
 
         # print(df.columns)
         # print(len(column_names_decode),len(df.columns))
@@ -887,14 +886,15 @@ def download_upload_quote(request, action=''):
         error1=df[~df.index.isin(non_nan_list)].copy()
         error2=df[df.index.isin(error_index)].join(error2)
         error1['Error']='Fill the Required fields'
-        error=error1.append(error2)
+        # error=error1.append(error2)
+        error=pd.concat([error1, error2], ignore_index=True)
         column_re=list(error.columns)
         column_re.insert(0,column_re.pop(len(column_re)-1))
         error=error.filter(column_re)
         error=error.reset_index()
         #print('error',error)
         error['index']=error['index']+3
-        error=error.replace({pd.np.nan:''})
+        error=error.replace({np.nan: ''})
         error.rename(columns={'index':'Excel row'},inplace=True)
 
         save_quote_notified_data(request, value=list_of_id, status='Quoted')
@@ -906,7 +906,7 @@ def download_upload_quote(request, action=''):
             return JsonResponse({
                 'status': 'error',
                 'success_count': success_count,
-                'error_table': error.rename(columns=column_names).to_html(index=False, justify='center', na_rep='', classes='compact table table-xs nowarp font-small-3 table-responsive table-striped text-nowarp')
+                'error_table': error.rename(columns=column_names).to_html(index=False, justify='center', na_rep='', classes='compact table table-xs table-responsive table-striped text-nowrap text-center')
             })
     elif action == 'Upload_cm':
         #print('into upload')

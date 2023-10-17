@@ -57,43 +57,126 @@
                 
                 <a class="menu-link block-page {% if 'quote_page' in request.path %} active {% endif %}"href="{%url 'quote_page' %}">
                     <span class="menu-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
                           </svg>
                     </span>
                     <span class="menu-title">Quoting Portal</span>
                 </a>
             </div>
-            <!-- <div data-kt-menu-trigger="click" class="menu-item here show menu-accordion">
+
+
+            {% if request.user|has_group:"CMM Team" or request.user|has_group:"GSM Team"  %}
+            <div data-kt-menu-trigger="click" class="menu-item here  menu-accordion">
+                    <span class="menu-link">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-graph-4 fs-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                </i>
+                        </span>
+                        <span class="menu-title">Quote Analysis</span>
+                        <span class="menu-arrow"></span>
+                    </span>
+
+                    <div class="menu-sub menu-sub-accordion">
+
+                        <div class="menu-item">
+                            {% if not request.user|has_group:"CMM Team" %}
+                            <a class="menu-link active" href="{%url 'Analysis_page' 'GSM'%}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">GSM Team</span>
+                            </a>
+                            {% endif %}
+                            {% if not request.user|has_group:"GSM Team" %}
+                            <a class="menu-link active" href="{%url 'Analysis_page' 'CMM'%}">
+                                <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                </span>
+                                <span class="menu-title">CMM Team</span>
+                            </a>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+            </div>        
+            {% elif request.user|has_group:"Super User" or request.user.is_superuser or request.user|has_group:"Director" or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager"  or request.user|has_group:"BP Manager" or not request.user|has_group:"BP Team"  %}
+            {%if not request.user|has_group:"Suppliers/Distributors"%}
+            {%if not request.user|has_group:"Contract Manufacturer"%}
+
+            <div data-kt-menu-trigger="click" class="menu-item here  menu-accordion">
                 <span class="menu-link">
                     <span class="menu-icon">
-                        <i class="ki-duotone ki-element-11 fs-1">
+                        <i class="ki-duotone ki-graph-4 fs-1">
                             <span class="path1"></span>
                             <span class="path2"></span>
-                            <span class="path3"></span>
-                            <span class="path4"></span>
-                        </i>
+                            </i>
                     </span>
-                    <span class="menu-title">Dashboards</span>
+                    <span class="menu-title">Quote Analysis</span>
                     <span class="menu-arrow"></span>
                 </span>
 
                 <div class="menu-sub menu-sub-accordion">
 
                     <div class="menu-item">
-
-                        <a class="menu-link active" href="../dist/index.html">
+                        {% if not request.user|has_group:"CMM Manager" %}
+                        <a class="menu-link active" href="{%url 'Analysis_page' 'GSM'%}">
                             <span class="menu-bullet">
                                 <span class="bullet bullet-dot"></span>
                             </span>
-                            <span class="menu-title">Default</span>
+                            <span class="menu-title">GSM Team</span>
                         </a>
-
+                        {% endif %}
+                        {% if not request.user|has_group:"GSM Manager" %}
+                        <a class="menu-link active" href="{%url 'Analysis_page' 'CMM'%}">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">CMM Team</span>
+                        </a>
+                        {% endif %}
+                        {% if request.user|has_group:"Director" %}
+                        <a class="menu-link active" href="{%url 'quote_analysis_report'%}">
+                            <span class="menu-bullet">
+                                <span class="bullet bullet-dot"></span>
+                            </span>
+                            <span class="menu-title">Report</span>
+                        </a>
+                        {% endif %}
                     </div>
 
                 </div>
 
-            </div> -->
+            </div> 
+            {% endif %}
+            {% endif %}
+            {% endif %}
+
+    
+            <!-- {% if not request.user|has_group:"Suppliers/Distributors" %}
+            <div class="menu-item">
+                
+                <a class="menu-link block-page {% if 'quote_page' in request.path %} active {% endif %}"href="{%url 'quote_page' %}">
+                    <span class="menu-icon">
+                        <i class="fa fa-money"></i>
+                    </span>
+                    <span class="menu-title">Master Pricing</span>
+                </a>
+            </div>
+            {% endif %} -->
+            <div class="menu-item">
+                
+                <a class="menu-link block-page {% if 'Master_pricing' in request.path %} active {% endif %}"href="{% url 'Master_Pricing_Index' %}">
+                    <span class="menu-icon">
+                        <i class="bi bi-clipboard-data fs-1"></i>
+                    </span>
+                    <span class="menu-title">Master Pricing</span>
+                </a>
+            </div>
             <div class="menu-item">
                 <!--begin:Menu link-->
                 <a class="menu-link" href="{%url 'contactlist' 'GSM' %}">

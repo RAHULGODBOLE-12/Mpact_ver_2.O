@@ -17,6 +17,7 @@ urlpatterns = [
     path('RFX/', include('rfx.urls')),
     path('portfolio/',include('portfolio.urls')),
     path('supplier/',include('Supplier.urls')),
+    path('Master_pricing/',include('MasterPricing.urls')),
     path('login_via_admin/user/<int:id>', login_via_admin, name="login_via_admin"),
     
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

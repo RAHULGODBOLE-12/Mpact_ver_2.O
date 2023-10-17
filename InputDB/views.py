@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404
 from portfolio.models import *
 from InputDB.models import *
 from django.http import JsonResponse,HttpResponse
-from CMT.cmt_helper import *
+from Slate_CMT.templatetags.cmt_helper import *
 import re
 from django.conf import settings
 from io import BytesIO

@@ -1,0 +1,292 @@
+{% load org_details %}
+{% load cmt_helper %}
+{% load static %}
+<div class="card py-0">
+    <div class="card-content">
+        <div class="card-body px-0 py-0 ">
+           
+                    <ul class="nav nav-tabs nav-underline square ">
+                        <li class="nav-item">
+                            <a class="nav-link px-0 active font-small-2" id="base-Arista_controlled" data-toggle="tab" aria-controls="Arista_controlled" href="#Arista_controlled" aria-expanded="true"><i class="ft-user"></i> Arista Controlled</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-0 font-small-2" id="base-cm-controlled" data-toggle="tab" aria-controls="cm-controlled" href="#cm-controlled" aria-expanded="false"><i class="ft-users"></i> CM Controlled</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-0 ">
+                        <div role="tabpanel" class=" tab-pane active " id="Arista_controlled" aria-expanded="true" aria-labelledby="base-Arista_controlled">
+                            
+                            <ul class="nav nav-tabs nav-underline no-hover-bg">
+                                {% if request.is_superuser or request.user|has_group:"SGD Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP SGD Manager"   %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 active font-small-1" id="base-Pending_arista" data-toggle="tab" aria-controls="Pending_arista" href="#Pending_arista" aria-expanded="true"><i class="ft-edit-3"></i> SGD</a>
+                                </li>
+                                {% endif %}
+                                {% if request.is_superuser or request.user|has_group:"JPE Contract Manufacturer"  or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JPE Manager"     %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista" href="#WIP_arista" aria-expanded="false"><i class="ft-settings"></i> JPE</a>
+                                </li>
+                                {% endif %}
+                                {% if request.is_superuser or request.user|has_group:"FGN Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP FGN Manager"   %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_FGN" href="#WIP_arista_FGN" aria-expanded="false"><i class="ft-settings"></i> FGN</a>
+                                </li>
+                                {% endif %}
+                                {% if request.is_superuser or request.user|has_group:"HBG Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP HBG Manager"   %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_HBG" href="#WIP_arista_HBG" aria-expanded="false"><i class="ft-settings"></i> HBG</a>
+                                </li>
+                                {% endif %}
+                                {% if request.is_superuser or request.user|has_group:"JSJ Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JSJ Manager"   %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_JSJ" href="#WIP_arista_JSJ" aria-expanded="false"><i class="ft-settings"></i> JSJ</a>
+                                </li>
+                                {% endif %}
+                                {% if request.is_superuser or request.user|has_group:"JMX Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JMX Manager"   %}
+                                <li class="nav-item">
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_JMX" href="#WIP_arista_JMX" aria-expanded="false"><i class="ft-settings"></i> JMX</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            <div class="tab-content p-0 ">
+                            {% if not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div role="tabpanel" class="tab-pane active" id='Pending_arista'  aria-expanded="true" aria-labelledby="base-Pending_arista">
+                                    <div id='SGD_ARISTA'>
+                                        
+                                        <input  class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search SGD" />
+                                    
+                                        <ul class="list-group list height-600 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                            
+                                            {% for part in parts.0 %}
+                                            <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=SGD">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                            {%endfor%}
+                                        </ul>
+                                    </div>
+                                    
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista" aria-expanded="true" aria-labelledby="base-WIP_arista">
+                                    <div id='JPE_ARISTA'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JPE" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.1%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JPE">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista_FGN" aria-expanded="true" aria-labelledby="base-WIP_arista_FGN">
+                                    <div id='FGN_ARISTA'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search FGN" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.4%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=FGN">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista_HBG" aria-expanded="true" aria-labelledby="base-WIP_arista_HBG">
+                                    <div id='HBG_ARISTA'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search HBG" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.6%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=HBG">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista_JSJ" aria-expanded="true" aria-labelledby="base-WIP_arista_JSJ">
+                                    <div id='JSJ_ARISTA'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JSJ" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.8%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JSJ">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" %}
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista_JMX" aria-expanded="true" aria-labelledby="base-WIP_arista_JMX">
+                                    <div id='JMX_ARISTA'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JMX" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.10%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JMX">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                        </div>
+                        <div class="tab-pane  " id="cm-controlled" aria-labelledby="base-cm-controlled">
+                            
+                            <ul class="nav nav-tabs nav-underline no-hover-bg">
+                                {% if not request.user|has_group:"JPE Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 active font-small-1" id="base-cm-sgd" data-toggle="tab" aria-controls="cm-sgd" href="#cm-sgd" aria-expanded="true"><i class="ft-edit-3"></i> SGD</a>
+                                </li>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 font-small-1" id="base-cm-jpe" data-toggle="tab" aria-controls="cm-jpe" href="#cm-jpe" aria-expanded="false"><i class="ft-settings"></i> JPE</a>
+                                </li>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 font-small-1" id="base-cm-fgn" data-toggle="tab" aria-controls="cm-fgn" href="#cm-fgn" aria-expanded="false"><i class="ft-settings"></i> FGN</a>
+                                </li>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 font-small-1" id="base-cm-hbg" data-toggle="tab" aria-controls="cm-hbg" href="#cm-hbg" aria-expanded="false"><i class="ft-settings"></i> HBG</a>
+                                </li>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 font-small-1" id="base-cm-jsj" data-toggle="tab" aria-controls="cm-jsj" href="#cm-jsj" aria-expanded="false"><i class="ft-settings"></i> JSJ</a>
+                                </li>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" %}
+                                <li class="nav-item">
+                                    <a class="cm_tab nav-link px-0 font-small-1" id="base-cm-jmx" data-toggle="tab" aria-controls="cm-jmx" href="#cm-jmx" aria-expanded="false"><i class="ft-settings"></i> JMX</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            <div class="tab-content p-0  no-border">
+                            {% if not request.user|has_group:"JPE Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div role="tabpanel" class="tab-pane active" id="cm-sgd" aria-expanded="true" aria-labelledby="base-Pending_arista">
+                                   <div id='SGD_CM'>
+                                    <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search SGD" />
+                                    
+                                    <ul class="list-group list height-500 scrollbar scrollbar-grey thin" style='overflow:auto;'>
+                                        
+                                        {% for part in parts.2 %}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=SGD">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                   </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" id="cm-jpe" aria-labelledby="base-WIP_arista">
+                                    <div id='JPE_CM'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JPE" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.3%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JPE">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" id="cm-fgn" aria-labelledby="base-WIP_arista">
+                                    <div id='FGN_CM'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search FGN" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.5%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=FGN">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" id="cm-hbg" aria-labelledby="base-WIP_arista">
+                                    <div id='HBG_CM'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search HBG" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.7%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=HBG">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
+                                <div class="tab-pane" id="cm-jsj" aria-labelledby="base-WIP_arista">
+                                    <div id='JSJ_CM'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JSJ" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.9%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JSJ">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"JPE Contract Manufacturer" and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" %}
+                                <div class="tab-pane" id="cm-jmx" aria-labelledby="base-WIP_arista">
+                                    <div id='JMX_CM'>
+                                        <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JMX" />
+                                    
+                                    <ul class="list-group list height-700 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                                        
+                                        {%for part in parts.11%}
+                                        <li class="list-group-item p-0 font-small-2 "><a class="parts px-1 detail_id" href="{% url 'part_details_cm' part.0 %}?cm=JMX">{{part.1}}<span style="width: 60px;" class='status badge bg-lighten-3 text-center  badge-pill bg-green float-right'> {{part.2}}</span> </a></li>
+                                        {%endfor%}
+                                    </ul>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+</div>
+<script>
+    var options = {
+        valueNames: ['parts', 'status']
+    };
+
+    var userList = new List('JPE_ARISTA', options);
+    var userList2 = new List('JPE_CM', options);
+    var userList3 = new List('SGD_ARISTA', options);
+    var userList4 = new List('SGD_CM', options);
+    var userList5 = new List('FGN_ARISTA', options);
+    var userList6 = new List('FGN_CM', options);
+    var userList7 = new List('HBG_ARISTA', options);
+    var userList8 = new List('HBG_CM', options);
+    var userList9 = new List('JSJ_ARISTA', options);
+    var userList10 = new List('JSJ_CM', options);
+    var userList11 = new List('JMX_ARISTA', options);
+    var userList12 = new List('JMX_CM', options);
+    $(document).ready(function(){
+        $('.search_box').on('keyup change',function(){
+            $(this).val($.trim($(this).val()));
+            $(this).keypress();
+        })
+    })
+    $('.arista_tab')[0].click()
+    $('.cm_tab')[0].click()
+
+</script>

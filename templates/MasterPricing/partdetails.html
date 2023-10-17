@@ -1,0 +1,808 @@
+{% load cmt_helper %}
+ {% load static %}
+{% get_Next_quarter as quote_qtr %}
+<div class="card-content">
+    <div class="card-body p-1">
+        <h4 class="text-bold-700">{{data.Arista_Part_Number}}</h4>
+        <!-- <div class="row">
+            <div class="col-6">
+                <h3>{{data.Arista_Part_Number}}</h3>
+            </div>
+            <div class="col-12">
+            </div>
+        </div> -->
+        <div class="card bg-info bg-lighten-5 border-info border-lighten-3 square   ">
+            <div class="card-content ">
+                <div class="row " >
+                    <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <span class="text-muted font-small-3 text-bold-600">CM Part Number</span> :
+                            <span class="font-small-3">{{portfolio.0.cm_Part_Number}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <span class="text-muted font-small-3 text-bold-600">Arista Part Number</span> :
+                            <span class="font-small-3">{{portfolio.0.Arista_Part_Number}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <span class="text-muted font-small-3 text-bold-600">Arista PIC</span> :
+                            <span class="font-small-3">{{portfolio.0.Arista_PIC}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-12">
+                        <div class="card-body px-1 pb-0">
+                            <span class="text-muted font-small-3 text-bold-600">Parts controlled by</span> :
+                            <span class="font-small-3">{{portfolio.0.Ownership}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 py-1">
+                            <span class="text-muted font-small-3 text-bold-600">Item Desc</span> :
+                            <span class="font-small-3">{{portfolio.0.Item_Desc}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 py-1">
+                            <span class="text-muted font-small-3 text-bold-600">Arista Consigned (Y/N)</span> :
+                            <span class="font-small-3">{{portfolio.0.Cust_consign}}</span>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 py-1">
+                            <span class="text-muted font-small-3 text-bold-600">LT</span> :
+                            <span class="font-small-3">{{portfolio.0.LT|floatformat:"0"}}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-12">
+                        <div class="card-body px-1 py-1">
+                            <span class="text-muted font-small-3 text-bold-600">MOQ</span> :
+                            <span class="font-small-3">{{portfolio.0.MOQ|floatformat:"0"}}</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="card bg-yellow bg-lighten-5 border-info border-lighten-3">
+            <div class="card-content">
+                <div class="row">
+                    <div class="col-lg-4 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Original PO/Delivery </dt> :
+                                {%if data.approval_status == 'Approved' %}
+                                <dd class="font-small-3 col-md-5">{{ PO_DEL_decision|default_if_none:"PO"}} </dd>
+                                {%endif%}
+
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Quantity Buffer OH</dt> :
+                                <dd class="font-small-3 col-md-5">{%if cm == 'SGD'%}{{portfolio.0.cm_Quantity_Buffer_On_Hand}}</dd>{%endif%}
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6"> CM Quantity OH</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.cm_Quantity_On_Hand_CS_Inv|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Open PO due Current Qtr ({{ data.Quarter }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.Open_PO_due_in_this_quarter|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Open PO due Q+1({{ quote_qtr.0 }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.Open_PO_due_in_next_quarter|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Total OH + OPO ({{ data.Quarter }}) </dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.Delivery_Based_Total_OH_sum_OPO_this_quarter|floatformat:"0"}}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Total OH + OPO ({{ data.Quarter }} & {{ quote_qtr.0 }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.PO_Based_Total_OH_sum_OPO|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Current Quarter Demand ({{ data.Quarter }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.CQ_ARIS_FQ_sum_1_SANM_Demand|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Q+1 Demand ({{ quote_qtr.0 }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Q+2 Demand ({{ quote_qtr.1 }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Q+3 Demand ({{ quote_qtr.2 }})</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.CQ_sum_3_ARIS_FQ_SANM_Demand|floatformat:"0"}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Delta = OH & Open PO - Demand (Current Qtr + Q+1)</dt> :
+                                <dd class="font-small-3 col-md-5">{{DELTA}}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-12 border-right-info border-right-lighten-3">
+                        <div class="card-body px-1 pb-0">
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">ARIS CQ CM FQ+1 unit price USD +  Current std ($)</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">CQ+1 ARIS FQ+2 CM unit price USD ($)</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD}}</dd>
+                            </dl>
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Delta ARIS CQ+1 CM FQ+2 vs ARIS CQ CM FQ+1</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1|floatformat:"0"}}</dd>
+                            </dl>
+
+
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Blended AVG PO Receipt Price ($)</dt> :
+                                <dd class="font-small-3 col-md-5">{%if cm == 'SGD'%}{{portfolio.0.Blended_AVG_PO_Receipt_Price|default_if_none:'0'}}</dd>{%endif%}
+                            </dl>
+
+                            <dl class="row">
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Ownership</dt> :
+                                <dd class="font-small-3 col-md-5">{{portfolio.0.Ownership}}</dd>
+                            </dl>
+
+                            <dl class="row">
+
+                                <dt class="text-muted font-small-3 text-bold-600 col-md-6">Demand Coverage</dt> :
+                                <dd class="font-small-3 col-md-5">{{mp.Demand_Coverage}}</dd>
+                                
+                                
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-lighten-5 bg-grey border-grey border-lighten-2">
+            <div class="card-body p-1 box-shadow-3">
+                {% get_user_name request.user as username %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Current Qtr Final Std Cost ($)</dt>
+                            <dd class="font-small-3 col-md-6"> : $ {{mp.current_final_std_cost}}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Current Quarter updated  std  Price ($)</dt>
+
+                            <dd class="font-small-3 col-md-6"> : {%if data.approval_status == 'Approved' %} $ {% get_previous_cost data.Part_Number 'std_cost' cm as cost %} {{cost.0|default_if_none:'Cost Not available'}}{%else%} Cost Not available {%endif%}
+
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Q+1 Std Cost(Quoted) ($)</dt>
+                             <dd class="font-small-3 col-md-6"> : {%if data.approval_status == 'Approved' %} $ {% if portfolio.0.Cust_consign == "N" %} {{ mp.std_cost|default_if_none:"-" }} {%endif%} {%else%} $ Cost Not available {%endif%}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Q+1 updated or Flat Price value ($)</dt>
+                            <dd class="font-small-3 col-md-6"> : $ {{ mp.standard_price_q1|default_if_none:"-" }}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Q+1 decision</dt>
+                            <dd class="font-small-3 col-md-6"> : {{ mp.current_qtr_decision|default_if_none:"-" }}
+                            </dd>
+                        </dl>
+
+
+
+
+                    </div>
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Approve / Rejected</dt>
+                            <dd class="font-small-3 col-md-6"> : {{mp.approve_reject_std_price|default_if_none:"Not Updated" }}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Arista PIC Q+1 decision comments</dt>
+                            <dd class="font-small-3 col-md-6"> : {{mp.arista_pic_approve_reject|default_if_none:"Not Updated" }}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Q+1 decision comments</dt>
+                            <dd class="font-small-3 col-md-6"> : {{mp.cm_approve_reject|default_if_none:"Not Updated" }}
+                            </dd>
+                        </dl>
+
+
+                    </div>
+                    <div class="col-md-4">
+                        <form action="{% url 'update_price_decision' %}" class="price_update" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ data.id }}">
+                            <input type="hidden" name="Part_Number" value="{{ portfolio.0.Arista_Part_Number }}">
+                            <input type="hidden" name="cm_partno" value="{{ portfolio.0.cm_Part_Number }}">
+                            <input type="hidden" name="part_control" value="{{ portfolio.0.Ownership }}">
+                            <input type="hidden" name="q_std_cost" value="{{ portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std}}">
+                            <input type="hidden" name="q+1_std_cost" value="{{ data.std_cost|default_if_none:'-' }}">
+                            <input type="hidden" name="quarter" value="{{ data.quarter }}">
+                            <input type="hidden" name="cm" value="{{cm }}">
+
+                            {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC %}
+                            {% if portfolio.0.Ownership == "Arista"%}
+                                {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                                <!-- {{data.approval_status}} -->
+                                <!-- {{data.quarter}} -->
+                                    <span class="font-small-3 text-bold-600">Flat or updated price <span class="red">*</span></span> <br> <br>
+                                    <select {%if data.approval_status != 'Approved' and logic_BP.lift_logic != 'disable' %} disabled{%endif%} name="current_qtr_decision" class="form-control input-sm mb-1 float-left" required style="width:80%;">
+                                        <option value="" selected disabled>Select</option>
+                                        <option {% if  previous_cost.0 or portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std %} value="Keep Flat">Keep Flat</option>  {%else%}disabled value="">Keep Flat (Cost Not available)</option> {%endif%}
+                                        <option value="Updated Price">Updated Price</option>
+                                    </select>
+                                    {%if data.approval_status == 'Approved'%}
+                                    {%if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1%}
+                                    <button type="submit" {%if data.approval_status != 'Approved' and logic_BP.lift_logic != 'disable' %} disabled{%endif%} class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+                                    <!-- <button type="button" part='{{data.id}}'  class="btn btn-info btn-sm mb-1 blank_out">Blank New PO</button> -->
+                                    {%endif%}
+                                    {%endif%}
+                                    <textarea name="arista_pic_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+                                {% endif %}
+                            {% endif %}
+                            {% endif %}
+                                {% if request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                                {% if portfolio.0.Ownership != "Arista"%}
+                                {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                                    <span class="font-small-3 text-bold-600">Flat or updated price <span class="red">*</span></span> <br> <br>
+                                    <select  name="current_qtr_decision" class="form-control input-sm mb-1 float-left" required style="width:80%;">
+                                        <option value="" selected disabled>Select</option>
+                                        <option {% if  previous_cost.0 or portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std %} value="Keep Flat">Keep Flat</option>  {%else%}disabled value="">Keep Flat (Cost Not available)</option> {%endif%}
+                                        <option value="Updated Price">Updated Price</option>
+                                    </select>
+
+                                    <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+                                    <button type="button" part='{{data.id}}'  class="btn btn-info btn-sm mb-1 blank_out">Blank New PO</button>
+                                    <button type="button" part='{{data.id}}'  decision='{{mp.current_qtr_decision}}' std_cost="{{ mp.std_cost|default_if_none:'' }}" class="btn btn-info btn-sm mb-1 revert_if_flat">Revert</button>
+
+                                <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea> {% endif %}
+                            {% endif %}
+                            {% endif %}
+                        </form>
+                        {% if mp.current_qtr_decision != None and  mp.current_qtr_decision != 'Un Approved' %}
+                            <form action="{% url 'price_approval' %}" class="price_update" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="id" value="{{ data.id }}">
+                                <input type="hidden" name="Part_Number" value="{{ portfolio.0.Arista_Part_Number }}">
+                                <input type="hidden" name="cm_partno" value="{{ portfolio.0.cm_Part_Number }}">
+                                <input type="hidden" name="part_control" value="{{ portfolio.0.Ownership }}">
+                                <input type="hidden" name="q_std_cost" value="{{mp.current_final_std_cost}}">
+                                <input type="hidden" name="q+1_std_cost" value="{{ mp.std_cost }}">
+                                <input type="hidden" name="quarter" value="{{ data.quarter }}">
+                                <input type="hidden" name="cm" value="{{ cm }}">
+
+                                {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC  %}
+                                
+                                {% if portfolio.0.Ownership != "Arista" %}
+                                    
+                                        <span class="font-small-3 text-bold-600">Approve or Reject Std. price <span class="red">*</span></span> <br> <br>
+                                        <select  name="approve_reject_std_price" class="form-control input-sm float-left mb-1" required style="width:80%;">
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="Approved">Approve</option>
+                                            <option value="Rejected">Reject</option>
+                                        </select>
+
+
+                                        <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+
+                                        <textarea name="arista_pic_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+
+                                {% endif %}
+                                {% endif %}
+                                    {% if  request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                                    {%has_permission request.user 'Contract Manufacturer' as per%}
+                                    {% if portfolio.0.Ownership == "Arista" and per %}
+                                    
+                                        <span class="font-small-3 text-bold-600">Approve or Reject Std. price <span class="red">*</span></span> <br> <br>
+                                        <select name="approve_reject_std_price" class="form-control input-sm float-left mb-1" required style="width:80%;">
+                                            <option value="" selected disabled>Select</option>
+                                            <option value="Approved">Approve</option>
+                                            <option value="Rejected">Reject</option>
+                                        </select>
+
+                                        <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+
+                                        <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+
+                                    {% endif %}
+                                {% endif %}
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="col-6">
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">New PO Price for Q+1 ($)</dt>
+                            <dd class="font-small-3 col-md-6"> :  {{ mp.new_po_price|default_if_none:"-" }} 
+                                {%if  logic_BP.lift_logic == 'disable'%}
+                                <button type="button" part='{{data.id}}' class="btn badge badge-info badge-sm ml-1 blank_out">Blank New PO</button>
+                                <button type="button" part='{{data.id}}'  decision='{{mp.current_qtr_decision}}' std_cost="{{ mp.std_cost}}" class="btn badge badge-success badge-sm ml-1 revert_if_flat"> <i class="ft-repeat"></i> Revert</button>
+                                {%endif%}
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">BP team Approve/Reject Comments for Q+1</dt>
+                            <dd class="font-small-3 col-md-6"> <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%}  cols=30 rows=2 name="BP_team_Approve_Reject_Comments" class="editableFields">{{mp.BP_team_Approve_Reject_Comments|default_if_none:""}}</textarea>
+                            </dd>
+                        </dl>
+
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Arista PIC Comments to CM for Q+1</dt>
+                            <dd class="font-small-3 col-md-6"> <textarea {%has_permission request.user "PIC" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="Arista_PIC_Comments_to_CM" class="editableFields">{{mp.Arista_PIC_Comments_to_CM|default_if_none:""}}</textarea>
+                            </dd>
+                        </dl>
+                    </div>
+                     <div class="col-6">
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">Arista BP Comments for Q+1</dt>
+                            <dd class="font-small-3 col-md-6"> <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="Arista_BP_Comments" class="editableFields">{{mp.Arista_BP_Comments|default_if_none:""}}</textarea>
+                            </dd>
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM Additional Notes on Supplier/Distributor for Q+1</dt>
+                            <dd class="font-small-3 col-md-6"> <textarea {%has_permission request.user "Contract Manufacturer" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="CM_Additional_Notes_on_Supplier_distributor" class="editableFields">{{mp.CM_Additional_Notes_on_Supplier_distributor|default_if_none:""}}</textarea>
+                            </dd>
+
+                        </dl>
+                        <dl class="row">
+                            <dt class="text-muted font-small-3 text-bold-600 col-md-6">CM PO/ Delivery Remarks</dt>
+                            <dd class="font-small-3 col-md-6"> <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="CM_PO_Delivery_Remarks" class="editableFields">{{mp.CM_PO_Delivery_Remarks|default_if_none:""}}</textarea>
+                            </dd>
+
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% comment %} initial Data {% endcomment %}
+    <div class="row">
+        <div class="col-12">
+            <!-- <a href="{% url 'refresh_quote_from_rfx' data.id %}" class="btn quote_refresh btn-sm btn-outline-pink border-pink square mb-2 float-right">Update Quote Details</a> -->
+        </div>
+    </div>
+    {% if portfolio.0.Cust_consign == "N" %} 
+    <div class="card black border-info border-lighten-3" style="background-color: {{ bgcolor }};">
+        <div class="card-header p-0 bg-white">
+            <ul class="nav nav-tabs nav-top-border no-hover-bg">
+                {% for mfr in mfrs %}
+                    <li class="nav-item">
+                        <a class="nav-link font-small-2 text-bold-600 {% if forloop.first %}active {% endif %}" id="base-{{ mfr.id }}" data-toggle="tab" aria-controls="tab{{ mfr.id }}" href="#tab{{ mfr.id }}" aria-expanded="true">{{ mfr.Mfr_Name }} - {{ mfr.Mfr_Part_Number }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card-body p-1">
+            <div class="tab-content p-0">
+                {% for mfr in mfrs %}
+                    <div role="tabpanel" class="tab-pane font-small-3 {% if forloop.first %}active {% endif %}" id="tab{{ mfr.id }}" aria-expanded="true" aria-labelledby="base-{{ mfr.id }}">
+                        <div class="row">
+                            <div class="col-md-6 border-right-primary">
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Name</dt>
+                                    <dd class="col-md-7">{{ mfr.Mfr_Name|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Lifecycle Phase</dt>
+                                    <dd class="col-md-7">{{ mfr.Life_Cycle|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Part Number</dt>
+                                    <dd class="col-md-7">{{ mfr.Mfr_Part_Number|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Part Revision</dt>
+                                    <dd class="col-md-7">{{ mfr.portfolio.Rev|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Qual Status</dt>
+                                    <dd class="col-md-7">{{ mfr.portfolio.Qualification_Status|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Quote Status</dt>
+                                    <dd class="col-md-7">{{ mfr.Quote_status|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Quoted Price ($)</dt>
+                                    <dd class="col-md-7">{{ mfr.Item_Price|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                {%if mfr.portfolio.Team == 'GSM Team' %}
+                                <dl class="row">
+                                    <dt class="col-md-5">Standard Price ($)</dt>
+                                    <dd class="col-md-7">{{ mfr.std_cost|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manual Split Allocated</dt>
+                                    <dd class="col-md-7">{{ mfr.manual_split|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Suggested Split Allocated</dt>
+                                    <dd class="col-md-7">{{ mfr.suggested_split|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                {%endif%}
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer Lead Time</dt>
+                                    <dd class="col-md-7">{{ mfr.Lead_Time|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer MOQ</dt>
+                                    <dd class="col-md-7">{{ mfr.MOQ|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">List</dt>
+                                    <dd class="col-md-7">{{ mfr.List|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                            </div>
+                            <div class="col-md-6">
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer NCNR</dt>
+                                    <dd class="col-md-7">{{ mfr.NCNR|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Manufacturer COO</dt>
+                                    <dd class="col-md-7">{{ mfr.COO|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Inco Terms</dt>
+                                    <dd class="col-md-7">{{ mfr.Inco_Term|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">MPN Level PO/Delivery</dt>
+                                    <dd class="col-md-7">{{ mfr.PO_Delivery|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Soft/Hard Tool</dt>
+                                    <dd class="col-md-7">{{ mfr.soft_hard_tool|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Frieght Cost ($)</dt>
+                                    <dd class="col-md-7">{{ mfr.Freight_cost|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Supplier Comments for Quote</dt>
+                                    <dd class="col-md-7">{{ mfr.Comments|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Arista PIC Comments for Quote</dt>
+                                    <dd class="col-md-7">{{ mfr.Arista_pic_comment|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Quoted By</dt>
+                                    <dd class="col-md-7">{{ mfr.Quoted_by|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Tarrif</dt>
+                                    <dd class="col-md-7">{{ mfr.tarrif|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Sent To</dt>
+                                    <dd class="col-md-7">{{ mfr.sent_to|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                                <dl class="row">
+                                    <dt class="col-md-5">Approval Status</dt>
+                                    <dd class="col-md-7">{{ mfr.approval_status|default_if_none:"Not Updated" }}</dd>
+                                </dl>
+                            </div>
+                        </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- CM Controled Patrs Second Data  -->
+{% if not portfolio.0.Ownership == 'Arista' %}
+<!-- Purple Data  -->
+<div class="card bg-primary bg-lighten-5  black border-info border-lighten-3">
+<div class="card-header p-0 bg-white">
+    <ul class="nav nav-tabs nav-top-border no-hover-bg">
+        {% for cm in cms %}
+            <li class="nav-item">
+                <!-- <a class="nav-link font-small-2 text-bold-600 {% if forloop.first %} active {% endif %}" id="base-{{ cm.id }}" data-toggle="tab" aria-controls="tab{{ cm.id }}" href="#tab{{ cm.id }}" aria-expanded="true">{{ cm.Mfr_Name }} - {{ cm.Mfr_Part_Number }}</a> -->
+                <a class="nav-link font-small-2 text-bold-600 {% if forloop.first %} active {% endif %}" id="base-{{ cm.id }}" data-toggle="tab" aria-controls="tab{{ cm.id }}" href="#tab{{ cm.id }}" aria-expanded="true">Contract Manufacturer's Quote {{cm.portfolio.cm}}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="card-body p-1">
+    <div class="tab-content p-0">
+        {% for cm in cms %}
+            <div role="tabpanel" class="tab-pane font-small-3 {% if forloop.first %}active {% endif %}" id="tab{{ cm.id }}" aria-expanded="true" aria-labelledby="base-{{ cm.id }}">
+            <div class="row">
+                <div class="col-md-6 border-right-primary">
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer Name</dt>
+                        <dd class="col-md-7">{{ cm.Mfr_Name|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer Lifecycle Phase</dt>
+                        <dd class="col-md-7">{{ cm.Life_Cycle|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Standard Price ($)</dt>
+                        <dd class="col-md-7">{{ cm.current_final_std_cost|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <dl class="row">
+                        <dt class="col-md-5">NCNR Q+1</dt>
+                        <dd class="col-md-7">{{ cm.NCNR|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer Part Number</dt>
+                        <dd class="col-md-7">{{ cm.Mfr_Part_Number|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer Part Revision</dt>
+                        <dd class="col-md-7">{{ cm.portfolio.Rev|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer Qual Status</dt>
+                        <dd class="col-md-7">{{ cm.Quote_status|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <dl class="row">
+                        <dt class="col-md-5">Quoted Price ($)</dt>
+                        <dd class="col-md-7">{{ cm.Item_Price|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Split Allocated</dt>
+                        <dd class="col-md-7">{{ cm.manual_split|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <dl class="row">
+                        <dt class="col-md-5">Manufacturer Lead Time</dt>
+                        <dd class="col-md-7">{{ cm.Lead_Time|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Manufacturer MOQ</dt>
+                        <dd class="col-md-7">{{ cm.MOQ|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">List</dt>
+                        <dd class="col-md-7">{{ cm.List|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-md-5">Manufacturer NCNR</dt>
+                        <dd class="col-md-7">{{ cm.NCNR|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Manufacturer COO</dt>
+                        <dd class="col-md-7">{{ cm.COO|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Inco Terms</dt>
+                        <dd class="col-md-7">{{ cm.Inco_Term|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <dl class="row">
+                        <dt class="col-md-5">MPN Level PO/Delivery</dt>
+                        <dd class="col-md-7">{{ cm.PO_Delivery|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Soft/Hard Tool</dt>
+                        <dd class="col-md-7">{{ cm.soft_hard_tool|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <!-- <dl class="row">
+                        <dt class="col-md-5">Frieght Cost</dt>
+                        <dd class="col-md-7">{{ cm.Freight_cost|default_if_none:"Not Updated" }}</dd>
+                    </dl> -->
+                    <dl class="row">
+                        <dt class="col-md-5">CM Comments for Quote</dt>
+                        <dd class="col-md-7">{{ cm.Comments|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Arista PIC Comments for Quote</dt>
+                        <dd class="col-md-7">{{ cm.Arista_pic_comment|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Quoted By</dt>
+                        <dd class="col-md-7">{{ cm.Quoted_by|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Tarrif</dt>
+                        <dd class="col-md-7">{{ cm.tarrif|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Sent To</dt>
+                        <dd class="col-md-7">{{ cm.sent_to|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">CM Supplier / Distributor Name</dt>
+                        <dd class="col-md-7">{{ cm.Supplier_Distributor_name_from_cm|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">CM Manufacturer Name</dt>
+                        <dd class="col-md-7">{{ cm.CM_Manufacturer|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">CM MPN</dt>
+                        <dd class="col-md-7">{{ cm.CM_mpn|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">CM Buyer Name</dt>
+                        <dd class="col-md-7">{{ cm.CM_buyer|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+                    <dl class="row">
+                        <dt class="col-md-5">Current Qtr Std Cost Source</dt>
+                        <dd class="col-md-7">{{ cm.CM_qty_std_source|default_if_none:"Not Updated" }}</dd>
+                    </dl>
+
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $(".price_update").submit(function(e) {
+            e.preventDefault()
+            window.swal({
+                title: "Price Updating...",
+                text: "Please wait",
+                icon: "{% static 'images/loader2.gif' %}",
+                buttons: false,
+                allowOutsideClick: false,
+                closeOnClickOutside: false
+            });
+            $.ajax({
+                url: $(this).attr("action"),
+                data: $(this).serialize(),
+                type: $(this).attr("method"),
+                success: function(data) {
+                    swal.close();
+                    if (data.status==200){
+                        swal({
+                            title: "Success!",
+                            icon: "success",
+                            text: data.message,
+                            timer: 5000,
+                            showConfirmButton: false
+                        });
+                        refresh()
+                    }
+                    else{
+                        swal({
+                            title: "Error",
+                            icon: "error",
+                            text: data.message,
+                            timer: 5000,
+                            showConfirmButton: false
+                        });
+                    }
+                },error: function(exception) {
+                $.unblockUI();
+                swal("Error please Reload the Page..It may Fix ", {
+                    icon: "error",
+                    button: true
+                });
+            }
+            })
+        });
+    });
+</script>
+<script>
+    function refresh(){
+
+        $.get( $("#Current_url").val(), function(d) {
+                                $('#details').html(d);
+                        });
+    }
+</script>
+<script>
+    $(document).ready(function() {
+        var timeout = null
+        $(".editableFields").on('change keyup paste',function() {
+        var text = this.value
+        var name = this.getAttribute('name')
+        clearTimeout(timeout)
+        timeout = setTimeout(function() {
+            // Do AJAX shit here
+            $.ajax({
+            type: "GET",
+            url: "{%url 'Analysis_page' 'extras'%}",
+            data: {option:'comments_mp',comment:text,field:name,cm:'{{cm}}',id:'{{data.id}}'},
+            success: function(data, status, xhr) {
+                if (data.status !== 200) {
+                    alert('Session Timeout:Re-Login In')
+                }
+
+            },
+
+            error: function(data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+        $(this).blur()
+        }, 2000)
+
+        });
+        $(".blank_out").on("click",function(){
+            swal()
+            $.ajax({
+            type: "GET",
+            url: "{%url 'MP_extras'%}",
+            data: {option:'blank_out',cm:'{{cm}}',part:$(this).attr('part')},
+            success: function(data, status, xhr) {
+                if (data.status !== 200) {
+                    swal({
+                        title: "Error",
+                        icon: "error",
+                        text: data.message,
+                        timer: 5000,
+                        button: false
+                    });
+                }
+                else{
+                    refresh()
+                    swal({
+                        title: "Success!",
+                        icon: "success",
+                        text: "Successfully Updated New Po Price",
+                        timer: 2000,
+                        button: false
+                    });
+                }
+
+            },
+
+            error: function(data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+        })
+
+        $(".revert_if_flat").on("click",function(){
+            swal()
+            $.ajax({
+            type: "GET",
+            url: "{%url 'MP_extras'%}",
+            data: {option:'revert_if_flat',cm:'{{cm}}',part:$(this).attr('part'),decision:$(this).attr('decision'),std_cost:$(this).attr('std_cost')},
+            success: function(data, status, xhr) {
+                if (data.status !== 200) {
+                    swal({
+                        title: "Error",
+                        icon: "error",
+                        text: data.message,
+                        timer: 5000,
+                        button: false
+                    });
+                }
+                else{
+                    refresh()
+                    swal({
+                        title: "Success!",
+                        icon: "success",
+                        text: data.message,
+                        timer: 1000,
+                        button: false
+                    });
+                }
+
+            },
+
+            error: function(data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+        })
+    });
+</script>

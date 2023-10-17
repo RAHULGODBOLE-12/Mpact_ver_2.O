@@ -1,0 +1,2854 @@
+{% extends 'main.html' %} {%load cmt_helper%} 
+{%load static%}
+{% block title %}
+<div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
+    <div class="page-title d-flex flex-column gap-1 me-3 mb-2">
+        <ul class="breadcrumb breadcrumb-separatorless fw-semibold mb-6">
+            <li class="breadcrumb-item text-gray-700 fw-bold lh-1">
+                <a href="" class="text-gray-500 text-hover-primary">
+                    <i class="ki-duotone ki-home fs-3 text-gray-400 me-n1"></i>
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <i class="ki-duotone ki-right fs-4 text-gray-700 mx-n1"></i>
+            </li>
+            <li class="breadcrumb-item text-gray-700 fw-bold lh-1">Dashboards</li>
+            <li class="breadcrumb-item">
+                <i class="ki-duotone ki-right fs-4 text-gray-700 mx-n1"></i>
+            </li>
+            <li class="breadcrumb-item text-gray-700">Quote Analysis</li>
+        </ul>
+        <h1 class="page-heading d-flex flex-column justify-content-center text-dark fw-bolder fs-1 lh-0">Quote Analysis</h1>
+    </div>
+    <div class="card-toolbar">
+        <ul class="nav" id="kt_chart_widget_8_tabs">
+            {%if Team == 'GSM Team'%}
+            <li class="nav-item">
+                <button class="btn  btn-light-info btn-sm" onclick='$("#Upload_Excel_field").click()' data-bs-toggle="modal" data-bs-target="#Split_up"><i class="fa fa-upload"></i> Split Upload</button>
+                <div class="modal fade text-left" id="Split_up" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+                    <div class="modal-dialog modal-xs" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel20">Split Upload</h4>
+    
+                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                </div>
+                            </div>
+    
+                            <form id='upload_spilt' class="form form-horizontal float-right" method="POST" enctype="multipart/form-data" action="{%url 'Analysis_upload_split'%}">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <input type="file" id='Upload_Excel_field' required name='Upload_Excel'>
+                                </div>
+                                <div class="modal-footer text-right">
+                                    <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <button class="btn btn-sm btn-light-primary justify-content-end  dropdown-toggle " 
+                data-kt-menu-trigger="click" 
+                data-kt-menu-placement="bottom-end" 
+                data-kt-menu-overflow="true">   
+                                
+                Actions     
+                                    
+            </button>   
+            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
+                <!-- <div class="menu-item px-3">
+                    <div class="menu-content fs-6 text-dark fw-bold px-3 py-4">Quick Actions</div>
+                </div> -->
+                <div class="separator mb-3 opacity-75"></div>
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Quote Analysis History</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                            {%for Quarter in Quarters%}
+                            <a class="menu-link px-3" href="{%url 'download_rfx' Team%}?Quarter={{Quarter}}">Quote for {%get_Next_quarter 1 Quarter as q%} {{q.0}}</a>                            
+                            {%empty%}
+                            <a href="#" class="menu-link px-3"> No History available </a>
+                            {%endfor%} 
+                        </div>  
+                    </div>
+                </div>
+                {%if Team == 'GSM Team'%}
+                {% if shared_status.share_award %}
+                <div class="menu-item px-3">
+                    <button type="button" onclick="shared_status_change(false)"
+                    class=" menu-link px-3 btn btn-square font-small-2 btn-sm btn-warning black float-right text-bold-600">
+                    <i class="fa fa-share-alt"></i><span
+                        class="menu-title"> Level 2:<br> Stop Shared Split % with Supplier </span></button>
+                </div>
+                {%else%}
+                <div class="menu-item px-3">
+                    <button type="button" onclick="shared_status_change(true)"
+                    class="menu-link px-3 btn btn-square btn-sm btn-outline-green">
+                    <span
+                        class="menu-title">  Level 2: <br>Share Split % with Supplier</span></button>
+                </div>
+                {%endif%}
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Level 1: <br>Supplier split % control</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-200px py-4">
+                        
+                        <div class="menu-item px-3">
+                            <button id='share_bulk' onclick="Mpn_Shareable_bulk('yes')" class="menu-link px-3 fs-8 btn btn-square" type="button">Share split% with supplier(s) for <span class="badge badge-info"><b class="select_counts "></b> Part(s) </button>
+                        </div>
+                 
+                        <div class="menu-item px-3">
+                            <button id='unshare_bulk' onclick="Mpn_Shareable_bulk('no')" class="menu-link px-3 fs-8 btn btn-square" type="button">Do not share split% with supplier(s) for <span class="badge badge-info"><b class="select_counts "></b> Part(s)</span> </button>
+                        </div> 
+                 
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Export</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                            <a href="{%url 'download_rfx' Team%}?award_letter=True"><button class="menu-link px-3 btn btn-sm btn-outline-success bg-glow"><i class="fa fa-download"></i> Export Award Letter Filtered</button></a>
+                        </div>
+                        <div class="menu-item px-3">
+                            <a onclick="download_filtered_excel()"><button class="menu-link px-3 btn btn-sm btn-outline-info"><i class="fa fa-download"></i> Export custom Filtered Excel</button></a>
+                        </div>        
+                        <div class="menu-item px-3">
+                            {% if request.user|has_group:"CMM Team" or request.user|has_group:"Admin" %}      
+                            <a href="" class="btn btn-sm btn-outline-info menu-link px-3"><i class="fa fa-download"></i> Export CM Quotes</a> 
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                 <div class="menu-item px-3 justify-content-center">
+                    <div class="menu-content px-3 py-3">
+                    {% if request.user|has_group:"CMM Team" or request.user|has_group:"Admin" %}      
+                    <button onclick="delete_rfx_bulk()" class="btn btn-sm btn-light-danger menu-link px-3"><i class="fa fa-trash"></i> Delete selected</button>
+                    {% endif %}
+                </div>
+                </div>
+<!-- 
+    <button class="btn btn-sm float-right btn-square btn-info mr-2 mt-2" onclick="$('#Analysis_table').DataTable().draw(false)"> <i class="fa fa-refresh"></i> Refresh Data</button>
+    <a class="btn btn-sm float-right btn-square btn-warning black mr-2 mt-2" href="{% if 'GSM' in request.path %}{%url 'file_serve'%}?file=GSM Team Quote Analysis- Instructions.pdf {% elif 'CMM' in request.path %} {%url 'file_serve'%}?file=CMM Team Quote Analysis- Instructions.pdf{% endif %}"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+    -->
+                <!-- <div class="separator mt-3 opacity-75"></div>
+                <div class="menu-item px-3">
+                    <div class="menu-content px-3 py-3">
+                        <a class="btn btn-primary  btn-sm px-4" href="#">
+                            Generate Reports
+                        </a>
+                    </div>
+                </div> -->
+            </div>
+        
+            </li>
+
+            <li class="nav-item">
+                <button class="btn btn-sm btn-light-primary btn-darken-2 ml-1 dropdown-toggle" id='filter_mega_menu' type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2">Advance Filter</button>
+            </li>
+
+        </ul>
+    </div>
+
+
+
+</div>
+{% endblock %}
+{% block content %}
+<style>
+    .select2-selection--single {
+        height: 100% !important;
+    }
+
+    .select2-selection__rendered {
+        word-wrap: break-word !important;
+        text-overflow: inherit !important;
+        white-space: normal !important;
+    }
+</style>
+<div class="wrap" id="styletab">
+
+        <div class="card" id="main">
+            <div class="card-header p-5">
+                <div id="table_regional_filter_tab_parent">
+                    <span id='select_count' class="font-small-4 ml-1"></span>
+                </div>
+                <div class="card-toolbar">
+                    <div class="btn-group" id="table_filter_tab_parent" role="group" aria-label="Basic example">
+                        <span id="table_filter_tab_parent" class="btn-group btn-group-xs">
+                       
+                            <button class="table_filter_tab square btn btn-light-danger btn-sm pull-right" onclick="quote_access_controller(false,'Lock ')">Lock Access</button>
+                            <button class="table_filter_tab square btn btn-light-info btn-sm pull-right" onclick="quote_access_controller(true,'Unlock')">Unlock Access</button>
+                            {% if 'CMM' in request.path %}
+                                <button class="table_filter_tab square btn btn-light-red btn-sm pull-right" onclick="approval(null,'Reject_bulk','CMM')"> Reject all Selected</button>
+                                <button class="table_filter_tab square btn btn-light-success btn-sm pull-right" onclick="approval(null,'Approve_all','CMM')">Share all the selected parts quote details to CM</button>  
+                            {% else %}
+                                {% if request.user|has_group:"Admin" or request.user|has_group:"GSM Team" or request.user|has_group:"GSM Manager" %}
+                                    <button class="table_filter_tab square btn btn-light-danger btn-sm pull-right" onclick="approval(null,'Reject_bulk','PIC')"> Reject all Selected</button>
+                                {% endif %}
+                                <button class="table_filter_tab  square btn btn-light-success btn-sm pull-right" onclick="approval(null,'Approve_all','PIC')">Approve Business Splits for all the selected parts</button>
+                            {% endif %}
+                        </span>
+                    </div> 
+                </div>
+            </div>
+            <div class="col-12 mt-1 collapse multi-collapse border-top-grey border-top-lighten-3">
+                <div class="row">
+
+                    <div id='filter-data' class="row" style="width: 100%;">
+                        <div class="col-md-4">
+                            <h5 class=" text-uppercase ml-1 my-1"><i class="fa fa-newspaper-o"></i> Fields Visible</h5>
+                            <div class="ml-1" id="mega-menu-carousel-example" style="height:80px; overflow-y: scroll;">
+                                <ul class="list-group">
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Number">Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="RFX_id">RFQ Id</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="quarter">Quarter</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="sent_to">Sent To</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Part_Number">Part Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Mfr_Part_Number">Mfr_Part_Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Mfr_Name">Mfr Name</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="cm">CM</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Arista_pic_comment">Arista PIC Comment</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Item_Price">Item Price</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Lead_Time">Lead Time</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="MOQ">MOQ</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="List">List</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="tarrif">Tarrif</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="COO">COO</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Inco_Term">Inco Term</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="MPQ">MPQ</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Assembly_cost">Assembly Cost</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Freight_cost">Freight Cost</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Masked_Price">Masked Price</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Quote_Type">Quote Type</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Region">Region</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Geo">Geo</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Life_Cycle">Life Cycle</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Comments">Comments</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Quote_status">Quote Status</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="sent_quater">Sent Quater</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Lifecycle_Phase">Lifecycle Phase</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__commodity">Commodity</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Rev">Rev</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Mfr_Name">Mfr Name</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Mfr_Part_Lifecycle_Phase">Mfr Part Lifecycle Phase</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Mfr_Part_Number">Mfr Part Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Qualification_Status">Qualification Status</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__cm_Part_Number">CM Part Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Arista_Part_Number">Arista Part Number</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Cust_consign">Cust Consign</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Parts_controlled_by">Parts Controlled by</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Item_Desc">Item Desc</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__LT">LT</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__MOQ">MOQ</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Original_PO_Delivery_sent_by_Mexico">Original PO/Delivery Sent by Mexico</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__cm_Quantity_Buffer_On_Hand">cm_Quantity Buffer On Hand</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__cm_Quantity_On_Hand_CS_Inv">cm_Quantity On Hand CS Inv</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Open_PO_due_in_this_quarter">Open_PO Due in this Quarter</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Open_PO_due_in_next_quarter">Open PO Due in Next Quarter</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Delivery_Based_Total_OH_sum_OPO_this_quarter">Delivery Based Total OH Sum OPO this Quarter</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__PO_Based_Total_OH_sum_OPO">PO Based Total OH Sum OPO</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__CQ_ARIS_FQ_sum_1_SANM_Demand">CQ ARIS FQ Sum 1 SANM Demand</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand">CQ Sum 1 ARIS FQ Sum 2 SANM Demand</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand">CQ Sum 2 ARIS FQ Sum 3 SANM Demand</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__CQ_sum_3_ARIS_FQ_SANM_Demand">CQ Sum 3 ARIS FQ SANM Demand</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista">Delta OH and Open PO DD CQ Sum CQ Sum 1 Arista</input></li>
+                                    <!-- <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std">ARIS CQ SANM FQ Sum 1 Unit Price USD Current Std</input></li> -->
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__sgd_jpe_cost">Current Qtr Std Cost (SGD / JPE / FGN / HBG/ JSJ/ JMX) $</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD">CQ Sum 1 ARIS FQ Sum 2 SANM Unit Price USD</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1">Delta ARIS CQ Sum 1 SANM FQ Sum 2 vs ARIS CQ SANM FQ Sum 1</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Blended_AVG_PO_Receipt_Price">Sanmina Blended AVG PO Receipt Price</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Ownership">Ownership</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Arista_PIC">Arista PIC</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Team">Team</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__Arista_pic_comment">Arista PIC Comment</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__offcycle">Offcycle</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__bp_comment">BP Comment</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__created_by__username">Created by Username</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="portfolio__bp_comment">BP Comment</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="created_by__username">Ceated by</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Quoted_by">Quoted by</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="NCNR">NCNR</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Team">Team</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="PO_Delivery">PO/Delivery</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="soft_hard_tool">soft_hard_tool</input></li>
+                                    {%if Team != 'CMM Team'%}
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="suggested_split">Suggested Split</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="manual_split">Manual Split</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="previous_split">Previous Split</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="split_type">Split Type</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval_status_PIC">Approval Status PIC</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval_status_Manager">Approval Status Manager</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval_status_Director">approval Status Director</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval_status">Approval Status</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="split_comments">Split Comments</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval1_comments">Manager Comment</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="approval2_comments">Director Comments</input></li>
+                                    {%endif%}
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="std_cost">Std Cost</input></li>
+                                    {%if Team == 'CMM Team'%}
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_comments_on_Justifing_price">CM Comments on Justifing Price</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="Supplier_Distributor_name_from_cm">Supplier Distributor Name from CM</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_Notes_on_Supplier">CM Notes on Supplier</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_Manufacturer">CM Manufacturer</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_mpn">CM MPN</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_buyer">CM Buyer</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="CM_qty_std_source">CM Qty Std Source</input></li>
+                                    <li><input type="checkbox" class="toggle-vis" checked data-column="po_delivery">PO/Delivery</input></li>
+                                    {%endif%}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <h5 class="dropdown-menu-header text-uppercase my-1"><i class="fa fa-envelope"></i>
+                                Filter Excel</h5>
+                                <a class="mt-1 info" href="{%url 'download_rfx' Team%}?template=excel_filter"><u>Download template for filter excel</u></a>
+                            <div id='reset_menu' hidden class="form-group row">
+                                <div class="col-sm-6 font ">
+                                    <p>Reset to Upload new Excel</p>
+                                </div>
+                                <div class="col-sm-1 p-0  float-right">
+                                    <button id='reset_button' class="btn btn-sm btn-danger">Reset</button>
+
+                                </div>
+                            </div>
+                            <form id='filterExcel' class="form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'rfx_excel_filter'%}" save_url="{%url 'rfx_save_predefined_filters'%}">
+                                {% csrf_token %}
+                                <div class="container">
+                                    <br>
+                                    <div class="form-group row">
+                                        <!-- <div class="col-sm-12">
+                                            <span id='file_name_input' class='text-muted text-center'>No File Selected</span>
+                                        </div> -->
+                                        <div class="col-sm-8 px-0">
+                                            <div class="custom-file float-right">
+                                                <!-- <label class="btn  btn-info btn-square btn-sm width-200" for="Upload_Excel">Choose File</label> -->
+                                                <input type="file" style="z-index: -5;top: -40px;" class="custom-file-input" id='Upload_Excel' onchange="$('#file_name_input').html(this.value.replace(/.*[\/\\]/, ''))"required name='Upload_Excel'>
+                                            </div>
+                                            <!-- <input type="file" onchange="$('#file_name_input').html(this.value.replace(/.*[\/\\]/, ''))" required name='Upload_Excel'> -->
+                                        </div>
+                                        <div class="col-4 pb-1 px-0">
+                                            <button type="submit" class="btn btn-sm btn-success btn-square font-small-3 fs-8 " style="width: 100%;" onclick="$('#excel_name').val('')">Upload and Filter</button>
+                                        </div>
+                                        <div class="col-8 pl-0">
+                                            <input type="text" class="form-control input-sm square" style="width: 100%;" id='excel_name' name='name' placeholder="Enter the filter name" />
+                                        </div>
+                                        <div class="col-4 px-0 ">
+                                            <button type="submit" class="btn btn-sm btn-light-info btn-square" onclick="if ($('#excel_name').val()==''){$('#excel_name').val('Un Named Filter')}" style="width: 100%;">Save and Filter</button>
+                                        </div>
+                                        <div class="col-12 pt-1 px-0">
+                                            <button type="button" class="btn  btn-info btn-sm btn-square" style="width: 100%;" data-bs-toggle="modal" onclick='saved_filters()' data-bs-target="#saved_filter_model"><i class="fa fa-database"></i> Saved filters</button></a>
+                                            
+                                            <div class="modal fade text-left" id="saved_filter_model" tabindex="-1" role="dialog" aria-labelledby="myModalLabel201" aria-hidden="true">
+                                                <div class="modal-dialog modal-md" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title" id="myModalLabel201">Saved Filters</h4>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <span class="width-100-per" id='saved_filters'></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-5">
+                            <div class=" border-left-grey border-left-lighten-3">
+                                <h5 class=" text-uppercase m-1"><i class="fa fa-filter"></i> Advance Filter
+                                    <button type="button" class="btn btn-light-success btn-social float-right m-2" id="newrow"><i class="fa fa-plus"></i> New Parameter</button>
+                                </h5>
+                                <div class="row mt-2">
+                                    <form method="POST" id="advance_filter_RFX_form">
+                                        {%csrf_token%}
+                                        <div id='Advance_filter_div' class="card-body py-0">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <table class="table table-xs font-small-2 table-borderless"id="advance_filter_table">
+                                                        <tbody>
+                                                            <tr id="advance_filter_tr" class="hidden">
+                                                                <td class="pt-0" style="width: 50%">
+                                                                    <fieldset class="form-group">
+                                                                        <select class="form-control input-sm fields" name="fields[]" onchange="getVal(this)">
+                                                                            <option disabled selected value=''>Select Field</option>
+                                                                            <option value="id">RFQ Id</option>
+                                                                            <option value="quarter">Quarter</option>
+                                                                            <option value="sent_to">Sent To</option>
+                                                                            <option value="Part_Number">Part Number</option>
+                                                                            {%if Team != 'CMM Team'%}
+                                                                            <option value="approval_status_PIC">Approval Status PIC</option>
+                                                                            <option value="approval_status_Manager">Approval Status Manager</option>
+                                                                            <option value="approval_status_Director">Approval Status Director</option>
+                                                                            {% endif %}
+                                                                            <option value="Mfr_Part_Number">Mfr Part Number</option>
+                                                                            <option value="Mfr_Name">Mfr Name</option>
+                                                                            <option value="cm">CM</option>
+                                                                            <option value="approval_status">ApprovalStatus</option>
+                                                                            <option value="Arista_pic_comment">Arista PIC Comment</option>
+                                                                            <option value="Item_Price">Item Price</option>
+                                                                            <option value="Lead_Time">Lead Time</option>
+                                                                            <option value="MOQ">MOQ</option>
+                                                                            <option value="List">List</option>
+                                                                            <option value="tarrif">Tarrif</option>
+                                                                            <option value="COO">COO</option>
+                                                                            <option value="Inco_Term">Inco Term</option>
+                                                                            <option value="MPQ">MPQ</option>
+                                                                            <option value="Assembly_cost">Assembly Cost</option>
+                                                                            <option value="Freight_cost">Freight Cost</option>
+                                                                            <option value="Masked_Price">Masked Price</option>
+                                                                            <option value="Quote_Type">Quote Type</option>
+                                                                            <option value="Region">Region</option>
+                                                                            <option value="Geo">Geo</option>
+                                                                            <option value="Life_Cycle">Life Cycle</option>
+                                                                            <option value="Comments">Comments</option>
+                                                                            <option value="Quote_status">Quote status</option>
+                                                                            <option value="sent_quater">Sent Quater</option>
+                                                                            <option value="portfolio__Lifecycle_Phase">Lifecycle Phase</option>
+                                                                            <option value="portfolio__commodity">Commodity</option>
+                                                                            <option value="portfolio__Rev">Rev</option>
+                                                                            <option value="portfolio__Mfr_Name">Mfr Name</option>
+                                                                            <option value="portfolio__Mfr_Part_Lifecycle_Phase">Mfr Part Lifecycle Phase</option>
+                                                                            <option value="portfolio__Mfr_Part_Number">Mfr Part Number</option>
+                                                                            <option value="portfolio__Qualification_Status">Qualification Status</option>
+                                                                            <option value="portfolio__cm_Part_Number">CM Part Number</option>
+                                                                            <option value="portfolio__Arista_Part_Number">Arista Part Number</option>
+                                                                            <option value="portfolio__Cust_consign">Cust Consign</option>
+                                                                            <option value="portfolio__Parts_controlled_by">Parts Controlled by</option>
+                                                                            <option value="portfolio__Item_Desc">Item Desc</option>
+                                                                            <option value="portfolio__LT">LT</option>
+                                                                            <option value="portfolio__MOQ">MOQ</option>
+                                                                            <option value="portfolio__Original_PO_Delivery_sent_by_Mexico">Original PO Delivery sent by Mexico</option>
+                                                                            <option value="portfolio__cm_Quantity_Buffer_On_Hand">CM Quantity Buffer On Hand</option>
+                                                                            <option value="portfolio__cm_Quantity_On_Hand_CS_Inv">CM Quantity On Hand CS Inv</option>
+                                                                            <option value="portfolio__Open_PO_due_in_this_quarter">Open PO Due in this Quarter</option>
+                                                                            <option value="portfolio__Open_PO_due_in_next_quarter">Open PO Due in next Quarter</option>
+                                                                            <option value="portfolio__Delivery_Based_Total_OH_sum_OPO_this_quarter">Delivery Based Total OH Sum OPO this Quarter</option>
+                                                                            <option value="portfolio__PO_Based_Total_OH_sum_OPO">PO Based Total OH Sum OPO</option>
+                                                                            <option value="portfolio__CQ_ARIS_FQ_sum_1_SANM_Demand">CQ ARIS FQ Sum 1 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand">CQ Sum 1 ARIS FQ Sum 2 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand">CQ Sum 2 ARIS FQ Sum 3 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_3_ARIS_FQ_SANM_Demand">CQ Sum 3 ARIS FQ SANM Demand</option>
+                                                                            <option value="portfolio__Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista">Delta OH and Open PO DD CQ Sum CQ Sum 1 Arista</option>
+                                                                            <option value="portfolio__ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std">ARIS CQ SANM FQ Sum 1 Unit Price USD Current Std</option>
+                                                                            <option value="portfolio__sgd_jpe_cost">Current Qtr Std Cost (SGD / JPE / FGN / HBG/ JSJ/ JMX) $</option>
+                                                                            <option value="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD">CQ Sum 1 ARIS FQ Sum 2 SANM Unit Price USD</option>
+                                                                            <option value="portfolio__Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1">Delta ARIS CQ Sum 1 SANM FQ Sum 2 vs ARIS CQ SANM FQ Sum 1</option>
+                                                                            <option value="portfolio__Blended_AVG_PO_Receipt_Price">Blended AVGPO Receipt Price</option>
+                                                                            <option value="portfolio__Ownership">Ownership</option>
+                                                                            <option value="portfolio__Arista_PIC">Arista PIC</option>
+                                                                            <option value="portfolio__Team">Team</option>
+                                                                            <option value="portfolio__Arista_pic_comment">Arista PIC Comment</option>
+                                                                            <option value="portfolio__offcycle">Offcycle</option>
+                                                                            <option value="portfolio__bp_comment">BP Comment</option>
+                                                                            <option value="portfolio__created_by__username">Created by Username</option>
+                                                                            <option value="portfolio__bp_comment">BP Comment</option>
+                                                                            <option value="created_by__username">Created by</option>
+                                                                            <option value="Quoted_by">Quoted by</option>
+                                                                            <option value="NCNR">NCNR</option>
+                                                                            <option value="Team">Team</option>
+                                                                            <option value="PO_Delivery">PO/Delivery</option>
+                                                                            <option value="soft_hard_tool">Soft Hard Tool</option>
+                                                                            {%if Team != 'CMM Team'%}
+                                                                            <option value="suggested_split">Suggested Split</option>
+                                                                            <option value="manual_split">Manual Split</option>
+                                                                            <option value="previous_split">Previous Split</option>
+                                                                            <option value="split_type">Split Type</option>
+                                                                            <option value="split_comments">Split Comments</option>
+                                                                            <option value="approval1_comments">Manager Comment</option>
+                                                                            <option value="approval2_comments">Director Comments</option>
+                                                                            {%endif%}
+                                                                            <option value="std_cost">Std Cost</option>
+                                                                            {%if Team == 'CMM Team'%}
+                                                                            <option value="CM_comments_on_Justifing_price">CM Comments on Justifing Price</option>
+                                                                            <option value="Supplier_Distributor_name_from_cm">Supplier Distributor Name from CM</option>
+                                                                            <option value="CM_Notes_on_Supplier">CM Notes on Supplier</option>
+                                                                            <option value="CM_Manufacturer">CM Manufacturer</option>
+                                                                            <option value="CM_mpn">CM MPN</option>
+                                                                            <option value="CM_buyer">CM Buyer</option>
+                                                                            <option value="CM_qty_std_source">CM Qty Std Source</option>
+                                                                            <option value="po_delivery">PO/Delivery</option>
+                                                                            {%endif%}
+                                                                        </select>
+                                                                    </fieldset>
+                                                                </td>
+                                                                <td class="pt-0" style="width: 50%">
+                                                                    <div class="appendvalue"> 
+                                                                        <input type="text" class="input-sm form-control overflow-auto" disabled>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="pt-0">
+                                                                    <a class="btn btn-light-danger white" onclick="DeleteRow(this)"><i class="ki-duotone ki-trash-square fs-1">
+                                                                        <span class="path1"></span>
+                                                                        <span class="path2"></span>
+                                                                        <span class="path3"></span>
+                                                                        <span class="path4"></span>
+                                                                        </i></a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="pt-0" style="width: 50%">
+                                                                    <fieldset class="form-group">
+                                                                        <select class="form-control input-sm fields"
+                                                                            name="fields[]" onchange="getVal(this)">
+                                                                            <option disabled selected value=''>Select Field</option>
+                                                                            <option value="id">RFQ Id</option>
+                                                                            <option value="quarter">Quarter</option>
+                                                                            <option value="sent_to">Sent To</option>
+                                                                            <option value="Part_Number">Part Number</option>
+                                                                            {%if Team != 'CMM Team'%}
+                                                                            <option value="approval_status_PIC">Approval Status PIC</option>
+                                                                            <option value="approval_status_Manager">Approval Status Manager</option>
+                                                                            <option value="approval_status_Director">Approval Status Director</option>
+                                                                            {% endif %}
+                                                                            <option value="Mfr_Part_Number">Mfr Part Number</option>
+                                                                            <option value="Mfr_Name">Mfr Name</option>
+                                                                            <option value="cm">CM</option>
+                                                                            <option value="approval_status">ApprovalStatus</option>
+                                                                            <option value="Arista_pic_comment">Arista PIC Comment</option>
+                                                                            <option value="Item_Price">Item Price</option>
+                                                                            <option value="Lead_Time">Lead Time</option>
+                                                                            <option value="MOQ">MOQ</option>
+                                                                            <option value="List">List</option>
+                                                                            <option value="tarrif">Tarrif</option>
+                                                                            <option value="COO">COO</option>
+                                                                            <option value="Inco_Term">Inco Term</option>
+                                                                            <option value="MPQ">MPQ</option>
+                                                                            <option value="Assembly_cost">Assembly Cost</option>
+                                                                            <option value="Freight_cost">Freight Cost</option>
+                                                                            <option value="Masked_Price">Masked Price</option>
+                                                                            <option value="Quote_Type">Quote Type</option>
+                                                                            <option value="Region">Region</option>
+                                                                            <option value="Geo">Geo</option>
+                                                                            <option value="Life_Cycle">Life Cycle</option>
+                                                                            <option value="Comments">Comments</option>
+                                                                            <option value="Quote_status">Quote status</option>
+                                                                            <option value="sent_quater">Sent Quater</option>
+                                                                            <option value="portfolio__Lifecycle_Phase">Lifecycle Phase</option>
+                                                                            <option value="portfolio__commodity">Commodity</option>
+                                                                            <option value="portfolio__Rev">Rev</option>
+                                                                            <option value="portfolio__Mfr_Name">Mfr Name</option>
+                                                                            <option value="portfolio__Mfr_Part_Lifecycle_Phase">Mfr Part Lifecycle Phase</option>
+                                                                            <option value="portfolio__Mfr_Part_Number">Mfr Part Number</option>
+                                                                            <option value="portfolio__Qualification_Status">Qualification Status</option>
+                                                                            <option value="portfolio__cm_Part_Number">CM Part Number</option>
+                                                                            <option value="portfolio__Arista_Part_Number">Arista Part Number</option>
+                                                                            <option value="portfolio__Cust_consign">Cust Consign</option>
+                                                                            <option value="portfolio__Parts_controlled_by">Parts Controlled by</option>
+                                                                            <option value="portfolio__Item_Desc">Item Desc</option>
+                                                                            <option value="portfolio__LT">LT</option>
+                                                                            <option value="portfolio__MOQ">MOQ</option>
+                                                                            <option value="portfolio__Original_PO_Delivery_sent_by_Mexico">Original PO Delivery sent by Mexico</option>
+                                                                            <option value="portfolio__cm_Quantity_Buffer_On_Hand">CM Quantity Buffer On Hand</option>
+                                                                            <option value="portfolio__cm_Quantity_On_Hand_CS_Inv">CM Quantity On Hand CS Inv</option>
+                                                                            <option value="portfolio__Open_PO_due_in_this_quarter">Open PO Due in this Quarter</option>
+                                                                            <option value="portfolio__Open_PO_due_in_next_quarter">Open PO Due in next Quarter</option>
+                                                                            <option value="portfolio__Delivery_Based_Total_OH_sum_OPO_this_quarter">Delivery Based Total OH Sum OPO this Quarter</option>
+                                                                            <option value="portfolio__PO_Based_Total_OH_sum_OPO">PO Based Total OH Sum OPO</option>
+                                                                            <option value="portfolio__CQ_ARIS_FQ_sum_1_SANM_Demand">CQ ARIS FQ Sum 1 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand">CQ Sum 1 ARIS FQ Sum 2 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand">CQ Sum 2 ARIS FQ Sum 3 SANM Demand</option>
+                                                                            <option value="portfolio__CQ_sum_3_ARIS_FQ_SANM_Demand">CQ Sum 3 ARIS FQ SANM Demand</option>
+                                                                            <option value="portfolio__Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista">Delta OH and Open PO DD CQ Sum CQ Sum 1 Arista</option>
+                                                                            <option value="portfolio__ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std">ARIS CQ SANM FQ Sum 1 Unit Price USD Current Std</option>
+                                                                            <option value="portfolio__sgd_jpe_cost">Current Qtr Std Cost (SGD / JPE / FGN / HBG/ JSJ/ JMX) $</option>
+                                                                            <option value="portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD">CQ Sum 1 ARIS FQ Sum 2 SANM Unit Price USD</option>
+                                                                            <option value="portfolio__Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1">Delta ARIS CQ Sum 1 SANM FQ Sum 2 vs ARIS CQ SANM FQ Sum 1</option>
+                                                                            <option value="portfolio__Blended_AVG_PO_Receipt_Price">Blended AVGPO Receipt Price</option>
+                                                                            <option value="portfolio__Ownership">Ownership</option>
+                                                                            <option value="portfolio__Arista_PIC">Arista PIC</option>
+                                                                            <option value="portfolio__Team">Team</option>
+                                                                            <option value="portfolio__Arista_pic_comment">Arista PIC Comment</option>
+                                                                            <option value="portfolio__offcycle">Offcycle</option>
+                                                                            <option value="portfolio__bp_comment">BP Comment</option>
+                                                                            <option value="portfolio__created_by__username">Created by Username</option>
+                                                                            <option value="portfolio__bp_comment">BP Comment</option>
+                                                                            <option value="created_by__username">Created by</option>
+                                                                            <option value="Quoted_by">Quoted by</option>
+                                                                            <option value="NCNR">NCNR</option>
+                                                                            <option value="Team">Team</option>
+                                                                            <option value="PO_Delivery">PO/Delivery</option>
+                                                                            <option value="soft_hard_tool">Soft Hard Tool</option>
+                                                                            {%if Team != 'CMM Team'%}
+                                                                            <option value="suggested_split">Suggested Split</option>
+                                                                            <option value="manual_split">Manual Split</option>
+                                                                            <option value="previous_split">Previous Split</option>
+                                                                            <option value="split_type">Split Type</option>
+                                                                            <option value="split_comments">Split Comments</option>
+                                                                            <option value="approval1_comments">Manager Comment</option>
+                                                                            <option value="approval2_comments">Director Comments</option>
+                                                                            {%endif%}
+                                                                            <option value="std_cost">Std Cost</option>
+                                                                            {%if Team == 'CMM Team'%}
+                                                                            <option value="CM_comments_on_Justifing_price">CM Comments on Justifing Price</option>
+                                                                            <option value="Supplier_Distributor_name_from_cm">Supplier Distributor Name from CM</option>
+                                                                            <option value="CM_Notes_on_Supplier">CM Notes on Supplier</option>
+                                                                            <option value="CM_Manufacturer">CM Manufacturer</option>
+                                                                            <option value="CM_mpn">CM MPN</option>
+                                                                            <option value="CM_buyer">CM Buyer</option>
+                                                                            <option value="CM_qty_std_source">CM Qty Std Source</option>
+                                                                            <option value="po_delivery">PO/Delivery</option>
+                                                                            {%endif%}
+                                                                        </select>
+                                                                    </fieldset>
+                                                                </td>
+                                                                <td class="pt-0" style="width: 50%">
+                                                                    <div class="appendvalue">
+                                                                        <input type="text" class="input-sm form-control " disabled>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="pt-0">
+                                                                    <a class="btn btn-light-danger white" onclick="DeleteRow(this)">
+                                                                    <i class="ki-duotone ki-trash-square fs-1">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                    <span class="path4"></span>
+                                                                    </i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-2 float-right">
+                                                <button class="btn  btn-sm btn-success text-nowrap"> Apply Filter</button>
+                                            </div>
+                                        </div>
+
+                                        <button type="button" id='Advance_filter_reset_button' hidden
+                                            class="btn btn-info btn-sm ml-3"><i class="fa fa-refresh"></i> Advance
+                                            filter reset</button>
+                                    </form>
+                                    <div class="col-md-2 float-left">
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-5">
+                <!-- <div class="row">
+                    <input class='form-control input-sm col-2 pull-left mt-1 ml-1' type="text" id='Analysis_master_search' placeholder="Master Search">
+                    <span class="m-2  info text-bold-700">Note:To check the lock/unlock status check Quote Writable Column</span>
+                    <input type="hidden" id='download_flag' value=false>
+                    <input type="hidden" id='filter_flag' value='no_filter'>
+                    <input type="hidden" id='advance_flag' value='no_filter'>
+                    <input type="hidden" id='check_box_all_flag' value='no_filter'>
+                    <input type="hidden" id='table_filter_tab' value='all'>
+                </div> -->
+
+                <div class="table-responsive">
+                    <input type="hidden" id='download_flag' value=false>
+                    <input type="hidden" id='filter_flag' value='no_filter'>
+                    <input type="hidden" id='advance_flag' value='no_filter'>
+                    <input type="hidden" id='check_box_all_flag' value='no_filter'>
+                    <input type="hidden" id='table_filter_tab' value='all'>
+                <table id="Analysis_table" class="table table-bordered table-striped text-nowrap table-xs font-small-2">
+                    <thead class="bg-light-info text-center text-dark font-s">
+                        <tr >
+                            <th class="px-5 text-nowrap bg-light-info"><input type="checkbox" onclick="select_all(this)" id="select_all_checkbox"></th>
+                            {%if Team == 'CMM Team'%}
+                            <th class="px-5 text-nowrap bg-light-info">Part Number</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Name</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Part Number</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Item Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM SGD Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JPE Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM FGN Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM HBG Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JSJ Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JMX Std Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Share it with CM</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM SGD Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JPE Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM FGN Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM HBG Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JSJ Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JMX Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM SGD MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JPE MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM FGN MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM HBG MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JSJ MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM JMX MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">Approval Status</th>
+                            <th class="px-5 text-nowrap bg-light-info">RFQ ID</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quarter</th>
+                            <th class="px-5 text-nowrap bg-light-info">Sent To</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM</th>
+                            <th class="px-5 text-nowrap bg-light-info">Commodity</th>
+                            <th class="px-5 text-nowrap bg-light-info">Lifecycle Phase</th>
+                            <th class="px-5 text-nowrap bg-light-info">Rev</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Part Lifecycle Phase</th>
+                            <th class="px-5 text-nowrap bg-light-info">Qualification Status</th>
+                            <th class="px-5 text-nowrap bg-light-info">Cust Consign</th>
+                            <th class="px-5 text-nowrap bg-light-info">Parts Controlled by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Item Desc</th>
+                            <th class="px-5 text-nowrap bg-light-info">Original PO Delivery Sent by Mexico</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Quantity Buffer On Hand</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Quantity On Hand CS Inv</th>
+                            <th class="px-5 text-nowrap bg-light-info">Open PO Due in this Quarter</th>
+                            <th class="px-5 text-nowrap bg-light-info">Open PO Due in Next Quarter</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delivery Based Total OH Sum OPO this Quarter</th>
+                            <th class="px-5 text-nowrap bg-light-info">PO Based Total OH Sum OPO</th>
+                            <th class="px-5 text-nowrap bg-light-info">Curent Quarter Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Curent Quarter+1 Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Curent Quarter+2 Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">CQ Sum 3 ARIS FQ SANM Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delta OH and Open PO DD CQ Sum CQ Sum 1 Arista</th>
+                            <th class="px-5 text-nowrap bg-light-info">Current Quarter std price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">CQ Sum 1 ARIS FQ Sum 2 SANM Unit Price USD ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delta std Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Sanmina Blended AVG PO Receipt Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Ownership</th>
+                            <th class="px-5 text-nowrap bg-light-info">Arista PIC</th>
+                            <th class="px-5 text-nowrap bg-light-info">Team</th>
+                            <th class="px-5 text-nowrap bg-light-info">List</th>
+                            <th class="px-5 text-nowrap bg-light-info">Tarrif</th>
+                            <th class="px-5 text-nowrap bg-light-info">COO</th>
+                            <th class="px-5 text-nowrap bg-light-info">Inco Term</th>
+                            <th class="px-5 text-nowrap bg-light-info">NCNR</th>
+                            <th class="px-5 text-nowrap bg-light-info">MPQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">Assembly Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Freight Cost ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Masked Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quote Type</th>
+                            <th class="px-5 text-nowrap bg-light-info">Region</th>
+                            <th class="px-5 text-nowrap bg-light-info">Geo</th>
+                            <th class="px-5 text-nowrap bg-light-info">Life Cycle</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Manufacturer</th>
+                            <th class="px-5 text-nowrap bg-light-info">Supplier Distributor Name from CM</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM MPN</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Buyer</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Qty std Source</th>
+                            <th class="px-5 text-nowrap bg-light-info">Comment</th>
+                            <th class="px-5 text-nowrap bg-light-info">BP Comment</th>
+                            <th class="px-5 text-nowrap bg-light-info">Created by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quoted by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Modified on</th>
+                            <th class="px-5 text-nowrap bg-light-info">Created on</th>
+                            <th class="px-5 text-nowrap bg-light-info">History</th>
+                            <th class="px-5 text-nowrap bg-light-info">Type</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quote Writable</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delete</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quote Status</th>
+                            {%else%}
+                            <!-- GSM Team -->
+                            <th class="px-5 text-nowrap bg-light-info">Arista Part Number or APN</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Name</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quoted Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Part Number or MPN</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM</th>
+                            <th class="px-5 text-nowrap bg-light-info">Lead Time</th>
+                            <th class="px-5 text-nowrap bg-light-info">MOQ</th>
+                            <th class="px-5 text-nowrap bg-light-info">Suggested Split</th>
+                            <th class="px-5 text-nowrap bg-light-info">Manual Split *</th>
+                            <th class="px-5 text-nowrap bg-light-info">Sent To</th>
+                            <th class="px-5 text-nowrap bg-light-info">Lifecycle Phase</th>
+                            <th class="px-5 text-nowrap bg-light-info">Qual Status</th>
+                            <th class="px-5 text-nowrap bg-light-info">Mfr Lifecycle</th>
+                            <th class="px-5 text-nowrap bg-light-info">PIC Approval Status</th>
+                            <th class="px-5 text-nowrap bg-light-info">Previous Qtr Split</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">PIC Approval Status</th> -->
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Manager Approval Status</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">PIC Approval / Rejection Comments</th>
+                            <th class="px-5 text-nowrap bg-light-info">Manual Split Comments*</th>
+                            <th class="px-5 text-nowrap bg-light-info">Manager Approval / Rejection Comments</th>
+                            <th class="px-5 text-nowrap bg-light-info">New Std Cost ($)</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Director Approval Status</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">Director Approval / Rejection Comments</th>
+                            <th class="px-5 text-nowrap bg-light-info">RFQ ID</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quarter</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Sent To</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">List</th>
+                            <th class="px-5 text-nowrap bg-light-info">Tariff</th>
+                            <th class="px-5 text-nowrap bg-light-info">COO</th>
+                            <th class="px-5 text-nowrap bg-light-info">Inco Terms</th>
+                            <th class="px-5 text-nowrap bg-light-info">Freight</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quote Type</th>
+                            <th class="px-5 text-nowrap bg-light-info">Supplier Lifecycle</th>
+                            <th class="px-5 text-nowrap bg-light-info">Supplier Comments</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Qual Status</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">NCNR</th>
+                            <th class="px-5 text-nowrap bg-light-info">Team</th>
+                            <th class="px-5 text-nowrap bg-light-info">PO / Delivery</th>
+                            <th class="px-5 text-nowrap bg-light-info">Soft / Hard Tool</th>
+                            <th class="px-5 text-nowrap bg-light-info">RFQ sent Quarter</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Lifecycle Phase</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">Commodity</th>
+                            <th class="px-5 text-nowrap bg-light-info">Rev</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Part Number</th>
+                            <th class="px-5 text-nowrap bg-light-info">Cust Consign</th>
+                            <th class="px-5 text-nowrap bg-light-info">Parts Controlled by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Item Desc</th>
+                            <th class="px-5 text-nowrap bg-light-info">Original PO / Delivery</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Qty Buffer On Hand</th>
+                            <th class="px-5 text-nowrap bg-light-info">CM Qty On Hand Cs Inv</th>
+                            <th class="px-5 text-nowrap bg-light-info">Open PO Current Qtr</th>
+                            <th class="px-5 text-nowrap bg-light-info">Open PO Q+1</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delivery based Total OH + OPO Current Qtr</th>
+                            <th class="px-5 text-nowrap bg-light-info">PO based Total OH +OPO</th>
+                            <th class="px-5 text-nowrap bg-light-info">Current Qtr Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Q+1 Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Q+2 Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Q+3 Demand</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delta Demand</th>
+                            <!-- <th class="px-5 text-nowrap bg-light-info">Current Qtr std cost ($)</th> -->
+                            <th class="px-5 text-nowrap bg-light-info">Current Qtr Std Cost (SGD / JPE / FGN / HBG / JSJ / JMX) $</th>
+                            <th class="px-5 text-nowrap bg-light-info">Sanmina Blended Avg PO Receipt Price ($)</th>
+                            <th class="px-5 text-nowrap bg-light-info">Ownership</th>
+                            <th class="px-5 text-nowrap bg-light-info">Arista PIC</th>
+                            <th class="px-5 text-nowrap bg-light-info">Offcycle</th>
+                            <th class="px-5 text-nowrap bg-light-info">BP comments</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quoted by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Split Type</th>
+                            <th class="px-5 text-nowrap bg-light-info">Created by</th>
+                            <th class="px-5 text-nowrap bg-light-info">Modified on</th>
+                            <th class="px-5 text-nowrap bg-light-info">Created on</th>
+                            <th class="px-5 text-nowrap bg-light-info">History</th>
+                            <th class="px-5 text-nowrap bg-light-info">Quote Writable</th>
+                            <th class="px-5 text-nowrap bg-light-info">Delete</th>
+                            <th class="px-5 text-nowrap bg-light-info">Approval Status</th>
+                            <!--                                     
+                                <th>Approval Flag</th>
+                                <th>CQ Sum 1 ARIS FQ Sum 2 SANM Unit Price USD ($)</th>
+                                <th>Delta std Price ($)</th>
+                                <th>MPQ</th>
+                                <th>Assembly Cost ($)</th>
+                                <th>Masked Price ($)</th>
+                                <th>Region</th>
+                                <th>Geo</th>
+                                <th>Director Approval / Rejection Comments</th>                                    
+                                <th>Comment</th>
+                                <th>Created by</th>
+                                <th>Modified on</th>
+                                <th>Created on</th>
+                                <th>History</th>
+                                <th>Quote Writable</th>
+                                <th>Type</th>
+                                <th>Delete</th>
+                                <th>Quote Status</th>
+                                <th>PO / Delivery</th>PO_Delivery -->
+                            {% endif %}
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <!-- <tfoot>
+                        <tr>
+                            <th class="font-small-1"></th>
+                            <th><input type="text" placeholder="Search RFX_id"></th>
+                            <th><input type="text" placeholder="Search quarter"></th>
+                            <th><input type="text" placeholder="Search sent_to"></th>
+                            <th><input type="text" placeholder="Search Part_Number"></th>
+                            <th><input type="text" placeholder="Search Mfr_Name"></th>
+                            <th><input type="text" placeholder="Search cm"></th>
+                            <th><input type="text" placeholder="Search Item_Price"></th>
+                            <th><input type="text" placeholder="Search Lead_Time"></th>
+                            <th><input type="text" placeholder="Search MOQ"></th>
+                            <th><input type="text" placeholder="Search List"></th>
+                            <th><input type="text" placeholder="Search tarrif"></th>
+                            <th><input type="text" placeholder="Search COO"></th>
+                            <th><input type="text" placeholder="Search Inco_Term"></th>
+                            <th><input type="text" placeholder="Search MPQ"></th>
+                            <th><input type="text" placeholder="Search Assembly_cost"></th>
+                            <th><input type="text" placeholder="Search Freight_cost"></th>
+                            <th><input type="text" placeholder="Search Masked_Price"></th>
+                            <th><input type="text" placeholder="Search Quote_Type"></th>
+                            <th><input type="text" placeholder="Search Region"></th>
+                            <th><input type="text" placeholder="Search Geo"></th>
+                            <th><input type="text" placeholder="Search Life_Cycle"></th>
+                            <th><input type="text" placeholder="Search Comments"></th>
+                            <th><input type="text" placeholder="Search portfolio__id"></th>
+                            <th><input type="text" placeholder="Search created_by"></th>
+                            <th><input type="text" placeholder="Search Quoted_by"></th>
+                            <th><input type="text" placeholder="Search modified_on"></th>
+                            <th><input type="text" placeholder="Search created_on"></th>
+                            <th><input type="text" placeholder="Search history"></th>
+                            <th><input type="text" placeholder="Search quote_is_writable"></th>
+                            <th><input type="text" placeholder="Search Quote_status"></th>
+                            <th><input type="text" placeholder="Search delete"></th>
+                        </tr>
+                    </tfoot> -->
+                </table>
+                </div>
+            </div>
+        </div>
+        {%if Team == 'CMM Team'%}
+        <div role="tabpanel" class="card tab-pane fade" id="tab2" aria-labelledby="base-tab2">
+            <div class="card-body">
+                <div class="table-responsive" id="price_bench_marking">
+                    Benchmarking Please wait...
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="card tab-pane fade" id="tab3" aria-labelledby="base-tab3">
+            <div class="card-body">
+                <div class="table-responsive" id="cm_quote_analysis">
+                    CM Quote Analysis Loading Please wait...
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- history table model -->
+<div class="modal fade" id="history_modal" role="dialog">
+    <div class="modal-dialog  modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">History</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body table-responsive">
+                <table id='history_table' class="table  table-bordered table-striped  table-xs font-small-1">
+                    <thead>
+                        <tr class="bg-blue bg-lighten-5">
+                            <th>Comment by tool</th>
+                            <th>Quarter</th>
+                            <th>Sent To</th>
+                            <th>Part Number</th>
+                            <th>Mfr Part Number</th>
+                            <th>Mfr Name</th>
+                            <th>CM</th>
+                            <th>Item Price ($)</th>
+                            <th>Lead Time</th>
+                            <th>MOQ</th>
+                            <th>List</th>
+                            <th>Tarrif</th>
+                            <th>COO</th>
+                            <th>Inco Term</th>
+                            <th>MPQ</th>
+                            <th>Assembly cost ($)</th>
+                            <th>Freight cost ($)</th>
+                            <th>Masked Price ($)</th>
+                            <th>Quote Type</th>
+                            <th>Region</th>
+                            <th>Geo</th>
+                            <th>Life Cycle</th>
+                            <th>Comments</th>
+                            <th>Quote status</th>
+                            <th>Sent Quater</th>
+                            <th>Portfolio</th>
+                            <th>Created by</th>
+                            <th>Quoted by</th>
+                            <th>Quote is writable</th>
+                            <th>NCNR</th>
+                            <th>PO Delivery</th>
+                            <th>Soft hard tool</th>
+                            <th>Previous Split</th>
+                            <th>Suggested Split</th>
+                            <th>Manual Split</th>
+                            <th>Modified by</th>
+                            <!--<th>Modified by email</th>-->
+                            <th>Modified on</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- split modal -->
+<div class="modal fade" id="split_modal" role="dialog">
+    <div class="modal-dialog  modal-xl">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Set Split</h4>
+                <button type="button" class="close " data-dismiss="modal">&times;</button>
+            </div>
+            <div id="split_modal_payload" class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- error dialog box -->
+<div class="modal fade" id="dialog_message" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <div id='message_header'></div>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id='message_title'></p>
+                <div id='message_div'></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
+{% block scripts %}
+
+<script>
+    $(document).ready(function () {
+        //     $('#Analysis_table thead th').each( function () {
+        //     var title = $('#Analysis_table thead th').eq( $(this).index() ).text();
+        //     $(this).html( title+'<br><input type="text" />' );
+        // } );
+        $('[data-toggle="tooltip"]').tooltip();
+
+        var analysis_table = $('#Analysis_table').DataTable({
+            language: {
+                "emptyTable": "No data available in table",
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                "infoEmpty": "Showing 0 to 0 of 0 entries",
+                "infoFiltered": "(filtered from _MAX_ total entries)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Show _MENU_ entries",
+                "loadingRecords": "Loading...",
+                "processing": "Fetching...",
+                "search": "Search",
+                "zeroRecords": "No matching records found",
+                "paginate": {
+                    "first": "First",
+                    "last": "Last",
+                    "next": "Next",
+                    "previous": "Previous"
+                },
+                "aria": {
+                    "sortAscending": ": activate to sort column ascending",
+                    "sortDescending": ": activate to sort column descending"
+                }
+            }, // global variable defined in html
+            // order: [[18, "desc"]],
+            lengthMenu: [
+                [20, 50, 100, -1],
+                [20, 50, 100, 'ALL']
+            ],
+            searching: true,
+            processing: true,
+            serverSide: 'true',
+            // stateSave: true,
+            // colReorder: {
+            //     allowReorder: true
+            // },
+            "order": [[1, "desc"]],
+           "columnDefs": [{
+               "targets"  : 'no-sort',
+               "orderable": false,
+           }],
+            autoWidth: true,
+            // colReorder: true,
+            // sorting: false,
+            columns: [
+                // {%if Team == 'CMM Team'%}
+                {
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    "data": "Checkbox",
+                    'render': function (data, type, full, meta) {
+                        if (data[0] != null) {
+                            var data = '<input type="checkbox" class="selection" onclick="checkbox(this)" value=' + data[1] + '  name="select_checkbox" ' + data[0] + ' id="' + data[1] + '_checkbox" >';
+                        } else {
+                            var data = null
+                        }
+                        return data
+                    }
+                }, {
+                    'data': 'Part_Number',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="text-bold-600 info" href="/History/Historydata/' + data + '" target="_blank"><u>' + data + '</u></a>';
+                        }
+                        return data;
+                    }
+                }, 
+                { 'data': 'Mfr_Name' }, 
+                { 'data': 'Mfr_Part_Number' }, 
+                { 'data': 'Item_Price' },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_sgd_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"SGD");  class='blue' >${data.cm_sgd_Item_Price}</a>`
+                        }else{
+                            data = '' 
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_jpe_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"JPE");  class='blue' >${data.cm_jpe_Item_Price}</a>`
+                        }else{
+                            data = ''
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_fgn_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"FGN");  class='blue' >${data.cm_fgn_Item_Price}</a>`
+                        }else{
+                            data = ''
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_hbg_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"HBG");  class='blue' >${data.cm_hbg_Item_Price}</a>`
+                        }else{
+                            data = ''
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_jsj_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"JSJ");  class='blue' >${data.cm_jsj_Item_Price}</a>`
+                        }else{
+                            data = ''
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if(data.cm_jmx_Item_Price){
+                            data = `<a onclick=arista_suggested_split_set(${data.id},"JMX");  class='blue' >${data.cm_jmx_Item_Price}</a>`
+                        }else{
+                            data = ''
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': null,
+                    render: function (data) {
+                        if (data.Quote_status === 'Quoted') {
+
+
+
+                            if (data.approval_status_cmm_team == 'your approval') {
+                                text = `
+                         <button onclick="approval('${data.id}','Approve','CMM')" class="badge badge-success white "><i class="ft-check-circle"> </i> Yes</button>
+                         <button onclick="approval('${data.id}','Reject','CMM')" class="badge badge-danger white "><i class="ft-x-circle"></i> No</button>
+                                     `
+                            }
+                            else if (data.approval_status_cmm_team == 'Approved') {
+                                text = `
+                            <span class='badge badge-success'>Shared</span>
+                            <button onclick="approval('${data.id}','Reject','CMM')" class="badge badge-danger white "><i class="ft-x-circle"></i> Hide</button>
+                        `
+
+
+                            }
+                            else {
+                                text = data.approval_status_cmm_team
+                            }
+                        }
+                        else {
+                            text = `
+                            <span class='badge badge-info'>Non Quoted</span>
+                            
+                        `
+                        }
+                        return text
+                    }
+                },
+                { 'data': 'Lead_Time' },
+                { 'data': 'cm_sgd_Lead_Time' },
+                { 'data': 'cm_jpe_Lead_Time' },
+                { 'data': 'cm_fgn_Lead_Time' },
+                { 'data': 'cm_hbg_Lead_Time' },
+                { 'data': 'cm_jsj_Lead_Time' },
+                { 'data': 'cm_jmx_Lead_Time' },
+                { 'data': 'MOQ' },
+                { 'data': 'cm_sgd_MOQ' },
+                { 'data': 'cm_jpe_MOQ' },
+                { 'data': 'cm_fgn_MOQ' },
+                { 'data': 'cm_hbg_MOQ' },
+                { 'data': 'cm_jsj_MOQ' },
+                { 'data': 'cm_jmx_MOQ' },
+                {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        if (data.approval_status == 'Approved') {
+                            data = `<span class='badge badge-success'> ${data.approval_status} </span>`
+                            return data
+                        }
+                        else if (data.approval_status === null) {
+                            data = ''
+                            return data
+                        }
+                        else {
+                            data = `<span class='badge badge-danger'> ${data.approval_status} </span>`
+                            return data
+                        }
+                    }
+                },
+                { 'data': 'id' },
+                { 'data': 'quarter' }, 
+                { 'data': 'sent_to' }, 
+                { 'data': 'cm' }, 
+                { 'data': 'portfolio__commodity' }, 
+                { 'data': 'portfolio__Lifecycle_Phase' }, 
+                { 'data': 'portfolio__Rev' }, 
+                { 'data': 'portfolio__Mfr_Part_Lifecycle_Phase' }, 
+                { 'data': 'portfolio__Qualification_Status' }, 
+                { 'data': 'portfolio__Cust_consign' }, 
+                { 'data': 'portfolio__Parts_controlled_by' }, 
+                { 'data': 'portfolio__Item_Desc' }, 
+                { 'data': 'portfolio__Original_PO_Delivery_sent_by_Mexico' }, 
+                { 'data': 'portfolio__Sanmina_Quantity_Buffer_On_Hand' }, 
+                { 'data': 'portfolio__Sanmina_Quantity_On_Hand_CS_Inv' }, 
+                { 'data': 'portfolio__Open_PO_due_in_this_quarter' }, 
+                { 'data': 'portfolio__Open_PO_due_in_next_quarter' }, 
+                { 'data': 'portfolio__Delivery_Based_Total_OH_sum_OPO_this_quarter' }, 
+                { 'data': 'portfolio__PO_Based_Total_OH_sum_OPO' }, 
+                { 'data': 'portfolio__CQ_ARIS_FQ_sum_1_SANM_Demand' }, 
+                { 'data': 'portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand' },
+                { 'data': 'portfolio__CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand' },
+                { 'data': 'portfolio__CQ_sum_3_ARIS_FQ_SANM_Demand' },
+                { 'data': 'portfolio__Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista' },
+                { 'data': 'portfolio__ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std' },
+                { 'data': 'portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD' },
+                { 'data': 'portfolio__Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1' },
+                { 'data': 'portfolio__Blended_AVG_PO_Receipt_Price' },
+                { 'data': 'portfolio__Ownership' },
+                { 'data': 'portfolio__Arista_PIC' },
+                { 'data': 'portfolio__Team' },
+                { 'data': 'List' },
+                { 'data': 'tarrif' },
+                { 'data': 'COO' },
+                { 'data': 'Inco_Term' },
+                { 'data': 'NCNR' },
+                { 'data': 'MPQ' },
+                { 'data': 'Assembly_cost' },
+                { 'data': 'Freight_cost' },
+                { 'data': 'Masked_Price' },
+                { 'data': 'Quote_Type' },
+                { 'data': 'Region' },
+                { 'data': 'Geo' },
+                { 'data': 'Life_Cycle' },
+                { 'data': 'CM_Manufacturer' },
+                { 'data': 'Supplier_Distributor_name_from_cm' }, 
+                { 'data': 'CM_mpn' },
+                { 'data': 'CM_buyer' }, 
+                { 'data': 'CM_qty_std_source' },
+                {
+                    'data': null,
+                    "render": function (data) {
+                        temp = `<a class='blue' onclick="Comments(${data.id},'portfolio__Arista_pic_comment','Enter the your comment')" >${data.Arista_pic_comment == null ? '' : data.Arista_pic_comment}</a>`
+                        return temp
+                    }
+                }, 
+                { 'data': 'bp_comment'},
+                { 'data': 'created_by'},
+                { 'data': 'Quoted_by' },
+                { 'data': 'modified_on' },
+                { 'data': 'created_on' },
+                {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        data = `
+                        <div class="badge badge-success ">
+                        <a onclick="history_render(${data.id})"  class='white' >History</a>
+                        </div>
+                        `
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        if (data.offcycle == true) {
+                            data = `<span class='badge badge-info'>Off-Cycle</span>`
+                        } else {
+                            data = `<span class='badge badge-success'>Normal</span>`
+                        }
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        if (data.quote_is_writable == true) {
+                            data = `<span class='badge badge-info'>Unlocked</span>`
+                        } else if (data.quote_is_writable == false) {
+                            data = `<span class='badge badge-danger'>locked</span>`
+                        } else {
+                            data = `<span class='badge badge-blue'>${data.quote_is_writable}</span>`
+                        }
+
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        data = `
+                    <div class="badge badge-danger ">
+                    <a onclick="delete_rfx(${data.id})"  class='white' >Delete</a>
+                    </div>
+                    `
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        data = `<span class='badge badge-info'>${data.Quote_status}</span>`
+                        return data
+                    }
+                },
+                //GSM TEAM
+
+                // {%else%}
+                {
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    "data": "Checkbox",
+                    'render': function (data, type, full, meta) {
+                        if (data[0] != null) {
+                            var data = '<input type="checkbox" class="selection" onclick="checkbox(this)" value=' + data[1] + '  name="select_checkbox" ' + data[0] + ' id="' + data[1] + '_checkbox" >';
+                        } else {
+                            var data = null
+                        }
+                        return data
+                    }
+                },
+                {
+                    'data': 'Part_Number',
+                    "render": function (data, type, row, meta) {
+                        if (type === 'display') {
+                            data = '<a class="text-bold-600 info" href="/History/Historydata/' + data + '" target="_blank"><u>' + data + '</u></a>';
+                        }
+                        return data;
+                    }
+                }, 
+                { 'data': 'Mfr_Name'}, 
+                { 'data': 'Item_Price'}, 
+                { 'data': 'Mfr_Part_Number' },
+                { 'data': 'cm' },
+                { 'data': 'Lead_Time' },
+                { 'data': 'MOQ' },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if (data.Quote_status == 'Quoted') {
+                            return data.suggested_split
+                        }
+                        else {
+                            return '-'
+                        }
+                    }
+                },
+                {
+                    'data': null,
+                    'render': function (data, type, full, meta) {
+                        if (data.Quote_status == 'Quoted') {
+                            data = `
+                        <a onclick=manual_split_set(${data.id});  class='blue' >${data.manual_split == null ? 0 : data.manual_split}</a>
+                        `
+                            return data
+                        }
+                        else {
+                            return '-'
+                        }
+                    }
+                },
+                { 'data': 'sent_to' }, 
+                { 'data': 'portfolio__Lifecycle_Phase' },
+                { 'data': 'portfolio__Qualification_Status' },
+                { 'data': 'portfolio__Mfr_Part_Lifecycle_Phase' },
+                {
+                    'data': null,
+                    render: function (data) {
+                         
+                        if (data.Quote_status == 'Quoted') {
+                            //{% if request.user|has_group:"Admin" or request.user|has_group:"Iness" %}
+                            text = `
+                            <button onclick="approval('${data.id}','Approve','PIC')" class="badge badge-success white"><i class="ft-check-circle"> </i> Accept</button> / 
+                            <button onclick="approval('${data.id}','Reject','PIC')" class="badge badge-danger white "><i class="ft-x-circle"></i>Reject</button> <small> (${data.split_type} Split)</small> 
+                            PIC Approval : ${data.approval_status_PIC}
+                            `
+                            return text
+                            //{% endif %}
+                            if (data.approval_status_PIC == 'your approval') {
+                                text = `
+                                <button onclick="approval('${data.id}','Approve','PIC')" class="badge badge-success white "><i class="ft-check-circle"> </i> Accept</button> <small> (${data.split_type} Split)</small>
+                                
+                                `
+                            } else if ((data.approval_status_PIC == 'your reject')) {
+                                text = `
+                                <button onclick="approval('${data.id}','Reject','PIC')" class="badge badge-danger white "><i class="ft-x-circle"></i>Reject</button>
+                                `
+                            } else {
+                                text = data.approval_status_PIC
+                            }
+                            return text
+                        } else {
+                            return ''
+                        }
+                    }
+                },
+                { 'data': 'previous_split' }, 
+                // {
+                //     'data': null,
+                //     render: function(data) {
+                //         if (data.approval_status_Manager == 'your approval') {
+                //             text = `
+                //          <button onclick="approval('${data.id}','Approve','Manager')" class="badge badge-success white "><i class="ft-check-circle"> </i> Accept</button>
+                //          <button onclick="approval('${data.id}','Reject','Manager')" class="badge badge-danger white "><i class="ft-x-circle"></i>Reject</button>
+                //                      `
+                //         } else {
+                //             text = data.approval_status_Manager
+                //         }
+                //         return text
+                //     }
+                // },
+                {
+                    'data': null,
+                    "render": function (data) {
+                        // {%has_permission request.user 'PIC' as permission%}
+                        // {%if permission%}
+                        temp = `<a class='blue' onclick="Comments_reject_or_approval(${data.id},'PIC_accept_reject_comments','Enter the your comment')" >${data.PIC_accept_reject_comments == null ? 'No Comments' : data.PIC_accept_reject_comments}</a>`
+                        // {%else%}
+                        temp = `${data.PIC_accept_reject_comments == null ? 'No Comments' : data.PIC_accept_reject_comments}`
+
+                        // {%endif%}
+                        return temp
+                    }
+                }, 
+                { 'data': 'split_comments' }, 
+                {
+                    'data': null,
+                    "render": function (data) {
+                        // {%has_permission request.user 'Manager' as permission%}
+                        // {%if permission%}
+                        temp = `<a class='blue' onclick="Comments_reject_or_approval(${data.id},'approval1_comments','Enter the your comment')" >${data.approval1_comments == null ? 'No Comments' : data.approval1_comments}</a>`
+                        // {%else%}
+                        temp = `${data.approval1_comments == null ? 'No Comments' : data.approval1_comments}`
+                        // {%endif%}
+                        return temp
+                    }
+                }, 
+                { 'data': 'std_cost' },
+                // {
+                //     'data': null,
+                //     render: function(data) {
+
+                //         if (data.approval_status_Director == 'your approval') {
+                //             text = `
+                //          <button onclick="approval('${data.id}','Approve','Director')" class="badge badge-success white "><i class="ft-check-circle"> </i> Accept</button>
+                //          <button onclick="approval('${data.id}','Reject','Director')" class="badge badge-danger white "><i class="ft-x-circle"></i>Reject</button>
+                //              `
+                //         } else {
+                //             text = data.approval_status_Director
+                //         }
+                //         return text
+
+                //     }
+                // },
+                {
+                    'data': null,
+                    "render": function (data) {
+                        // {%has_permission request.user 'Director' as permission%}
+                        // {%if permission%}
+                        temp = `<a class='blue' onclick="Comments_reject_or_approval(${data.id},'approval2_comments','Enter the your comment')" >${data.approval2_comments == null ? 'No Comments' : data.approval2_comments}</a>`
+                        // {%else%}
+                        temp = `${data.approval2_comments == null ? 'No Comments' : data.approval2_comments}`
+                        // {%endif%}
+                        return temp
+                    }
+                }, 
+                { 'data': 'id' }, 
+                { 'data': 'quarter' }, 
+                { 'data': 'List' }, 
+                { 'data': 'tarrif' }, 
+                { 'data': 'COO' }, 
+                { 'data': 'Inco_Term' }, 
+                { 'data': 'Freight_cost' }, 
+                { 'data': 'Quote_Type' }, 
+                { 'data': 'Life_Cycle' },
+                { 'data': 'Comments' },  
+                { 'data': 'NCNR' }, 
+                { 'data': 'portfolio__Team' }, 
+                { 'data': 'PO_Delivery' }, 
+                { 'data': 'soft_hard_tool' }, 
+                { 'data': 'sent_quater' },  
+                { 'data': 'portfolio__commodity' }, 
+                { 'data': 'portfolio__Rev' },  
+                { 'data': 'portfolio__cm_Part_Number' }, 
+                { 'data': 'portfolio__Cust_consign' }, 
+                { 'data': 'portfolio__Parts_controlled_by' }, 
+                { 'data': 'portfolio__Item_Desc' }, 
+                { 'data': 'portfolio__Original_PO_Delivery_sent_by_Mexico' }, 
+                { 'data': 'portfolio__Sanmina_Quantity_Buffer_On_Hand' }, 
+                { 'data': 'portfolio__Sanmina_Quantity_On_Hand_CS_Inv' }, 
+                { 'data': 'portfolio__Open_PO_due_in_this_quarter' }, 
+                { 'data': 'portfolio__Open_PO_due_in_next_quarter' }, 
+                { 'data': 'portfolio__Delivery_Based_Total_OH_sum_OPO_this_quarter' }, 
+                { 'data': 'portfolio__PO_Based_Total_OH_sum_OPO' }, 
+                { 'data': 'portfolio__CQ_ARIS_FQ_sum_1_SANM_Demand' }, 
+                { 'data': 'portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand' }, 
+                { 'data': 'portfolio__CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand' }, 
+                { 'data': 'portfolio__CQ_sum_3_ARIS_FQ_SANM_Demand' }, 
+                { 'data': 'portfolio__Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista' },
+                //  { 'data': 'portfolio__ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std' },
+                { 'data': 'portfolio__sgd_jpe_cost' },
+                { 'data': 'portfolio__Blended_AVG_PO_Receipt_Price' }, 
+                { 'data': 'portfolio__Ownership' }, 
+                { 'data': 'portfolio__Arista_PIC' }, 
+                {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        if (data.offcycle == true) {
+                            data = `<span class='badge badge-info'>Off-Cycle</span>`
+                        } else {
+                            data = `<span class='badge badge-success'>Normal</span>`
+                        }
+                        return data
+                    }
+                }, 
+                
+                { 'data': 'bp_comment' }, 
+                { 'data': 'Quoted_by' }, 
+                { 'data': 'split_type' }, 
+                { 'data': 'created_by' }, 
+                {
+                    'data': 'modified_on',
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        date = new Date(Date.parse(data))
+                        return date
+                    }
+                }, {
+                    'data': 'created_on',
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        date = new Date(Date.parse(data))
+                        return date
+                    }
+                },
+                {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        data = `
+                        <div class="badge badge-success">
+                        <a onclick="history_render(${data.id})"  class='white text-white' >History</a>
+                        </div>
+                        `
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        if (data.quote_freeze == true) {
+                            data = `<span class='badge badge-success' data-trigger="click" data-toggle="tooltip" data-placement="top" title="APN Approved,Reject the APN to unlock the quote">APN is approved so MPN is locked</span>`
+                        }
+                        else if (data.quote_is_writable == true) {
+                            data = `<span class='badge badge-info'>Unlocked</span>`
+                        } else if (data.quote_is_writable == false) {
+                            data = `<span class='badge badge-danger'>locked</span>`
+                        } else {
+                            data = `<span class='badge badge-blue'>${data.quote_is_writable}</span>`
+                        }
+                        $('[data-toggle="tooltip"]').tooltip();
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+                    "className": "text-center",
+                    'render': function (data, type, full, meta) {
+                        data = `
+                    <div class="badge badge-danger ">
+                    <a onclick="delete_rfx(${data.id})"  class='white text-white' >Delete</a>
+                    </div>
+                    `
+                        return data
+                    }
+                }, {
+                    'data': null,
+                    "searchable": false,
+
+                    'render': function (data, type, full, meta) {
+                        if (data.Quote_status == 'Quoted' & data.approval_status == 'Approved') {
+
+                            data = `
+                        
+                            <div class="badge ${data.Shareable?'badge-primary':'badge-success'} ">
+                            <a onclick="Mpn_Shareable(${data.id})"  class='white text-white' >${data.Shareable?'Shared with Supplier':'Not Shared with Supplier'}</a>
+                            </div>
+                            
+                            <span class='badge badge-info text-white'>Quoted</span> <span class='badge badge-success text-white'> Approved </span>`
+                            return data
+                        }
+                        else if (data.Quote_status == 'Quoted' & data.approval_status != 'Approved') {
+                            data = `
+                        
+                            <div class="badge ${data.Shareable?'badge-primary':'badge-success'} ">
+                            <a onclick="Mpn_Shareable(${data.id})"  class='white text-white' >${data.Shareable?'Shared with Supplier':'Not Shared with Supplier'}</a>
+                            </div>
+                            
+                            <span class='badge badge-info'>Quoted</span> <span class='badge badge-danger text-white'> PIC Approval Pending </span>`
+                            return data
+
+                        }
+                        else if (data.Quote_status != 'Quoted') {
+                            data = `
+                            <div class="badge ${data.Shareable?'badge-primary':'badge-success'} ">
+                            <a onclick="Mpn_Shareable(${data.id})"  class='white text-white' >${data.Shareable?'Shared with Supplier':'Not Shared with Supplier'}</a>
+                            </div>
+                            <span class='badge badge-info text-white'>${data.Quote_status}</span> `
+                            return data
+
+                        }
+
+                        else {
+                            data = `
+                            <div class="badge ${data.Shareable?'badge-primary':'badge-success'} ">
+                            <a onclick="Mpn_Shareable(${data.id})"  class='white text-white' >${data.Shareable?'Shared with Supplier':'Not Shared with Supplier'}</a>
+                            </div>
+                            <span class='badge badge-info'>${data.Quote_status}</span> `
+
+                            return data
+
+                        }
+
+                    }
+                },
+                // {
+                //     'data': 'approval_flag',
+
+                // },
+                // {
+                //     'data': null,
+                //     "searchable": false,
+                //     "className": "text-center",
+                //     'render': function(data, type, full, meta) {
+                //         if (data.approval_status=='Approved'){
+                //             data = `<span class='badge badge-success'> ${data.approval_status} </span>`
+                //         return data
+                //         }
+                //         else if(data.approval_status===null){
+                //                 data=''
+                //                 return data
+                //         }
+                //         else {
+                //             data = `<span class='badge badge-danger'> ${data.approval_status} </span>`
+                //         return data
+
+                //         }
+
+                //     }
+                // },    {
+                //     'data': 'portfolio__Cust_consign'
+                // }, {
+                //     'data': 'portfolio__Parts_controlled_by'
+                // }, {
+                //     'data': 'portfolio__Item_Desc'
+                // },    {
+                //     'data': 'portfolio__CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD'
+                // }, {
+                //     'data': 'portfolio__Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1'
+                // }, {
+                //     'data': 'portfolio__Blended_AVG_PO_Receipt_Price'
+                // },  {
+                //     'data': 'MPQ'
+                // }, {
+                //     'data': 'Assembly_cost'
+                // },  {
+                //     'data': 'Masked_Price'
+                // },  {
+                //     'data': 'Region'
+                // }, {
+                //     'data': 'Geo'
+                // }, {
+                //     'data': 'Life_Cycle'
+                // },
+
+
+                // {
+                //     'data': null,
+                //     "render": function(data) {
+                //         temp = `<a class='blue' onclick="Comments(${data.id},'portfolio__Arista_pic_comment','Enter the your comment')" >${data.Arista_pic_comment==null ? '':data.Arista_pic_comment}</a>`
+                //         return temp
+                //     }
+                // }, {
+                //     'data': 'bp_comment'
+                // }, 
+                // {%endif%}
+
+            ],
+            buttons: [{
+                extend: 'colvis',
+                className: "btn btn-outline-secondary btn btn-secondary dropdown-toggle btn-sm",
+
+            }, {
+                extend: 'excelHtml5',
+                className: "btn btn-outline-secondary btn-sm",
+
+                exportOptions: {
+                    columns: ':visible',
+                }
+            }, {
+                extend: 'copy',
+                className: "btn btn-outline-secondary btn-sm",
+
+            },
+            ],
+
+
+            ajax: {
+                url: '{% url "Analysis_data" %}',
+                "type": "GET",
+
+                "data": function (d) {
+                    return $.extend({}, d, {
+                        "filter": $("#filter_flag").val(),
+                        "advance_filter": $("#advance_flag").val(),
+                        "team": '{{Team}}',
+                        'download': $("#download_flag").val(),
+                        'check_box_all_flag': $("#check_box_all_flag").val(),
+                        'table_filter_tab': $('#table_filter_tab').val()
+                    });
+                }
+
+            },
+            fixedColumns: {
+                leftColumns: 4,
+                rightColumns: 1,
+            },
+            scrollY: '60vh',
+            scrollX: '70vh',
+            "paging": "True",
+            //  dom: '<"top"i>rt<"bottom"flp><"clear">'
+            // responsive: true
+            "drawCallback": function (settings) {
+                checkbox(0)
+                // $('[data-toggle="tooltip"]').tooltip(); 
+
+                if ($('#download_flag').val() == "true") {
+                    swal.fire('Downloading filtered excel', {
+                        icon: 'success',
+                        button: false,
+                        timer: 1000
+                    })
+                    notify_sound()
+                    $('#download_flag').val("false")
+                    var a = document.createElement('a');
+                    a.href = "{%url 'download_rfx' Team%}";
+                    document.body.append(a);
+                    a.click();
+                    a.remove();
+                    $('#Analysis_table').DataTable().draw(false)
+                }
+                if ($("#check_box_all_flag").val() === 'true' || $("#check_box_all_flag").val() === 'false') {
+                    $("#check_box_all_flag").val('no_filter')
+                    $('#Analysis_table').DataTable().draw(false)
+                }
+                // stop_loader();
+
+
+            }
+
+        });
+        // setInterval( function () {
+        //     // analysis_table.draw()
+        //     analysis_table.ajax.reload( null, false ); 
+        // }, 20000 ); 
+        //$('#Analysis_table').DataTable().draw(false)
+
+        var table = $('#Analysis_table').DataTable()
+        $('.toggle-vis').on('change', function (e) {
+            e.preventDefault();
+            // console.log($(this).attr('data-column'))
+            // Get the column API object
+
+            for (i = 1; i < 100; i++) {
+                // console.log(i)
+                var title = table.column(i).data();
+                // console.log(table.columns(i).dataSrc()[0],'###',($(this).attr('data-column')))
+                if (table.columns(i).dataSrc()[0] == $(this).attr('data-column')) {
+                    var column = table.column(i);
+                    break;
+                }
+            }
+
+            column.visible(!column.visible());
+        });
+
+        // $('#Analysis_table').DataTable().columns().every(function() {
+        //     var column = this;
+        //     console.log(column)
+
+        //     $('select', this.footer()).on('change', function() {
+        //         column.search(this.value).draw();
+
+        //     });
+        //     $('input', this.footer()).on('keyup change', function() {
+        //         column.search(this.value).draw();
+
+        //     });
+        // });
+        $("#Analysis_master_search").on('change', function () {
+            $('#Analysis_table').DataTable().search(this.value).draw();
+
+        });
+        $("#upload_spilt").submit(function (e) {
+            e.preventDefault();
+            swal.fire({
+                        title: "Splits are uploading... ",
+                        text: "Please wait",
+                        icon: "{% static 'images/loader.gif' %}",
+                        buttons: false,
+                        allowOutsideClick: false,
+                        closeOnClickOutside: false
+                    });
+            var form = $(this);
+            var url = form.attr('action');
+            var formData = new FormData(this);
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData, // serializes the form's elements.
+                success: function (data) {
+                    swal.close();
+                    $.unblockUI();
+                    $("#upload_spilt").trigger("reset");
+
+                    if (data.status == 422) {
+                        swal.close();
+                        $("#message_header").html('Split Upload Response');
+                        $("#message_title").html(data.message);
+                        $("#message_div").html(data.error_table);
+                        $("#dialog_message").modal('show');
+                        $('.compact').DataTable({
+                            dom: 'Bfrtip',
+                            buttons: [{
+                                extend: 'excelHtml5',
+                                filename:'Non-Qualified Splits',
+                                text:'Download as excel',
+                                title:'Manual Split(s) for  Non-Qualified Parts',
+                                exportOptions: {
+                                    columns: ':visible'
+                                }
+                            },
+                            ],}
+                        );
+                    }
+                    else if (data.status == 415) {
+                        swal.close();
+                        swal(`Invalid File format,Download and edit the excel file which is provide`, {
+                            icon: "error",
+                            timer: 2500
+                        });
+                    }
+                    else if (data.status == 200) {
+                        swal.close();
+                        swal(data.message, {
+                            icon: "success",
+                            timer: 2500
+                        });
+                        table.draw();
+                    }
+                    else {
+                        swal.close();
+                        swal(`Something went wrong,Refresh the page`, {
+                            icon: "error",
+                            timer: 2500
+                        });
+                    }
+
+                },
+                error: function (exception) {
+                    $.unblockUI();
+                    swal.close();
+                    swal("Upload a correct format excel file which had been downloaded from Tool", {
+                        icon: "error",
+                        button: true
+                    });
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            //after inserting
+
+        });
+        function saved_filters() {
+            $.get('{% url "rfx_save_predefined_filters"%}', function (data) {
+                $('#saved_filters').html(data)
+            });
+        }
+        saved_filters()
+        $("#filterExcel").submit(function (e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+
+            var form = $(this);
+            // var url = form.attr('action');
+            var url = $(this).attr('save_url');
+            var formData = new FormData(this);
+            
+            if ($('#excel_name').val() == '') {
+                var url = form.attr('action');
+            }
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: formData, // serializes the form's elements.
+                success: function (data) {
+                    $("#filter_flag").val('excel')
+                    $("#filterExcel").trigger("reset");
+                    $("#file_name_input").html("No File Selected");
+
+                    $('#reset_menu').attr('hidden', false)
+                    $("#filter_mega_menu").click();
+                    $("#filterExcel").hide();
+                    table.draw();
+
+                    $.unblockUI();
+                    swal.fire('Filtered with excel', {
+                        icon: 'success',
+                        button: false,
+                        timer: 1000
+                    })
+                    notify_sound()
+                },
+                error: function (exception) {
+                    swal.fire('Upload a valid excel which has been downloaded !', {
+                        icon: 'error',
+                        button: true,
+                    })
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+
+        $('#reset_menu').on('click', function () {
+            $('#reset_menu').attr('hidden', 'true');
+            $("#filterExcel").show();
+            $("#filter_flag").val('no_filter')
+            table.draw();
+            swal('Excel filter reverted', {
+                icon: 'success',
+                button: false,
+                timer: 1000
+            })
+            $.unblockUI();
+        })
+
+        $("#Advance_filter_reset_button").on('click', function () {
+            $('#advance_flag').val('no_filter');
+            $('#Advance_filter_div').show();
+            $('#Advance_filter_reset_button').attr('hidden', true);
+            $('#Analysis_table').DataTable().draw(false);
+        });
+        $('#select_all_checkbox').on('click change', function () {
+            console.log(this.is(':checked'))
+        });
+        $('.table_filter_tab').on('click', function () {
+            $('#table_filter_tab').val(this.value)
+            $('#Analysis_table').DataTable().draw(false);
+            $('#table_filter_tab_parent').children().removeClass('active')
+            $(this).addClass('active')
+        })
+    });
+</script>
+<script>
+    function download_filtered_excel() {
+        $('#download_flag').val("true");
+        $('#Analysis_table').DataTable().draw(false);
+    }
+</script>
+
+<!-- advance_filter -->
+<script>
+    $("#newrow").click(function () {
+        var n = $('#advance_filter_tr').html();
+        $('#advance_filter_table').append('<tr>' + n + '</tr>');
+    });
+
+    function DeleteRow(r) {
+        var i = r.parentNode.parentNode.rowIndex;
+
+        document.getElementById("advance_filter_table").deleteRow(i);
+    }
+
+    $("#advance_filter_RFX_form").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            url: "{%url 'rfx_advance_filter' Team 'filter_form' 'all_data' %}",
+            type: 'POST',
+            data: formData,
+            success: function (data) {
+                $("#advance_flag").val('true');
+                $('#Analysis_table').DataTable().draw(false);
+                $("#Advance_filter_div").hide();
+                $("#Advance_filter_reset_button").attr('hidden', false);
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+
+    });
+
+    function getVal(r) {
+        var field = $(r).closest('td').find('select').val();
+        $(r).closest('td').next('td').find('.appendvalue').html('<select class="form-control attrib" name="' + field + '_value[]" multiple style="width: 100%" data-placeholder="Select Values"><option disabled value="">Select Value</option></select>');
+        $.ajax({
+            url: '/RFX/Analysis_page/filter/advancefilter/{{Team}}/get_value/' + field,
+            dataType: 'json',
+            type: 'get',
+            contentType: 'application/json',
+            success: function (data) {
+
+                $.each(data, function (index, value) {
+                    $(r).closest('td').next('td').find('select')
+                        .append('<option value="' + value + '">' + value + '</option>')
+                });
+                $(r).closest('td').next('td').find('select').select2();
+            },
+            error: function (jqXhr, textStatus, errorThrown) {
+                console.log(errorThrown);
+            }
+        });
+    }
+
+    function checkbox(id) {
+        if (id != 0) {
+            var checkbox_value = $(id).is(':checked')
+            var data = {
+                id: id.value,
+                State: checkbox_value,
+                option: 'check_box'
+            }
+        } else if (id = -1) {
+            var data = {
+                id: -1,
+                State: 'reset',
+                option: 'check_box'
+            }
+        } else {
+            var data = {
+                id: 00,
+                State: 'status',
+                option: 'check_box'
+            }
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "{%url 'Analysis_page' 'extras'%}",
+            data: data,
+            success: function (data, status, xhr) {
+                if (data.status !== 200) {
+                    alert('Session Timeout:Re-Login In')
+                    location.reload()
+                }
+                $("#select_count").html('<span class="text-bold-700 font-medium-1">Selected Rows: ' + (data.selected) + '</span>');
+                $(".select_counts").html(data.selected)
+            },
+            error: function (data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+        $('#Selected').attr('disabled', false)
+        // $.unblockUI()
+        //Do stuff
+    }
+
+    function select_all(data) {
+        if ($(data).is(':checked')) {
+            $("#check_box_all_flag").val('true')
+            $('#Analysis_table').DataTable().draw(false);
+        } else {
+            $("#check_box_all_flag").val('false')
+            $('#Analysis_table').DataTable().draw(false);
+        }
+    }
+
+    function quote_access_controller(states, text) {
+        var data = {
+            id: 00,
+            State: 'status',
+            option: 'check_box'
+        }
+        $.ajax({
+            type: "GET",
+            url: "{%url 'Analysis_page' 'extras'%}",
+            data: data,
+            success: function (data, status, xhr) {
+                if (data.status !== 200) {
+                    alert('Session Timeout:Re-Login In')
+                    location.reload()
+                }
+                if (data.selected == 0) {
+                    data.selected = 'All'
+                }
+                swal({
+                    title: "Are you sure?",
+                    text: text + ' the quote(s) for ' + data.selected + ' item(s) ',
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            data = {
+                                id: 00,
+                                state: states,
+                                option: 'quote_access_controller'
+                            }
+
+                            $.ajax({
+                                type: "GET",
+                                url: "{%url 'Analysis_page' 'extras'%}",
+                                data: data,
+                                success: function (data, status, xhr) {
+                                    if (data.status !== 200) {
+                                        location.reload()
+                                    } else {
+                                        swal(data.message + ',' + text + 'ed the Quote(s)', {
+                                            icon: 'success',
+                                            button: false,
+                                            timer: 1000
+                                        })
+                                        notify_sound()
+                                        select_all('')
+                                        $('#Analysis_table').DataTable().draw(false);
+                                    }
+
+
+                                },
+
+                                error: function (data) {
+                                    swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                                }
+                            })
+
+
+                        } else {
+                            swal("Cancelled ", {
+                                icon: 'error',
+                                timer: 1000
+                            });
+                        }
+                    });
+
+
+            },
+
+            error: function (data) {
+                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+            }
+        })
+
+
+
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+
+        var history_table = $('#history_table').DataTable({
+            language: {
+                "emptyTable": "<span class='float-left font-large-1'>No History available for this part</span>",
+            },
+
+            // fixedColumns: {
+            //     leftColumns: 0,
+            //     rightColumns: 0
+            // },
+            "autoWidth": true,
+            paging: false,
+            searching: false,
+            info: false,
+            "ajax": "{%url 'rfx_history' 16941%}",
+            columns: [
+                { 'data': 'comment'}, 
+                { 'data': 'quarter'}, 
+                { 'data': 'sent_to'}, 
+                { 'data': 'Part_Number'}, 
+                { 'data': 'Mfr_Part_Number'}, 
+                { 'data': 'Mfr_Name'}, 
+                { 'data': 'cm'}, 
+                { 'data': 'Item_Price'}, 
+                { 'data': 'Lead_Time'}, 
+                { 'data': 'MOQ'}, 
+                { 'data': 'List'}, 
+                { 'data': 'tarrif'}, 
+                { 'data': 'COO'}, 
+                { 'data': 'Inco_Term'}, 
+                { 'data': 'MPQ'}, 
+                { 'data': 'Assembly_cost'}, 
+                { 'data': 'Freight_cost'}, 
+                { 'data': 'Masked_Price'}, 
+                { 'data': 'Quote_Type'}, 
+                { 'data': 'Region'}, 
+                { 'data': 'Geo'}, 
+                { 'data': 'Life_Cycle'}, 
+                { 'data': 'Comments'}, 
+                { 'data': 'Quote_status'}, 
+                { 'data': 'sent_quater'}, 
+                { 'data': 'portfolio'}, 
+                { 'data': 'created_by'}, 
+                { 'data': 'Quoted_by'}, 
+                { 'data': 'quote_is_writable'}, 
+                { 'data': 'NCNR'}, 
+                { 'data': 'PO_Delivery'}, 
+                { 'data': 'soft_hard_tool'},
+                { 'data': 'previous_split'},
+                { 'data': 'suggested_split'}, 
+                { 'data': 'manual_split'},
+                { 'data': 'modified_by'},
+                //{ 'data': 'modified_by_email' }, 
+                { 'data': 'modified_on' },
+            ],
+        });
+    });
+
+    function history_render(id) {
+        $('#history_modal').modal('show')
+        $('#history_table').DataTable().ajax.url(`/RFX/Analysis_page/history/table/json/${id}`).load();
+        $('#history_table').DataTable().reload(null, true);
+    }
+    function shared_status_change(status){
+        if (status==true){
+            swal({
+            title: "Are you sure to share?",
+            text: 'This process will notify supplier and split alloted will be visible to supplier',
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((change) => {
+                if (change) {
+                    
+                    $.get("{%url 'shared_status_change'%}", {
+                        shared_status: 'share_it'
+                    }, function (data, status) {
+
+                        if (data.status == 200) {
+                            swal(data.message, {
+                                icon: 'success',
+                                timer: 1000
+                            });
+                            window.location.reload()
+                        } else {
+                            $('#Analysis_table').DataTable().draw(false)
+                        }
+                    });
+
+
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+        }
+        else{
+            swal({
+            title: "Are you sure to Unshare?",
+            text: 'This process will notify supplier and split alloted will not be visible to supplier',
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((change) => {
+                if (change) {
+                    
+                    $.get("{%url 'shared_status_change'%}", {
+                        
+                    }, function (data, status) {
+
+                        if (data.status == 200) {
+                            swal(data.message, {
+                                icon: 'success',
+                                timer: 1000
+                            });
+                            notify_sound()
+                            window.location.reload()
+                        } else {
+                            $('#Analysis_table').DataTable().draw(false)
+                        }
+                    });
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+        }
+    }
+    function delete_rfx(id) {
+        swal.fire({
+            title: "Are you sure? (Please make sure APN is rejected before delete this)",
+            text: 'This will delete the quote which has been raised along with the price and comments provided by the supplier (if any)',
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    swal.fire({
+                        title: "RFQ(s) are being deleting... ",
+                        text: "Please wait",
+                        buttons: false,
+                        allowOutsideClick: false,
+                        closeOnClickOutside: false
+                    });
+                    $.get("{%url 'Analysis_page' 'extras'%}", {
+                        id: id,
+                        option: 'delete_rfx'
+                    }, function (data, status) {
+                        swal.close();
+                        if (data.status == 200) {
+                            swal(data.message, {
+                                icon: 'success',
+                                timer: 1000
+                            });
+                            notify_sound()
+                            $('#Analysis_table').DataTable().draw(false)
+                        } else {
+                            $('#Analysis_table').DataTable().draw(false)
+                        }
+                    });
+                } else {
+                    swal.fire("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+    }
+    function Mpn_Shareable(id) {
+        $.get("{%url 'Analysis_page' 'extras'%}", {
+            id: id,
+            option: 'Shareable'
+        }, function (data, status) {
+            if (data.status == 200) {
+                swal(data.message, {
+                    icon: 'success',
+                });
+                $('#Analysis_table').DataTable().draw(false)
+            } else {
+                $('#Analysis_table').DataTable().draw(false)
+            }
+        });
+    }
+    function Mpn_Shareable_bulk(value) {
+        $.get("{%url 'Analysis_page' 'extras'%}", {
+            value: value,
+            option: 'Shareable_bulk'
+        }, function (data, status) {
+
+            if (data.status == 200) {
+                swal(data.message, {
+                    icon: 'success',
+                });
+                
+                $('#Analysis_table').DataTable().draw(false)
+            } else {
+                $('#Analysis_table').DataTable().draw(false)
+            }
+        });
+    }
+    function delete_rfx_bulk() {
+        swal.fire({
+            title: "Are you sure?",
+            text: 'This will delete the quote which has been raised along with the price and comments provided by the supplier (if any)',
+            icon: "warning",
+            buttons: true,  
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                   swal.fire({
+                        title: "RFQ(s) are being deleting... ",
+                        text: "Please wait",
+                        icon: "{% static 'images/loader.gif' %}",
+                        buttons: false,
+                        allowOutsideClick: false,
+                        closeOnClickOutside: false
+                    });
+                    $.get("{%url 'Analysis_page' 'extras'%}", {
+                        option: 'delete_rfx_bulk'
+                    }, function (data, status) {
+                        swal.close();
+                        if (data.status == 200) {
+                            swal(data.message, {
+                                icon: 'success',
+                                timer: 1000
+                            });
+                            notify_sound()
+                            $('#Analysis_table').DataTable().draw(false)
+                        } else {
+                            $('#Analysis_table').DataTable().draw(false)
+                        }
+                    });
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+    }
+
+    function manual_split_set(id) {
+        data = {
+            id: id
+        }
+        $.get("{%url 'manual_split_set'%}", data, function (data) {
+
+            $('#split_modal').modal('show')
+            $('#split_modal_payload').html(data)
+            calculate()
+        })
+
+    }
+
+    function arista_suggested_split_set(id,cm) {
+        data = {
+            id: id,
+            cms: cm
+        }
+        $.get("{%url 'cm_manual_split_set' %}", data, function (data) {
+            $('#split_modal').modal('show')
+            $('#split_modal_payload').html(data)
+            calculate()
+        })
+
+    }
+
+    function Comments(id, field, text) {
+        swal(`${text}`, {
+            content: "input",
+            buttons: true,
+            cancel: 'cancel'
+        })
+        .then((value) => {
+            if (value !== null && value !== '') {
+                $.post("{%url 'Comments'%}", {
+                    id: id,
+                    Comment: value,
+                    field: field,
+                    csrfmiddlewaretoken: "{{csrf_token|default_if_none:'' }}"
+                },
+                    function (data, status) {
+                        if (data.status === 200) {
+                            swal(data.message, {
+                                icon: 'success'
+                            })
+                            $('#Analysis_table').DataTable().draw(false)
+                        } else {
+                            swal(data.message, {
+                                icon: 'error'
+                            })
+                        }
+
+                    })
+                    .fail(function (xhr, status, error) {
+                        swal('Error Session time out, Refresh the page', {
+                            icon: 'error'
+                        })
+                    });
+
+                // $('#Analysis_table').DataTable().draw(false)
+            } else {
+                swal('Nothing has been saved', {
+                    icon: 'error',
+                    timer: 1000
+                })
+            }
+        })
+    }
+    function Comments_reject_or_approval(id, field, text) {
+        swal(`${text}`, {
+            content: "input",
+            buttons: true,
+            cancel: 'cancel'
+
+        })
+        .then((value) => {
+            if (value !== null && value !== '') {
+                $.get("{%url 'Analysis_page' 'extras'%}", {
+                    option: "comments",
+                    field: field,
+                    comment: value,
+                    id: id,
+                },
+                    function (data, status) {
+                        if (data.status === 200) {
+                            swal(data.message, {
+                                icon: 'success'
+                            })
+                            $('#Analysis_table').DataTable().draw(false)
+                        } else {
+                            swal(data.message, {
+                                icon: 'error'
+                            })
+                        }
+
+                    })
+                    .fail(function (xhr, status, error) {
+                        swal('Error Session time out, Refresh the page', {
+                            icon: 'error'
+                        })
+                    });
+
+                // $('#Analysis_table').DataTable().draw(false)
+
+
+            } else {
+                swal('Nothing has been saved', {
+                    icon: 'error',
+                    timer: 1000
+                })
+            }
+        })
+
+    }
+
+    function approval(id, status, role) {
+        if (status === 'Approve') {
+            swal({
+                title: "Are you sure?",
+                text: "Approval process can't undone ",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willApprove) => {
+                if (willApprove) {
+                    $.get("{%url 'Analysis_page' 'extras'%}", {
+                        id: id,
+                        option: 'approval_rfx',
+                        comment: '',
+                        role: role,
+                        status: 'Approve'
+                    }, function (data, status) {
+                        swal("Approved ", {
+                            icon: 'success',
+                            timer: 2000
+                        });
+
+                        $('#Analysis_table').DataTable().draw(false)
+
+                    });
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+        } else if (status === 'Approve_all') {
+            swal({
+                title: "Are you sure?",
+                //{% if 'CMM' in request.path %}
+                text: "Share the quote details of all the selected part number to CM ?",
+                //{% else %}
+                text: "Approve the business splits for all the part numbers ?",
+                //{% endif %}
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willApprove) => {
+                if (willApprove) {
+                    window.swal({
+                        title: "RFQ(s) Approval in progress... ",
+                        text: "Please wait",
+                        icon: "{% static 'images/loader.gif' %}",
+                        buttons: false,
+                        allowOutsideClick: false,
+                        closeOnClickOutside: false
+                    });
+
+                    $.get("{%url 'Analysis_page' 'extras'%}", {
+                        option: 'approval_rfx_all',
+                        Team: '{{Team}}',
+                    }, function (data, status) {
+                        debugger;
+                        swal.close();
+                        if (data.state == 'Unapproved Parts') {
+                            // part_id = ""
+                            // $.each(data.list,function(k, v){
+                            //             part_id += ' ; <br>'+v
+                                        
+                            //     })
+                            $("#message_header").html('Parts Approval response');
+                            $("#message_title").html(data.message);
+                            $("#message_div").html(data.error_table);
+                            $("#dialog_message").modal('show');
+                            $('.compact').DataTable({dom: 'Bfrtip',
+                                buttons: [{
+                                extend: 'excelHtml5',
+                                filename:'Non-Qualified Splits', exportOptions: { columns: ':visible' }
+                                }],
+                            });
+                            // swal({
+                            //     title:data.message,
+                            //     text:part_id,
+                            //     icon: "warning",
+                            // });
+                        }
+                        else {
+                            swal("Approved ", {
+                                icon: 'success',
+                                timer: 2000
+                            });
+                        }
+
+                        select_all('')
+                        notify_sound()
+                        $('#Analysis_table').DataTable().draw(false)
+
+                    });
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+        } else if (status === 'Reject') {
+            swal(`Enter the reason for rejection`, {
+                content: "input",
+                buttons: true,
+                cancel: 'cancel'
+            })
+                .then((value) => {
+                    if (value !== null && value !== '') {
+                        $.get("{%url 'Analysis_page' 'extras'%}", {
+                            id: id,
+                            option: 'approval_rfx',
+                            comment: value,
+                            role: role,
+                            status: 'Reject',
+                        },
+                            function (data, status) {
+                                if (data.status==200){
+
+                                    swal('Rejected', {
+                                        icon: 'success',
+                                        timer: 2000
+                                    })
+    
+                                    $('#Analysis_table').DataTable().draw(false)
+                                }
+                                else{
+                                    swal('Rejected', {
+                                        icon: 'error',
+                                        text:data.message,
+                                        title:'Failed'
+                                    })
+
+                                }
+                            })
+                            .fail(function (xhr, status, error) {
+                                swal('Error Session time out, Refresh the page', {
+                                    icon: 'error'
+                                })
+                            });
+
+                        $('#Analysis_table').DataTable().draw(false)
+
+                    } else {
+                        swal('Cancelled', {
+                            icon: 'error',
+                            timer: 1000
+                        })
+                    }
+                })
+        } else if (status === 'Reject_bulk') {
+            swal(`Enter the reason for rejection`, {
+                content: "input",
+                buttons: true,
+                cancel: 'cancel'
+
+            })
+            .then((value) => {
+                if (value !== null && value !== '') {
+                    $.get("{%url 'Analysis_page' 'extras'%}", {
+                            option: 'approval_rfx',
+                            comment: value,
+                            role: role,
+                            status: 'Reject_bulk',
+                        },
+                        function (data, status) {
+                            if (data.status==200){
+                                swal('Rejected', { icon: 'success', })
+                                $('#Analysis_table').DataTable().draw(false)
+                            }
+                            else{
+                                swal('Rejected', {
+                                    icon: 'error',
+                                    text:data.message,
+                                    title:'Failed'
+                                })
+
+                            }
+                        })
+                        .fail(function (xhr, status, error) {
+                            swal('Error Session time out, Refresh the page', {
+                                icon: 'error'
+                            })
+                        });
+                        $('#Analysis_table').DataTable().draw(false)
+                } else {
+                    swal('Cancelled', { icon: 'error', timer: 1000 })
+                }
+            })
+        }
+    }
+</script>
+{%if Team == 'CMM Team'%}
+<script>
+    $(document).ready(function () {
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+            .columns.adjust()
+            .responsive.recalc();
+            });
+        $.get('{% url "price_bench_marking"%}', function (data) {
+
+            $('#price_bench_marking').html(data.table)
+            $('.export_table th').addClass('bg-info bg-lighten-5')
+            $('.export_table').DataTable({
+                dom: 'Bfrtip',
+                searching: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    ['10 rows', '25 rows', '50 rows', 'Show all']
+                ],
+                buttons: [{
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                    'colvis',
+                    'pageLength',
+                ],
+                orderCellsTop: true,
+                // fixedHeader: { headerOffset: $('.navbar').outerHeight() }
+            });
+        })
+    });
+</script>
+<script>
+$(document).ready(function () {
+    $("#base-tab3").click(function(){
+        $.get('{% url "cm_quote_analysis"%}', function (data) {
+            $('#cm_quote_analysis').html(data.table)
+            $('.export_table th').addClass('bg-info bg-lighten-5')
+            $('.export_table').DataTable({
+                dom: 'Bfrtip',
+                searching: true,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    ['10 rows', '25 rows', '50 rows', 'Show all']
+                ],
+                buttons: [{
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                    'colvis',
+                    'pageLength',
+                ],
+                orderCellsTop: true,
+                // fixedHeader: { headerOffset: $('.navbar').outerHeight() }
+            });
+        })
+    }); 
+});
+</script>
+{% endif %}
+{% endblock %}

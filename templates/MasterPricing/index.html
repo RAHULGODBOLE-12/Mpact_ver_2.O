@@ -1,0 +1,746 @@
+{% extends 'main.html' %}
+{% load static %}
+
+{% load cmt_helper %}
+{% block title %}
+<!-- <div class="content-header-left col-md-4 col-12 mb-2">
+  <h3 class="content-header-title mb-0">Master Pricing</h3>
+</div> -->
+<input type="hidden" id="Current_url" value=" ">
+<div class="col-12">
+<div class="card ">
+   <div class="row align-items-center">
+      <div class="col-12 ml-1">
+      <h4 class="mt-1 text-bold-400">Master Pricing
+      <!-- <a class="btn btn-sm btn-square float-right btn-warning mr-3" href="{%url 'file_instruction'%}"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a> -->
+    </h4>
+
+        {% if request.user.username == 'superadmin'%}
+        <button class="btn btn-sm font-small-1 btn-outline-danger text-bold-600 report_download" href="{%url 'MP_Updater_status'%}?update_all=update">Manual Refresh all</button>
+        <button class="btn btn-sm font-small-1 btn-outline-danger text-bold-600 report_download" href="{%url 'MP_Updater_status'%}?update_portfolio=update">Manual Refresh with portfolio</button>
+        {%endif%}
+        <input type="hidden" id="processing_status" value='processing'/>
+        <span id="processing_MP" hidden class="blue-grey font-small-3 col-12"> <i class="ft ft-loader  icon-spin"></i> Processing Quote details. To get the updated data, download the excel after its completion</span>
+      </h4>
+
+      <div class="row mt-1">
+        <div class="col-2">
+          
+        {% if request.user|has_group:"SGD Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'SGD'%}">Download for Bulk Approval SGD</a>
+          {% elif request.user|has_group:"JPE Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JPE'%}">Download for Bulk Approval JPE</a>
+          {% elif request.user|has_group:"FGN Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'FGN'%}">Download for Bulk Approval FGN</a>
+          {% elif request.user|has_group:"HBG Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'HBG'%}">Download for Bulk Approval HBG</a>
+          {% elif request.user|has_group:"JSJ Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JSJ'%}">Download for Bulk Approval JSJ</a>
+          {% elif request.user|has_group:"JMX Contract Manufacturer" %}
+          <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JMX'%}">Download for Bulk Approval JMX</a>
+          
+          {%else%}
+            <div class="btn-group  ml-1 float-left " role="group">
+              <button type="button" class="btn btn-sm btn-outline btn-light-primary " data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Download for Bulk Approval  <i class="fas fa-download"></i></button>
+              <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                  {% if request.user|has_group:"SGD" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'SGD'%}" class="menu-link px-3">Sanmina</a></div>
+                  {% endif %}
+                  {% if request.user|has_group:"SSN" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JPE'%}" class="menu-link px-3">Jabil</a></div>
+                  {% endif %}
+                  {% if request.user|has_group:"JSJ" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'FGN'%}" class="menu-link px-3">Flextronics</a></div>
+                  {% endif %}
+                  {% if request.user|has_group:"JPE" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'HBG'%}" class="menu-link px-3">Foxconn</a></div>
+                  {% endif %}
+                  {% if request.user|has_group:"JMX" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JSJ'%}" class="menu-link px-3">Jabil San Jose</a></div>
+                  {% endif %}
+                  {% if request.user|has_group:"FGN" %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JMX'%}" class="menu-link px-3">Jabil Mexico</a></div>
+                  {% endif %}
+                  {% if not request.user|has_group:"BP Team" %}
+                  {%has_permission request.user 'PIC' as per%}
+                  {%if per%}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'SGD'%}?PIC_MP=my_parts" class="menu-link px-3">Sanmina (Your Parts only)</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JPE'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil (Your Parts only)</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'FGN'%}?PIC_MP=my_parts" class="menu-link px-3">Flextronics (Your Parts only)</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'HBG'%}?PIC_MP=my_parts" class="menu-link px-3">Foxconn (Your Parts only)</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JSJ'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil San Jose (Your Parts only)</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JMX'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil Mexico (Your Parts only)</a></div>
+                  {% endif %}
+                  {%endif%}
+              </div>
+<!--         
+            <button id="btnGroupDrop3" type="button" class="btn btn-sm btn-outline-success text-bold-600 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Download for Bulk Approval
+            </button>
+            <div class="dropdown-menu" aria-labelledby="btnGroupDrop3" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 40px, 0px); top: 0px; left: 0px; will-change: transform;">
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'SGD'%}"> Sanmina</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JPE'%}"> Jabil</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'FGN'%}"> Flextronics</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'HBG'%}"> Foxconn</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JSJ'%}"> Jabil San Jose</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JMX'%}"> Jabil Mexico</a>
+              {% if not request.user|has_group:"BP Team" %}
+              {%has_permission request.user 'PIC' as per%}
+              {%if per%}
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'SGD'%}?PIC_MP=my_parts"> Sanmina (Your Parts only)</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JPE'%}?PIC_MP=my_parts"> Jabil (Your Parts only)</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'FGN'%}?PIC_MP=my_parts"> Flextronics (Your Parts only)</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'HBG'%}?PIC_MP=my_parts"> Foxconn (Your Parts only)</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JSJ'%}?PIC_MP=my_parts"> Jabil San Jose (Your Parts only)</a>
+              <a class="cursor-pointer dropdown-item " href="{%url 'MP_instance_download' 'JMX'%}?PIC_MP=my_parts"> Jabil Mexico (Your Parts only)</a>
+              {%endif%}
+              {%endif%}
+            </div> -->
+          </div>
+          
+          
+        {%endif%}
+        
+           
+     </div>
+            {% comment %}
+             <form method="POST" action="{% url 'upload' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+
+                <div class="form-group m-0  row">
+                    <div class="col-8 mt-1 pl-0">
+                        <input type="file" required name='attachment'>
+                    </div>
+                    <div class="col-2 mt-1 float-right">
+                        <button type="submit" class="btn btn-sm btn-info">Upload</button>
+                    </div>
+                </div>
+
+            </form>
+            {% endcomment %}
+
+      
+
+      <div class="col-5 text-center">
+      {% if request.user.is_superuser or request.user|has_group:"BP SGD Manager"  %}
+
+ 		<button type="button" class="btn btn-sm btn-outline-info text-bold-600 mx-1" data-bs-toggle="modal" data-bs-target="#sgd_receipt"><i class="fa fa-upload"></i> Import SGD Receipt </button>
+					<div class="modal fade text-left" id="sgd_receipt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+						<div class="modal-dialog modal-md" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h4 class="modal-title" id="myModalLabel20">Import SGD Receipt File</h4>
+						<a class="mt-0 ml-1 btn btn-sm btn-info float-left" href="{%url 'download_receipt_template' 'SGD'%}">Download SGD Receipt Template</a>
+                <div class="btn btn-icon btn-sm btn-active-light-primary " data-bs-dismiss="modal" aria-label="Close">
+                  <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+              </div>
+                   
+							</button>
+						</div>
+						<form class="float-right" id='upload_po_receipt' action="{%url 'upload_po_receipt'%}" method="post">
+        				{% csrf_token %}
+							<div class="modal-body">
+								<input type="file" class="ml-2" required name='Upload_Excel_po_receipt'>
+								</div>
+							<div class="modal-footer text-right">
+								<button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-sm btn-success">Upload file</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	 	{% endif %}
+            <button type="button" class="btn btn-sm btn-outline-info text-bold-600 mx-1" onclick="$('#Upload_Excel').click()" data-bs-toggle="modal" data-bs-target="#MP"><i class="fa fa-upload"></i> Import Master Pricing </button>
+
+			
+					<div class="modal fade text-left" id="MP" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+							<div class="modal-dialog modal-xl" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h4 class="modal-title" id="myModalLabel20">Import Master Pricing Excel File</h4>
+                    
+                    <div class="btn btn-icon btn-sm btn-active-light-primary " data-bs-dismiss="modal" aria-label="Close">
+                      <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                  </div>
+								</button>
+							</div>
+						<form id='bulk_upload_MP' class="form-group mb-0" action="{% url 'update_masterpricing' %}" method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+								<div class="modal-body">
+									 <input type="file" class="ml-2" required id='Upload_Excel' name='Upload_Excel'>
+                   {% if  request.user|has_group:"BP Team" or request.user|has_group:"Contract Manufacturer" %}
+                   <ul class="list-group">
+                     <li class="list-group-item font-medium-1 text-bold-700 my-1">
+                       
+                       Note:
+                       Tool will take maximum 30 minutes to reflect the “Current Qtr Std Cost Source” and “CM Buyer Name” after the receipt submission
+                      </li>
+                    </ul>
+                    {%endif%}
+									</div>
+								<div class="modal-footer text-right">
+									<button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+									<button type="submit" class="btn btn-sm btn-success">Upload file</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+        {%if logic_BP.lift_logic == 'disable'%}
+            <span  class=" btn-sm btn-green text-bold-600 mx-1 square" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
+
+        {%else%} 
+            <span  class=" btn-sm btn-danger  text-bold-600 mx-1 square" disabled>  <i class="fa fa-lock"></i> MP Status : Locked </span>
+
+        {%endif%}
+
+
+        {% if request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" or request.user.is_superuser %}
+        {%if logic_BP.lift_logic == 'disable'%}
+        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-outline-info lift_logic'> <i class="fa fa-lock"></i> Lock</span>
+        {%else%} 
+        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic'><i class="fa fa-unlock"></i> Unlock</span>
+        {%endif%}
+        {%endif%}
+       
+      </div>
+
+
+        
+        {% if  request.user|has_group:"Super User" or request.user.is_superuser or request.user|has_group:"Director" or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or request.user|has_group:"BP Team" or request.user|has_group:"BP Manager" or request.user|has_group:"GSM Team" or request.user|has_group:"CMM Team" %} 
+    	 <div class="col-3">
+           <form method="POST" action="{% url 'download_excel' 'file_name' %}" class="mt-0" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ form.as_p}}
+           <div class="form-group float-right">
+            <div class="row">
+              <div class="col-4">
+
+                <select name="quarter_file" class="form-control input-sm">
+                  <option value="" selected disabled>Choose Quarter file</option>
+                  {% for file in files %}
+                  <option value ="{{file}}" name="{{file}}">{{file}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-sm btn-info  float-left"><i class="fa fa-download"></i> Export History</button>
+        
+          </div>
+           </div>
+        </form>
+        </div>
+        <div class="col-2">
+          <button type="button" class="btn btn-sm btn-outline btn-light-primary " data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Export MPAT History  <i class="fas fa-download"></i></button>
+              <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                {% for Quarter in Quarter_History %}
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'SGD'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} SGD</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JPE'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JPE</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'FGN'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} FGN</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'HBG'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} HBG</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JSJ'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JSJ</a></div>
+                  <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JMX'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JMX</a></div>
+                  {% empty %}
+                  <a class="menu-item px-3 disabled" disabled href="#">No History available</a>
+                {% endfor %}
+              </div>
+          <!-- <button type="button"
+            class="btn btn-square btn-sm btn-info dropdown-toggle float-left "
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-history"></i><span
+            class="font-small-1"> Export MPAT History </span>
+          </button>
+          <div class="dropdown-menu font-small-1" x-placement="bottom-start">
+            {% for Quarter in Quarter_History %}
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'SGD'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} SGD</a>
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'JPE'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JPE</a>
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'FGN'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} FGN</a>
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'HBG'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} HBG</a>
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'JSJ'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JSJ</a>
+            <a class="dropdown-item" href="{%url 'MP_instance_download' 'JMX'%}?Quarter={{Quarter}}">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JMX</a>
+            {% empty %}
+            <a class="dropdown-item disabled" disabled href="#">No History available</a>
+
+            {% endfor %}
+          </div>   -->
+        </div>
+      {%endif%}
+      
+        <!-- {%comment%}
+        {%if logic_GSM.lift_logic == 'disable'%}
+        <a href="{%url 'lift_logic'%}?Team=GSM Team&Action=enable" type='button' class='btn btn-outline-info white'>Add Multi Approval GSM</a>
+        {%else%}
+        <a href="{%url 'lift_logic'%}?Team=GSM Team&Action=disable" type='button' class='btn btn-info white'>Disable Multi Approval GSM</a>
+        {%endif%}
+        {%if logic_CMM.lift_logic == 'disable'%}
+        <a href="{%url 'lift_logic'%}?Team=CMM Team&Action=enable" type='button' class='btn btn-outline-info white'>Add Multi Approval CMM</a>
+        {%else %}
+        <a href="{%url 'lift_logic'%}?Team=CMM Team&Action=disable" type='button' class='btn btn-info white'>Disable Multi Approval CMM</a>
+        {%endif%}
+        {%endcomment%} -->
+      </div>
+   </div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-12 card-content">
+ <div class="row">
+  <div class="col-3">
+    <div class="card box-shadow-5 border border-info p-1">
+      <div class="card-body p-0" id='masterpartlistsidebar' style="min-height: 600px;">
+        <h3 class="p-5 text-center"><i class="fa fa-spinner fa-spin"></i><br>Loading Part No. ...</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-9">
+    <div class="card box-shadow-5 border border-info">
+      <div class="card-body p-0" id='details'>
+        <div class="card-body" style="min-height: 600px;">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+{% comment %}
+<!--<div class="customizer border-left-blue-grey border-left-lighten-4 d-none d-xl-block">
+  <a class="customizer-close" href="#"><i class="ft-x font-medium-3"></i></a>
+  <a class="customizer-toggle bg-success box-shadow-3" href="javascript:void(0)"><i class="ft-filter font-medium-3 white"></i></a>
+  <div class="customizer-content p-2 ps-container ps-theme-dark ps-active-y">
+  <form class="filterform" action="{% url 'apply_filter_masterpricing' %}" method="POST">
+    {% csrf_token %}
+      <h4 class="text-uppercase mb-0">Advanced Filter</h4>
+      <hr>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <h5 class="mt-1 mb-1 text-bold-500">PO / Delivery Status</h5>
+            <select class="selectize-multiple" name="po_or_delivery" multiple>
+				      <option value="" selected>Select</option>
+              <option value="PO">PO</option>
+              <option value="Delivery">Delivery</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <h5 class="mt-1 mb-1 text-bold-500">Keep flat / Updated Price</h5>
+            <select class="selectize-multiple" name="keepflat_updated" multiple>
+				      <option value="" selected>Select</option>
+              <option value="Keep Flat">Keep Flat</option>
+              <option value="Updated">Updated</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+      <h5 class="mt-1 mb-1 text-bold-500">Part Number</h5>
+      <select class="selectize-multiple" name="ampart" multiple>
+				<option value="" selected>Select Part Number</option>
+        {% if not request.user|has_group:"JPE Contract Manufacturer" or request.user|has_group:"SGD Contract Manufacturer" %}
+        {% ORM "Portfolio.objects.filter(Parts_controlled_by='Arista').filter(cm='SGD').values_list('id','Arista_Part_Number','Parts_controlled_by').distinct('Arista_Part_Number')" as parts %}
+        <optgroup label="Arista Controled SGD Parts">
+        {% for part in parts %}
+        <option value="{{part.1}}">{{part.1}}</option>
+        {% endfor %}
+        </optgroup>
+        {% ORM "Portfolio.objects.filter(Parts_controlled_by='Arista').filter(cm='JPE').values_list('id','Arista_Part_Number','Parts_controlled_by').distinct('Arista_Part_Number')" as parts %}
+        <optgroup label="Arista Controled JPE Parts">
+        {% for part in parts %}
+          <option value="{{part.1}}">{{part.1}}</option>
+        {% endfor %}
+        </optgroup>
+        {% endif %}
+        {% if not request.user|has_group:"JPE Contract Manufacturer" %}
+        {% ORM "Portfolio.objects.exclude(Parts_controlled_by='Arista').filter(cm='SGD').values_list('id','Arista_Part_Number','Parts_controlled_by').distinct('Arista_Part_Number')" as parts %}
+        <optgroup label="cm Controled SGD Parts">
+        {% for part in parts %}
+        <option value="{{part.1}}">{{part.1}}</option>
+        {% endfor %}
+        </optgroup>
+        {% endif %}
+        {% if not request.user|has_group:"SGD Contract Manufacturer" %}
+        {% ORM "Portfolio.objects.exclude(Parts_controlled_by='Arista').filter(cm='JPE').values_list('id','Arista_Part_Number','Parts_controlled_by').distinct('Arista_Part_Number')" as parts %}
+        <optgroup label="cm Controled JPE Parts">
+        {% for part in parts %}
+        <option value="{{part.1}}">{{part.1}}</option>
+        {% endfor %}
+        </optgroup>
+        {% endif %}
+      </select>
+      <hr class="mt-2">
+      <button type="submit" class="btn btn-sm btn-outline-success">Apply Filter</button>
+      <button type="button" class="btn btn-sm btn-outline-info resetfilter float-right">Reset Filter</button>
+      </form>
+    <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 3px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div>
+    <div class="ps-scrollbar-y-rail" style="top: 0px; height: 417px; right: 3px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 220px;"></div></div>
+  </div>
+</div>-->
+{% endcomment %}
+<!-- error dialog box -->
+<div class="modal fade" id="dialog_message" role="dialog">
+  <div class="modal-dialog modal-xl">
+      <!-- Modal content-->
+      <div class="modal-content">
+          <div class="modal-header">
+              <h4 class="modal-title">Response for Master Pricing Upload</h4>
+              <button type="button" class="btn btn-sm btn-primary " data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+
+            <h5 id='message_title'></h5>
+            {% if  request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" %}
+            <h5 id='BP_message_title'></h5>
+            {%endif%}
+            <p>Please, verify this rows which has incorrect data and follow the below criteria.
+              <ul>
+                <li>Decision comments are mandatory if the cost is Rejected</li>
+                <li>Check whether this part is under you</li>
+                <li>kindly use the excel download from your login</li>
+                <li>Tool will not accept the Keep Flat/Updated Decision & Approve/ Reject Decision If "std price Q+1 " is not updated</li>
+                <li>Tool will not accept keep flat decision if current quarter cost is not available</li>
+              </ul>
+            </p>
+                <div id='message_div'></div>
+          </div>
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal">Close</button>
+          </div>
+
+      </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('.customizer-toggle').on('click',function(){
+        $('.customizer').toggleClass('open');
+    });
+    $('.customizer-close').on('click',function(){
+        $('.customizer').removeClass('open');
+    });
+    if($('.customizer-content').length > 0){
+        $('.customizer-content').perfectScrollbar({
+            theme:"dark"
+        });
+    }
+</script>
+<script>
+$(".filterform").submit(function(e) {
+  e.preventDefault();
+  window.swal({
+      title: "Appling Filter...",
+      text: "Please wait",
+      icon: "{% static 'images/loader.gif' %}",
+      buttons: false,
+      allowOutsideClick: true,
+      closeOnClickOutside: true
+  });
+  $.ajax({
+      url: $(this).attr("action"),
+      data: $(this).serialize(),
+      type: $(this).attr("method"),
+      success: function(data) {
+          swal.close();
+          //$('#prev_qtr').html(data);
+          $('#masterpartlistsidebar').html(data);
+          swal({
+              title: "Success!",
+              icon: "success",
+              text: "Filter Applied Successfully",
+              timer: 5000,
+              showConfirmButton: false
+          });
+      }
+  })
+
+});
+  $("#bulk_upload_MP").submit(function(e) {
+        e.preventDefault();
+        window.swal({
+            title: "Uploading Master pricing...",
+            text: "Please wait",
+            icon: "{% static 'images/loader.gif' %}",
+            buttons: false,
+            allowOutsideClick: false,
+            closeOnClickOutside: false
+        });
+        var form = $(this);
+        var url = form.attr('action');
+        var formData = new FormData(this);
+        console.log(url)
+        $("#bulk_upload_MP").trigger("reset");
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData, // serializes the form's elements.
+            success: function(data) {
+                swal.close();
+                console.log(data)
+                if (data.status == 'error') {
+                    $("#message_title").html(`Decision has been updated for ${data.success_count} Parts`);
+                    $("#BP_message_title").html(`BP Team changes has been updated for ${data.bp_team_count} Parts`);
+                    $("#message_div").html(data.error_table);
+                    $("#dialog_message").modal('show');
+                    
+                    $('#error_table').DataTable({
+
+                    });
+                }
+                else if (data.status=="Invalid"){
+                    swal(`Invalid File format,Download and edit the excel file which is provide`, {
+                        icon: "error",
+                        timer: 2500
+                    });
+                }
+                else if (data.status=="success") {
+                    swal(`Decision has been updated for ${data.success_count} parts {% if  request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" %}and BP Team Updated  ${data.bp_team_count} {%endif%}
+                    `, {
+                        icon: "success",
+
+                    });
+                }
+                else{
+                    swal(`Something went wrong, Refresh the page`, {
+                        icon: "error",
+                        timer: 2500
+                    });
+                }
+
+                // loading()
+            },
+            error: function(exception) {
+              swal.close();
+                swal("Upload a correct format excel file which had been downloaded from system", {
+                    icon: "error",
+                    button: true
+                });
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        $("#Upload_quote").trigger("reset");
+        });
+        $("#upload_po_receipt").submit(function(e) {
+        e.preventDefault();
+        window.swal({
+            title: "Uploading Receipt price ...",
+            text: "Please wait,It may take 5 minutes based part count",
+            icon: "{% static 'images/loader.gif' %}",
+            buttons: false,
+            // allowOutsideClick: false,
+            // closeOnClickOutside: false
+        });
+        var form = $(this);
+        var url = form.attr('action');
+        var formData = new FormData(this);
+        console.log(url)
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: formData, // serializes the form's elements.
+            success: function(data) {
+                swal.close();
+                console.log(data)
+                if (data.status == 'error') {
+                    // $("#message_title").html(`Decision has been updated for ${data.success_count} Parts`);
+                    // $("#message_div").html(data.error_table);
+                    // $("#dialog_message").modal('show');
+                    // $('.compact').DataTable();
+                }
+                else if (data.status=="Invalid"){
+                    swal(`Invalid File format,Download and edit the excel file which is provide`, {
+                        icon: "error",
+
+                    });
+                }
+                else if (data.status=="success") {
+                    swal(`Recipt data updated for the parts in excel`, {
+                        icon: "success",
+
+                    });
+                }
+                else{
+                    swal(`Something went wrong, Refresh the page`, {
+                        icon: "error",
+                        timer: 2500
+                    });
+                }
+                // loading()
+            },
+            error: function(exception) {
+                swal.close();
+                swal("Upload a correct format excel file which had been downloaded from system", {
+                    icon: "error",
+                    button: true
+                });
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+        $('#upload_po_receipt').trigger("reset");
+
+
+        });
+
+</script>
+<script>
+$(document).ready(function() {
+
+  function check_mp_processing(){
+    $.get('{%url "MP_Updater_status"%}',(data)=>{
+        console.log(data)
+        if (data.status==true){
+          $('#processing_status').val('processing')
+          $('#processing_MP').attr('hidden',false)
+    }
+    else{
+          $('#processing_status').val('processed')
+          $('#processing_MP').attr('hidden',true)
+          if ($('#is_waiting').val()==='waiting'){
+              refresh()
+          }
+
+    }
+
+        })
+  }
+  setInterval(check_mp_processing, 5000);
+  $(".lift_logic").click(function(e) {
+    swal({
+                title: "Are you sure?",
+                text: $(this).attr('message') ,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+
+                    swal({
+                    title: "Need to turn off Notification ?",
+
+                    icon: "info",
+                    buttons: {
+                        cancel: "Yes",
+                        No: true,
+                      },
+                  
+
+                    }).then((value) => {
+
+                        if (value=='No') {
+
+                          var url=$(this).attr('href')+'&notify=yes'
+                          window.location.replace(url)
+
+
+                        }else{
+                          var url=$(this).attr('href')
+                          window.location.replace(url)
+
+                        }
+                      })
+
+
+                } else {
+                    swal("Cancelled the action", {
+                        timer: 1000
+                    });
+                }
+            });
+              
+            });
+    
+    $(".report_download").on('click',function(){
+      url=$(this).attr('href')
+      $.get(url, function(data) {
+          swal(data.message, {
+              icon: "success",
+              timer: 2500
+          });
+    });
+    });
+    
+   
+        $.get("{%url 'masterpartlistsidebar' %}", function(data) {
+
+
+            $('#masterpartlistsidebar').html(data);
+            
+            
+            $('#details').html('<div class="card-body" style="min-height: 700px;"><h1 class="p-5 text-center"><i class="fa fa-spinner"></i> <br> Click Part to load details...</h1></div>');
+            
+
+            
+
+            $(".detail_id").click(function(e) {
+                var block_ele = $('#details').closest('.card');
+                e.preventDefault();
+                $('.list-group-item').removeClass('bg-info info white');
+                $('.list-group-item').addClass('bg-transparent ');
+                $(this).closest('.list-group-item').addClass('bg-info white');
+                $('#details').html('<div class="card-body" style="min-height: 500px;"><h1 class="p-5 text-center"><i class="fa fa-spinner fa-spin"></i> <br> Fetching Data...</h1></div>');
+                $("#Current_url").val($(this).attr('href'))
+                $.get($(this).attr('href'), function(data) {
+                    $('#details').html(data);
+                    $.unblockUI();
+                });
+
+            });
+
+            try{
+               $('.list-group-item .detail_id')[0].click()
+            }
+            catch{
+            }
+            
+           
+
+        });
+    
+   
+  //  {% comment %}  /*$.get("{%url 'masterdetail_table'%}", function(data){
+  //           $('#Master_table').html(data);
+  //       });*/
+  //     // {%ORM "Portfolio.objects.values_list('id',flat=True)[0]" as parts%}
+  //       /*$.get("{% url 'part_details' 'parts' %}", function(data) {
+
+  //           $('.list-group-item').addClass('bg-transparent info');
+  //           $('#details').html(data);
+  //           $('.list-group-item').first().removeClass('bg-info info white');
+  //           console.log($('.list-group-item').first().addClass('bg-info white'));
+
+  //       });*/ {% endcomment %}
+});
+
+</script>
+<script>
+$(".resetfilter").click(function(e) {
+  $.get("{%url 'masterpartlistsidebar' %}", function(data) {
+    $('#masterpartlistsidebar').html(data);
+  });
+});
+function refresh(){
+
+$.get( $("#Current_url").val(), function(d) {
+                        $('#details').html(d);
+                });
+}
+
+
+</script>
+
+
+{% endblock %}

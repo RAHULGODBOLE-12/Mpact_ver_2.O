@@ -57,17 +57,17 @@
         <div class="card-body py-1">
              
             <div class="row justify-content-start">
-                <div class="col-4 d-flex justify-content-start">
+                <div class="col-2 d-flex justify-content-start">
                     
                     <span id="tab_filter_tab_parent" class="btn-group btn-group-xs ml-1" id="Group">
                     <button  value="All" class="tab_filter_tab btn btn-sm btn-outline-info active">All</button>
                     <button  value="Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn1">Quoted</button>
-                    <button  value="Non Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn2">Non Quoted</button>
-                    <button  value="No BID" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn3">No BID</button>
+                    <button  value="Non Quoted" class="tab_filter_tab text-nowrap btn btn-sm btn-outline-info" id="btn2">Non Quoted</button>
+                    <button  value="No BID" class="tab_filter_tab text-nowrap btn btn-sm btn-outline-info" id="btn3">No BID</button>
                     </span>
                 
                 </div>
-                <div class="col-8 d-flex justify-content-end">
+                <div class="col-9 d-flex justify-content-end">
                     
                     {% if request.user|has_group:"Contract Manufacturer" %}
                     <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'upload_cm_quote' %}">
@@ -103,16 +103,16 @@
                     {%endif%}
                     {%if not request.user|has_group:"Contract Manufacturer" %}
                    
-                        <form class="Upload_quote col-5 text-right pr-0 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload'%}">
+                        <form class="Upload_quote justify-content-end text-right pr-0 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'download_upload_quote' 'Upload'%}">
                             {% csrf_token %}
     
     
-                        <div class="form-group mb-0">
+                        <div class="form-group mb-0 justify-content-end">
     
-                            <div class="col-sm-20 col-12 float-right">
+                            <div class="col-sm-20 col-12 justify-content-end">
                                 <label class="font-medium-1" for="Upload_quote"></label>
                                 <input type="file" class="input-sm" required name='Upload_Excel'>
-                                <button type="submit" class="btn btn-sm btn-success "><i class="fa fa-upload"> </i> Import Quote</button>
+                                <button type="submit" class="btn btn-sm btn-success justify-content-end "><i class="fa fa-upload"> </i> Import Quote</button>
     
                             </div>
                         </div>

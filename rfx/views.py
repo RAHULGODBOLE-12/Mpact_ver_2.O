@@ -3318,7 +3318,7 @@ def download_rfx(request,Team='',mail=False):
             with pd.ExcelWriter(b) as writer:
                 df.rename(columns=column_names_analysis, inplace=True)
                 df.to_excel(writer, index=False, sheet_name='Quote Analysis')
-                writer.save()
+                writer.close()
                 response = HttpResponse(
                     b.getvalue(), content_type='application/vnd.ms-excel')
                 response['Content-Disposition'] = 'inline; filename=Quote_Analysis.xlsx'
@@ -3370,7 +3370,7 @@ def download_rfx(request,Team='',mail=False):
         with pd.ExcelWriter(b) as writer:
             df.rename(columns=column_names_analysis, inplace=True)
             df.to_excel(writer, index=False, sheet_name='Quote Analysis')
-            writer.save()
+            writer.close()
             if mail:
                 return b.getvalue(),f'Quote Analysis {Team}.xlsx'
             response = HttpResponse(
@@ -3763,7 +3763,7 @@ def save_predefined_filters(request):
     else:
         filters = predefined_filter.objects.filter(created_by=request.user)
         #print(filters)
-        return render(request,'rfx/components/predefined_filters.html',{'filters':filters})
+        return render(request,'rfx/predefined_filters.html',{'filters':filters})
 
 
 

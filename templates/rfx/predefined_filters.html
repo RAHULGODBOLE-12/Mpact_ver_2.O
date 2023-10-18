@@ -1,0 +1,115 @@
+
+<div class="row pl-2">
+
+    <table class="table table-borderless table-con" style="max-height: 500px;height: 500px;" >
+        <!-- <thead>
+            <tr>
+                <th >Name</th>
+                <th >Action</th>
+            </tr>
+        </thead> -->
+        <tbody>
+            <tr>
+            {%for filter in filters%}
+                <td onclick='apply_filter({{filter.id}})' class="btn btn-outline-info btn-square border-info mb-1" style="width: 60%;">
+                    {{filter.name}}
+                </td>
+                <td onclick='delete_filter({{filter.id}},"{{filter.name}}")' class="btn float-right btn-danger btn-square align-center mr-1 "> 
+    
+                <i class="fa fa-trash mx-2"></i> Delete filter
+            </td>
+                {%empty%}
+            <H5>Sorry, You Haven’t  Saved any filter</H5>
+            {%endfor%}
+        </tr>
+        </tbody>
+    
+    </table>
+</div>
+
+<script>
+    function apply_filter(id){
+            $('#saved_filter_model').modal('hide')
+            $.ajax({
+                type: "GET",
+                url: "{%url 'rfx_save_predefined_filters'%}",
+                data: {id:id,option:'filter'}, // serializes the form's elements.
+                success: function(data) {
+                    $("#filter_flag").val('excel')
+                    $("#filterExcel").trigger("reset");
+                    $('#reset_menu').attr('hidden', false)
+                    $("#filter_mega_menu").click();
+                    $("#filterExcel").hide();
+                    $('#Analysis_table').DataTable().draw();
+
+                    $.unblockUI();
+                    swal('Filtered with excel', {
+                        icon: 'success',
+                        button: false,
+                        timer: 1000
+                    })
+                },
+                error: function(exception) {
+                    swal('Upload a valid excel which has been downloaded !', {
+                        icon: 'error',
+                        button: true,
+                    })
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            
+        }
+        function saved_filters(){
+            $.get('{% url "rfx_save_predefined_filters"%}', function(data) {
+                $('#saved_filters').html(data)
+            });
+        }
+        function delete_filter(id,name){
+            swal({
+                title: "Are you sure?",
+                text: `This will delete filte named ${name}`,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    
+                $.ajax({
+                type: "GET",
+                url: "{%url 'rfx_save_predefined_filters'%}",
+                data: {id:id,option:'delete'}, // serializes the form's elements.
+                success: function(data) {
+                    saved_filters()
+                    swal('Deleted the filter', {
+                        icon: 'success',
+                        button: false,
+                        timer: 1000
+                    })
+
+                },
+                error: function(exception) {
+                    swal('Error Something when ', {
+                        icon: 'error',
+                        button: true,
+                    })
+                },
+               
+            });
+
+
+                } else {
+                    swal("Cancelled ", {
+                        icon: 'error',
+                        timer: 1000
+                    });
+                }
+            });
+            
+            
+            
+        }
+</script>
+

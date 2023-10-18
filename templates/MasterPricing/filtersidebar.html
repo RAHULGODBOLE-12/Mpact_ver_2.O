@@ -1,0 +1,23 @@
+{% load org_details %}
+{% load cmt_helper %}
+<div class="card py-0">
+    <div class="card-content">
+        <div class="card-body px-0 py-0 ">
+                    <ul class="nav nav-tabs nav-underline">
+                        <li class="nav-item">
+                            <a class="nav-link px-0 active font-small-2" id="base-Arista_controlled" data-toggle="tab" aria-controls="Arista_controlled" href="#Arista_controlled" aria-expanded="true"><i class="ft-user"></i> Filtered Parts</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-0">
+                        <div role="tabpanel" class="border-right-grey border-left-grey border-left-lighten-1 border-right-lighten-1 tab-pane active " id="Arista_controlled" aria-expanded="true" aria-labelledby="base-Arista_controlled">
+                        <ul class="list-group list height-600 scrollbar scrollbar-grey thin"style='overflow:auto;'>
+                            {% for part in partslist %}
+                            <li class="list-group-item p-0 font-small-2 "><a class="name px-1 detail_id" href="{% url 'part_details_arista' part.id %}">{{part.arista_partno}}<span style="width: 60px;" class='badge bg-lighten-3 text-center  badge-pill bg-green float-right'>{{part.controlby}}</span> </a></li>
+                            {%endfor%}
+                        </ul>
+                        </div>
+
+                    </div>
+    </div>
+</div>
+</div>

@@ -2,7 +2,7 @@
 
 <div class="card-content">
 
-    <div class="card-header pb-0">
+    <div class=" test card-header pb-0">
         <p class=" font-medium-1">
             <span class="text-bold-600">Arista Part :</span> {{Quotes.0.Part_Number|default_if_none:'' }},
             <span class="text-bold-600">Mfr. Part : </span>{{Quotes.0.portfolio.Mfr_Part_Number|default_if_none:'' }}
@@ -382,6 +382,11 @@
         </form>
 
 
+
+    </div>
+
+    <div id='blockmessage' class='container' style="display: none;position: relative;width: 500px; height: 400px;" >
+        <div class="semibold" style="position: absolute;top: 20%;left: 45%;"><span class="ft-refresh-cw spinner-border text-center"></span></div>
     </div>
 
 </div>

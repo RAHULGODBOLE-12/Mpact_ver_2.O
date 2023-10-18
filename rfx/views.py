@@ -65,32 +65,32 @@ def his_parts(request):
     '''
     if has_permission(request.user, 'Super User') or request.user.is_superuser or 'Director' in request.user.groups.values_list('name', flat=True):
         parts_GSM = RFX.objects.filter(sent_quater=Current_quarter(), quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='GSM Team').order_by('Part_Number').exclude(sent_to='cm')
-        parts_CMM = RFX.objects.filter(sent_quater=Current_quarter(), quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').order_by('Part_Number').exclude(sent_to='cm')
+        # parts_CMM = RFX.objects.filter(sent_quater=Current_quarter(), quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').order_by('Part_Number').exclude(sent_to='cm')
 
     else:
         
 
         if has_permission(request.user,'CMM') or has_permission(request.user,'GSM'):
             parts_GSM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).exclude(sent_to='cm').filter(Team='GSM Team').filter(portfolio__Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}').order_by('Part_Number')
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).exclude(sent_to='cm').filter(Team='CMM Team').filter(portfolio__Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).exclude(sent_to='cm').filter(Team='CMM Team').filter(portfolio__Arista_PIC__icontains=f'{request.user.first_name} {request.user.last_name}').order_by('Part_Number')
 
         elif has_permission(request.user,'JPE Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JPE').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JPE').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif has_permission(request.user,'SGD Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='SGD').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='SGD').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif has_permission(request.user,'FGN Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='FGN').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='FGN').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif has_permission(request.user,'HBG Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='HBG').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='HBG').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif has_permission(request.user,'JSJ Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JSJ').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JSJ').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif has_permission(request.user,'JMX Contract Manufacturer'):
-            parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JMX').filter(sent_to='cm').order_by('Part_Number')
+            # parts_CMM=RFX.objects.filter(sent_quater=Current_quarter(),quarter__in=get_Next_quarter(2,this_quarter=True)).filter(Team='CMM Team').filter(cm='JMX').filter(sent_to='cm').order_by('Part_Number')
             parts_GSM=RFX.objects.none()
         elif suppliers_detail.objects.filter(user_model__email__iexact=request.user.email).exists():
             distributor_name=suppliers_detail.objects.filter(user_model=request.user)
@@ -118,30 +118,30 @@ def his_parts(request):
             # print(parts_GSM,parts_CMM)
             data=his_quotes_rfx(request.user)
             parts_GSM=data.filter(Team='GSM Team').order_by('Part_Number')
-            parts_CMM=data.filter(Team='CMM Team').order_by('Part_Number')
+            # parts_CMM=data.filter(Team='CMM Team').order_by('Part_Number')
             #print(parts_GSM,parts_CMM)
         else:
             parts_CMM = RFX.objects.none()
-            parts_GSM = RFX.objects.none()
+            # parts_GSM = RFX.objects.none()
 
-    Mfr_names = set(list(parts_GSM.values_list('Mfr_Name', flat=True).distinct())+list(parts_CMM.values_list('Mfr_Name', flat=True).distinct()))
+    Mfr_names = set(list(parts_GSM.values_list('Mfr_Name', flat=True).distinct()))
     if request.GET.get('filter_parameter'):
         #print(request.GET.get('filter_parameter'))
         #print(request.GET.get('value'))
-        parts_CMM = parts_CMM.filter(**{request.GET.get('filter_parameter'): request.GET.get('value')})
+        # parts_CMM = parts_CMM.filter(**{request.GET.get('filter_parameter'): request.GET.get('value')})
         parts_GSM = parts_GSM.filter(**{request.GET.get('filter_parameter'): request.GET.get('value')})
 
     if request.GET.get('Mfr_Name'):
         #print(request.GET)
 
-        parts_CMM = parts_CMM.filter(**{'Mfr_Name': request.GET.get('Mfr_Name')})
+        # parts_CMM = parts_CMM.filter(**{'Mfr_Name': request.GET.get('Mfr_Name')})
         parts_GSM = parts_GSM.filter(**{'Mfr_Name': request.GET.get('Mfr_Name')})
-    request.session['session_quote_parts'] = list(set(list(parts_CMM.values_list('id', flat=True))+list(parts_GSM.values_list('id', flat=True))))
+    request.session['session_quote_parts'] = list(set(list(parts_GSM.values_list('id', flat=True))))
 
-    try:
-        parts_CMM = parts_CMM.values_list('Part_Number', 'id', 'Quote_status', 'quote_is_writable', 'cm')
-    except:
-        LOGGER.error("LOG_MESSAGE", exc_info=1)
+    # try:
+    #     parts_CMM = parts_CMM.values_list('Part_Number', 'id', 'Quote_status', 'quote_is_writable', 'cm')
+    # except:
+    #     LOGGER.error("LOG_MESSAGE", exc_info=1)
 
     try:
         parts_GSM = parts_GSM.values_list('Part_Number', 'id', 'Quote_status', 'quote_is_writable', 'cm')
@@ -150,7 +150,7 @@ def his_parts(request):
 
 
     return render(request,'rfx/components/parts_sidebar.html',context={
-        'parts':[parts_GSM.filter(~Q(RFX_id=None)),parts_CMM.filter(~Q(RFX_id=None)),],
+        'parts':[parts_GSM.filter(~Q(RFX_id=None))],
         'Mfr_names':Mfr_names,
         'selected_Mfr_name':request.GET.get('Mfr_Name'),
     })

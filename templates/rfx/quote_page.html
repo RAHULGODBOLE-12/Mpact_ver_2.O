@@ -208,21 +208,19 @@
 <script>
     $(document).ready(function() {
 
-    var options = {
-        valueNames: ['parts', 'status']
-    };
+    // var options = {
+    //     valueNames: ['parts', 'status']
+    // };
 
-    var userList = new List('part_for_supplier', options);
 
     $('.tab_filter_tab').on('click', function() {
-            //$('#tab_filter_tab').val(this.value)
+        
             var status=$(this).attr('value')
             $('#tab_filter_tab_parent').children().removeClass('active');
             $(this).addClass('active');
-            window.swal({
+            swal.fire({
                 title: "Loading Parts...",
                 text: "Please wait",
-                icon: "{% static 'images/loader.gif' %}",
                 buttons: false,
                 allowOutsideClick: false,
                 closeOnClickOutside: false
@@ -248,31 +246,21 @@
                     swal.close();
                     $('#masterpartlistsidebar').html(data);
                     $(".detail_id").click(function() {
-                        var block_ele = $('#details').closest('.card');
+       
                         $('.list-group-item').removeClass('active');
 
                         $(this).addClass('active');
-                        $(block_ele).block({
-                            message: '<div class="ft-refresh-cw icon-spin font-medium-2"></div>',
-
-                            overlayCSS: {
-                                backgroundColor: '#fff',
-                                opacity: 0.8,
-                                cursor: 'wait'
-                            },
-                            css: {
-                                border: 0,
-                                padding: 0,
-                                backgroundColor: 'transparent'
-                            }
-                        });
+                        var target = $(".test").hide();
+                            $('#blockmessage').show()
+            
                         var urls = "{%url 'this_part_quote_page'%}";
 
                         $.get(urls, {
                             part: $(this).attr('part_id')
                         }, function(data) {
                             $('#details').html(data);
-                            $(block_ele).unblock();
+                            $('#blockmessage').hide()
+                            target.show();
 
 
                         });
@@ -293,7 +281,7 @@
 
                     }
                     console.log(status)
-                    swal({
+                    swal.fire({
                         title: "Success!",
                         icon: "success",
                         text: "Parts are Loaded Successfully",
@@ -338,37 +326,38 @@
 </script>
 <script>
     function loading() {
+        var target = document.querySelector("#kt_block_ui_2_target");
+                // console.log(target)
+                var blockUI = new KTBlockUI(target, {
+                message: '<div class="semibold"><span class="ft-refresh-cw spinner-border text-left"></span>&nbsp;  Uploading Quote Data...</div>',
+            });
         $.get("{%url 'his_parts'%}", function(data) {
 
             $('#masterpartlistsidebar').html(data)
 
 
             $(".detail_id").click(function() {
-                var block_ele = $('#details').closest('.card');
+                
                 $('.list-group-item').removeClass('active');
-
+                    console.log($(this))
                 $(this).addClass('active');
-                $(block_ele).block({
-                    message: '<div class="ft-refresh-cw icon-spin font-medium-2"></div>',
-
-                    overlayCSS: {
-                        backgroundColor: '#fff',
-                        opacity: 0.8,
-                        cursor: 'wait'
-                    },
-                    css: {
-                        border: 0,
-                        padding: 0,
-                        backgroundColor: 'transparent'
-                    }
-                });
+                
+            if (blockUI.isBlocked()) {
+                console.log("i am already blocked")
+            } else {
+                console.log("i am going to block")
+                blockUI.block();
+            }
+                
+                
                 var urls = "{%url 'this_part_quote_page'%}";
 
                 $.get(urls, {
                     part: $(this).attr('part_id')
                 }, function(data) {
                     $('#details').html(data);
-                    $(block_ele).unblock();
+                    console.log("i am in the function")
+                    blockUI.release();
 
 
                 });

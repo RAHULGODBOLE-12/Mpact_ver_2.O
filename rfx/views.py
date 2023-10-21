@@ -34,7 +34,7 @@ import logging
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Value as V
 from django.db.models.functions import Concat   
-# from rfx.models import Apply_split
+from rfx.models import Apply_split
 from django.db.models import Avg
 
 import os
@@ -1489,20 +1489,21 @@ def this_part_quote_page(request):
                                 sent_to=data.sent_to,
                                 sent_quater=get_previous_quarter()[0]).first()
 
-    if data.sent_to == 'cm':
-        if CM_Quotes.objects.filter(rfq_id=id).exists():
-            cmquotes = CM_Quotes.objects.filter(rfq_id=id)
-            cm_std_cost = cmquotes[:1].get().std_cost
-            splits = split_for_cm_quote(id)
-            for_std = [i['id'] for i in splits]
-            print(CM_Quotes.objects.filter(id__in=for_std))
-            po_del=cm_po_delivery_calc(CM_Quotes.objects.filter(id__in=for_std))
-            print(po_del,"PO Del")
-        else:
-            cmquotes = CM_Quotes.objects.none()
-            cm_std_cost = None
-            po_del = None
-        return render(request, 'rfx/components/quote_form_CMM_cm.html', context={'Quotes': Quotes, 'Required': Required,'previous_Quotes':previous_Quotes,'cmquotes':cmquotes,'cm_std_cost':cm_std_cost,'po_del':po_del})
+
+    # if data.sent_to == 'cm':
+    #     if CM_Quotes.objects.filter(rfq_id=id).exists():
+    #         cmquotes = CM_Quotes.objects.filter(rfq_id=id)
+    #         cm_std_cost = cmquotes[:1].get().std_cost
+    #         splits = split_for_cm_quote(id)
+    #         for_std = [i['id'] for i in splits]
+    #         print(CM_Quotes.objects.filter(id__in=for_std))
+    #         po_del=cm_po_delivery_calc(CM_Quotes.objects.filter(id__in=for_std))
+    #         print(po_del,"PO Del")
+    #     else:
+    #         cmquotes = CM_Quotes.objects.none()
+    #         cm_std_cost = None
+    #         po_del = None
+    #     return render(request, 'rfx/components/quote_form_CMM_cm.html', context={'Quotes': Quotes, 'Required': Required,'previous_Quotes':previous_Quotes,'cmquotes':cmquotes,'cm_std_cost':cm_std_cost,'po_del':po_del})
     return render(request, 'rfx/components/quote_form.html', context={'Quotes': Quotes, 'Required': Required,'previous_Quotes':previous_Quotes})
 
 

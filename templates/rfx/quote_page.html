@@ -21,7 +21,7 @@
         </ul>
         <h1 class="page-heading d-flex flex-column justify-content-center text-dark fw-bolder fs-1 lh-0">Submit Quote</h1>
     </div>
-    <button type="button" class="btn btn-sm btn-outline btn-light-primary justify-content-end m-1" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Export  <i class="fas fa-download"></i></button>
+    <button type="button" class="btn btn-sm btn-outline btn-light-primary justify-content-end m-1" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Export<i class="fas fa-download"></i></button>
    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
         {%if request.user|has_group:"Contract Manufacturer"  %}
         <div class="menu-item px-3"><a class=' btn btn-sm btn-info float-left font-small-3 ml-1' href="{%url 'download_upload_quote' 'Download_cm'%}"><i class="ft-download"></i> Export All Details (cm)</a></div>
@@ -54,20 +54,17 @@
 <div class="content-fluid app-content">
  
     <div class="card">
-        <div class="card-body py-1">
-             
+        <div class="card-body py-1">         
             <div class="row justify-content-start">
                 <div class="col-2 d-flex justify-content-start">
-                    
                     <span id="tab_filter_tab_parent" class="btn-group btn-group-xs ml-1" id="Group">
                     <button  value="All" class="tab_filter_tab btn btn-sm btn-outline-info active">All</button>
                     <button  value="Quoted" class="tab_filter_tab btn btn-sm btn-outline-info" id="btn1">Quoted</button>
                     <button  value="Non Quoted" class="tab_filter_tab text-nowrap btn btn-sm btn-outline-info" id="btn2">Non Quoted</button>
                     <button  value="No BID" class="tab_filter_tab text-nowrap btn btn-sm btn-outline-info" id="btn3">No BID</button>
                     </span>
-                
                 </div>
-                <div class="col-9 d-flex justify-content-end">
+                <div class="col-10 d-flex justify-content-end">
                     
                     {% if request.user|has_group:"Contract Manufacturer" %}
                     <form class="Upload_quote col-3 form form-horizontal" method="POST" enctype="multipart/form-data" action="{%url 'upload_cm_quote' %}">
@@ -127,29 +124,28 @@
         </div>
 
     </div>
-    <!-- tabcontents -->
-    <div class="row "  id="kt_block_ui_2_target">
-        <div class="col-3">
-            <div class="card box-shadow-5">
 
-                <div class="card-body " id='masterpartlistsidebar'>
-                    <div class="card-body" style="min-height: 600px;">
-                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"><i class="ft ft-loader icon-spin font-medium-5"></i> <br> Fetching Your Quotes</h3></div>
-                    </div>
-                </div>
+    <div class="row mt-5"  id="kt_block_ui_2_target">
+        <div class="col-12 card-content">
+         <div class="row">
+          <div class="col-3">
+            <div class="card box-shadow-5 border border-info p-1">
+              <div class="card-body p-0" id='masterpartlistsidebar' style="min-height: 600px;">
+                <h3 class="p-5 text-center"><i class="fa fa-spinner fa-spin"></i><br>Fetching Your Quotes</h3>
+              </div>
             </div>
-        </div>
-        <div class="col-9">
-            <div class="card box-shadow-5">
-                <div class="card-body px-0 pt-0" id='details'>
-                    <div class="card-body" style="min-height: 600px;">
-                        <div class="card-body" style="min-height: 500px;"><h3 class="p-5 text-center"><i class="ft ft-loader icon-spin font-medium-5"></i> <br> Fetching Quote Details</h3></div>
-
-                    </div>
+          </div>
+          <div class="col-9">
+            <div class="card box-shadow-5 border border-info">
+              <div class="card-body p-0" id='details'>
+                <div class="card-body" style="min-height: 600px;"><h3 class="p-5 text-center"><i class="ft ft-loader icon-spin font-medium-5"></i> <br> Fetching Quote Details</h3>
                 </div>
-            </div>
-        </div>
+              </div>
 
+        </div>
+          </div>
+        </div>
+        </div>
     </div>
 </div>
 <div class="modal fade" tabindex="-1" id="kt_modal_1">
@@ -329,7 +325,7 @@
         var target = document.querySelector("#kt_block_ui_2_target");
                 // console.log(target)
                 var blockUI = new KTBlockUI(target, {
-                message: '<div class="semibold"><span class="ft-refresh-cw spinner-border text-left"></span>&nbsp;  Uploading Quote Data...</div>',
+                message: '<div class="semibold"><span class="ft-refresh-cw spinner-border text-left"></span>&nbsp;Uploading Quote Data...</div>',
             });
         $.get("{%url 'his_parts'%}", function(data) {
 
@@ -342,22 +338,14 @@
                     console.log($(this))
                 $(this).addClass('active');
                 
-            if (blockUI.isBlocked()) {
-                console.log("i am already blocked")
-            } else {
-                console.log("i am going to block")
-                blockUI.block();
-            }
-                
-                
                 var urls = "{%url 'this_part_quote_page'%}";
 
                 $.get(urls, {
                     part: $(this).attr('part_id')
                 }, function(data) {
+                    console.log(data)
                     $('#details').html(data);
                     console.log("i am in the function")
-                    blockUI.release();
 
 
                 });
@@ -435,7 +423,7 @@
                         icon: "success",
                         timer: 2500
                     });
-                    notify_sound()
+                
                 }
                 else{
                     swal.fire(`Something went wrong,Refresh the page`, {

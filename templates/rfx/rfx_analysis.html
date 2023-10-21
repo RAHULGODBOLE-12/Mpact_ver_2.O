@@ -139,7 +139,7 @@
                  <div class="menu-item px-3 justify-content-center">
                     <div class="menu-content px-3 py-3">
                     {% if request.user|has_group:"CMM Team" or request.user|has_group:"Admin" %}      
-                    <button onclick="delete_rfx_bulk()" class="btn btn-sm btn-light-danger menu-link px-3"><i class="fa fa-trash"></i> Delete selected</button>
+                    <button onclick="delete_rfx_bulk()" class="btn btn-sm btn-light-danger px-3"><i class="fa fa-trash"></i> Delete selected</button>
                     {% endif %}
                 </div>
                 </div>
@@ -2444,8 +2444,8 @@
             buttons: true,  
             dangerMode: true,
         })
-            .then((willDelete) => {
-                if (willDelete) {
+            .then((result) => {
+                if (result.isConfirmed) {
                    swal.fire({
                         title: "RFQ(s) are being deleting... ",
                         text: "Please wait",
@@ -2470,7 +2470,7 @@
                         }
                     });
                 } else {
-                    swal("Cancelled ", {
+                    swal.fire("Cancelled ", {
                         icon: 'error',
                         timer: 1000
                     });
@@ -2488,7 +2488,6 @@
             $('#split_modal_payload').html(data)
             calculate()
         })
-
     }
 
     function arista_suggested_split_set(id,cm) {
@@ -2505,7 +2504,7 @@
     }
 
     function Comments(id, field, text) {
-        swal(`${text}`, {
+        swal.fire(`${text}`, {
             content: "input",
             buttons: true,
             cancel: 'cancel'
@@ -2532,14 +2531,14 @@
 
                     })
                     .fail(function (xhr, status, error) {
-                        swal('Error Session time out, Refresh the page', {
+                        swal.fire('Error Session time out, Refresh the page', {
                             icon: 'error'
                         })
                     });
 
                 // $('#Analysis_table').DataTable().draw(false)
             } else {
-                swal('Nothing has been saved', {
+                swal.fire('Nothing has been saved', {
                     icon: 'error',
                     timer: 1000
                 })
@@ -2595,15 +2594,15 @@
 
     function approval(id, status, role) {
         if (status === 'Approve') {
-            swal({
+            swal.fire({
                 title: "Are you sure?",
                 text: "Approval process can't undone ",
                 icon: "warning",
                 buttons: true,
                 dangerMode: true,
             })
-            .then((willApprove) => {
-                if (willApprove) {
+            .then((result) => {
+                if (result.isConfirmed) {
                     $.get("{%url 'Analysis_page' 'extras'%}", {
                         id: id,
                         option: 'approval_rfx',
@@ -2611,7 +2610,7 @@
                         role: role,
                         status: 'Approve'
                     }, function (data, status) {
-                        swal("Approved ", {
+                        swal.fire("Approved ", {
                             icon: 'success',
                             timer: 2000
                         });
@@ -2620,14 +2619,14 @@
 
                     });
                 } else {
-                    swal("Cancelled ", {
+                    swal.fire("Cancelled ", {
                         icon: 'error',
                         timer: 1000
                     });
                 }
             });
         } else if (status === 'Approve_all') {
-            swal({
+            swal.fire({
                 title: "Are you sure?",
                 //{% if 'CMM' in request.path %}
                 text: "Share the quote details of all the selected part number to CM ?",
@@ -2638,9 +2637,9 @@
                 buttons: true,
                 dangerMode: true,
             })
-            .then((willApprove) => {
-                if (willApprove) {
-                    window.swal({
+            .then((result) => {
+                if (result.isConfirmed) {
+                    swal.fire({
                         title: "RFQ(s) Approval in progress... ",
                         text: "Please wait",
                         icon: "{% static 'images/loader.gif' %}",
@@ -2678,7 +2677,7 @@
                             // });
                         }
                         else {
-                            swal("Approved ", {
+                            swal.fire("Approved ", {
                                 icon: 'success',
                                 timer: 2000
                             });
@@ -2690,14 +2689,14 @@
 
                     });
                 } else {
-                    swal("Cancelled ", {
+                    swal.fire("Cancelled ", {
                         icon: 'error',
                         timer: 1000
                     });
                 }
             });
         } else if (status === 'Reject') {
-            swal(`Enter the reason for rejection`, {
+            swal.fire(`Enter the reason for rejection`, {
                 content: "input",
                 buttons: true,
                 cancel: 'cancel'

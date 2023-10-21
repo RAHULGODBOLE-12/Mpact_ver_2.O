@@ -1,4 +1,3 @@
-from django.db import models
 
 from django.db import models
 from django.forms.models import model_to_dict
@@ -9,7 +8,258 @@ from django.db.models import Q
 from django.contrib.auth.models import User,Group
 from django.utils import timezone
 from Supplier.models import suppliers_detail
-# Create your models here.
+from Slate_CMT.templatetags.masterprice_helper import *
+
+###Split helper
+
+def split_set(data=[{'id':None,'Item_Price':None,'Mfr_Name':None}]):
+    '''
+    --Suggested Split Logic--
+    This will allocate the split for the MPN based on predefined formulas:
+    this will return the id of rfx and split assigned with flag(used to decide the level of approval )
+    * We Will consider only 3 parts based on the least Item_price
+    1 Quote per APN:
+        100% is the split value
+    2 Quote per APN:
+        delta=((greatest_Item_Price-lowerst_Item_Price)/lowerst_Item_Price)*100
+        if delta is greater or equal to 3:Returns 50% for each
+        if delta between 3 to 5:Returns 60% for lowest and 40% to greatest
+        if delta greater than 5:Returns 80% for lowest and 20% to greatest
+    3> Quote per APN:
+        *Condiders only Least 3 Quotes
+        Consider:v1 as lowest price,v2 as normal priceand v3 as greatest price
+        delta1=((v2-v1)/v2)*100
+        delta2=((v3-v1)/v3)*100
+        if delta1<=3 and delta2<=3:
+            return v1:34%,v2:33%,v3:33%
+        elif 3<delta1<=5 and 3<delta2<=5:
+            return v1:45%,v2:35%,v3:20%
+        elif delta1>5 and delta2>5:
+            return v1:80%,v2:20%,v3:0%
+        elif delta1<=3 and 3<delta2<=5:
+            return v1:40%,v2:40%,v3:20%
+           
+        elif 3<delta1<=5 and delta2>5:
+            return v1:60%,v2:40%,v3:0%
+
+        elif delta1<=3 and delta2>5:
+            return v1:60%,v2:40%,v3:0%
+        else :
+            Undefined
+    '''
+    split=[]
+    data_all=data.copy()
+    data=data[:3]
+
+
+    if len(data)==1:
+        split.append({'id':data[0]['id'],'split':100,'flag':10})
+        # send_logger_tele(f'''Single {data[0]['Mfr_Name']}''')
+
+    elif len(data)==2:
+        delta1=((data[1]['Item_Price']-data[0]['Item_Price'])/data[1]['Item_Price'])*100
+        # send_logger_tele(f'''{delta1} Delta1 2''')
+        print(delta1)
+        if delta1<=3:
+            split.append({'id':data[0]['id'],'split':50,'flag':10})
+            split.append({'id':data[1]['id'],'split':50,'flag':10})
+        elif 3<delta1<=5:
+            split.append({'id':data[0]['id'],'split':60,'flag':10})
+            split.append({'id':data[1]['id'],'split':40,'flag':20})
+        elif delta1>5:
+            split.append({'id':data[0]['id'],'split':80,'flag':10})
+            split.append({'id':data[1]['id'],'split':20,'flag':30})
+    elif len(data)==3:
+        delta1=((data[1]['Item_Price']-data[0]['Item_Price'])/data[1]['Item_Price'])*100
+        delta2=((data[2]['Item_Price']-data[0]['Item_Price'])/data[2]['Item_Price'])*100
+        # # send_logger_tele(f'''lower {data[0]['Mfr_Name']}
+        #                 {delta1} Delta1 3 {data[0]['Mfr_Name']}
+        #                 {delta2} Delta2 3 {data[1]['Mfr_Name']}''')
+        if delta1<=3 and delta2<=3:
+            split.append({'id':data[0]['id'],'split':34,'flag':10})
+            split.append({'id':data[1]['id'],'split':33,'flag':10})
+            split.append({'id':data[2]['id'],'split':33,'flag':10})
+        elif 3<delta1<=5 and 3<delta2<=5:
+            split.append({'id':data[0]['id'],'split':45,'flag':10})
+            split.append({'id':data[1]['id'],'split':35,'flag':20})
+            split.append({'id':data[2]['id'],'split':20,'flag':20})
+        elif delta1>5 and delta2>5:
+            split.append({'id':data[0]['id'],'split':80,'flag':10})
+            split.append({'id':data[1]['id'],'split':20,'flag':30})
+            split.append({'id':data[2]['id'],'split':0,'flag':30})
+        elif delta1<=3 and 3<delta2<=5:
+            split.append({'id':data[0]['id'],'split':40,'flag':10})
+            split.append({'id':data[1]['id'],'split':40,'flag':10})
+            split.append({'id':data[2]['id'],'split':20,'flag':20})
+        elif 3<delta1<=5 and delta2>5:
+            split.append({'id':data[0]['id'],'split':60,'flag':10})
+            split.append({'id':data[1]['id'],'split':40,'flag':20})
+            split.append({'id':data[2]['id'],'split':0,'flag':30})
+        elif delta1<=3 and delta2>5:
+            split.append({'id':data[0]['id'],'split':60,'flag':10})
+            split.append({'id':data[1]['id'],'split':40,'flag':10})
+            split.append({'id':data[2]['id'],'split':0,'flag':30})
+        else :
+            print('No condition occurred')
+            print(delta1,delta2)
+            print(data)
+            split=[]
+        for x in data_all[3:]:
+            split.append({'id':x['id'],'split':0,'flag':30})
+    # send_logger_tele(str(split))
+    return split
+
+def std_generator(datas):
+    '''
+    Standard Cost Generator for CPN:
+    This will sum up every(Iterate) parts MPN's Item_price*split(manual or suggested)/100
+    and return the summed value  rounded by 5 decimals
+    '''
+    std_cost=0
+    for part in datas:
+        data=RFX.objects.get(id=part.id)
+        print(data.Item_Price)
+        qs=RFX.objects.filter(Quote_status='Quoted',sent_to=data.sent_to,sent_quater=data.sent_quater,quarter=data.quarter,Part_Number=data.Part_Number,cm=data.cm)
+        if qs.filter(split_type='Manual').exists():
+            std_cost+=float(data.Item_Price)*(float(data.manual_split or 0)/100)
+            if qs.filter(split_type='Automated').exists():
+                qs.update(split_type='Manual')
+        else:
+            std_cost+=float(data.Item_Price)*(float(data.suggested_split)/100)
+    for part in datas:
+        data=RFX.objects.filter(id=part.id)
+        data.update(std_cost=round(std_cost,5))
+    print('std_cost final',std_cost)
+    return round(std_cost,5) 
+
+def std_generator_bulk(datas_in):
+    '''
+    Standard Cost Generator for CPN(BULK Process):
+    This will sum up every(Iterate) parts MPN's Item_price*split(manual or suggested)/100
+    and return the summed value  rounded by 5 decimals
+    '''
+    for rq in datas_in:
+        std_cost=0
+        datas=RFX.objects.filter(
+            quarter=rq.quarter,
+            Part_Number=rq.Part_Number,
+            cm=rq.cm,
+            sent_to=rq.sent_to,
+            Quote_status='Quoted',
+            )
+        for part in datas:
+            data=RFX.objects.get(id=part.id)
+            if  datas.filter(split_type='Manual').exists():
+                if datas.filter(split_type='Automated').exists():
+                    datas.update(split_type='Manual')
+                try:std_cost+=float(data.Item_Price)*(float(data.manual_split or 0)/100)
+                except:std_cost+=0
+            else:
+                try:std_cost+=float(data.Item_Price)*(float(data.suggested_split)/100)
+                except:std_cost+=0
+           
+        for part in datas:
+            data=RFX.objects.filter(id=part.id)
+            data.update(std_cost=round(std_cost,5))
+    return True
+        
+
+def Apply_split(APN,Team,cm,sent_to):
+    '''
+    Suggested Split
+    Here we deside wether we need to consider the Qual Values or IPQ parts
+    * if we have Qualified parts then we don't consider IPQ else we consider IPQ if not Qualified parts are there
+    * This parts are send to split_set fuc and returns the split based on a predefined logic.
+    * Standard Cost as been set based on the logic in std_generator function
+    '''
+    print('Apply_split')
+    quarter=get_Next_quarter(q=3,this_quarter=True)
+    for q in quarter:
+        
+        datas=RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN).filter(Quote_status='Quoted',portfolio__Qualification_Status='Qualified').order_by('Item_Price')
+        # datas_flag=RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN).filter(portfolio__Qualification_Status='Qualified').order_by('Item_Price')
+        all_qual=False
+        if not datas.exists():
+            datas=RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN).filter(Quote_status='Quoted').exclude(portfolio__Qualification_Status='Qualified').order_by('Item_Price')
+            all_qual=True
+        else:
+            pass
+            # RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN).filter(Quote_status='Quoted').filter(portfolio__Qualification_Status='In Process Qual').order_by('Item_Price').update(suggested_split=0)
+        ###top 3 mfr divider
+     
+        mfr_top_3=list(datas.values('id','Item_Price','Mfr_Name','portfolio__Qualification_Status'))
+        splits=split_set(mfr_top_3)
+        if all_qual==False:
+            ipq=RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN,Quote_status='Quoted').exclude(portfolio__Qualification_Status='Qualified').order_by('Item_Price')
+            # ipq=RFX.objects.filter(Team=Team).filter(~Q(RFX_id=None) & Q(sent_quater=Current_quarter()) & Q(cm=cm) &Q(quarter=q)).filter(Part_Number=APN).filter(Quote_status='Quoted').filter(portfolio__Qualification_Status='In Process Qual').order_by('Item_Price')
+            ipq=ipq.values('id','Item_Price','Mfr_Name','portfolio__Qualification_Status')
+            for x in ipq:
+                splits.append({'id':x['id'],'split':0,'flag':30})
+
+        print('splits',splits)
+        for_std=[]
+        for split in splits:
+            print('Split sets')
+            data=RFX.objects.filter(id=split['id'])
+            for_std.append(split['id'])
+            print(datas.values_list('split_type',flat=True))
+            if not 'Manual' in datas.values_list('split_type',flat=True) :
+
+                data.update(
+                suggested_split=split['split'],
+                split_type='Automated',
+                approval_flag=split['flag'],
+                manual_split=0
+                )
+                if data.filter(Team__icontains='CMM Team').count():
+                    return None
+                if split['flag']==10 and split['split']!=0:
+                    data.update(approval_status_PIC='Approval Pending',
+                    approval_status_Manager='Approval No Need',
+                    approval_status_Director='Approval No Need',
+                    approval_status='PIC Approval Pending'
+                    )
+                elif split['flag']==20 and split['split']!=0:
+                    data.update(approval_status_PIC='Approval Pending',
+                    approval_status_Manager='Approval Pending PIC',
+                    approval_status_Director='Approval No Need',
+                    approval_status='PIC Approval Pending')
+                elif split['flag']==30 and split['split']!=0:
+                    data.update(approval_status_PIC='Approval Pending',
+                    approval_status_Manager='Approval Pending PIC',
+                    approval_status_Director='Approval Pending Manager',
+                    approval_status='PIC Approval Pending')
+                else :
+                    data.update(
+                    suggested_split=split['split'],
+                    split_type='Automated',
+                    manual_split=0
+                    )
+                    data.update(approval_status_PIC='Approval Pending',
+                    approval_status_Manager='Approval No Need',
+                    approval_status_Director='Approval No Need',
+                    approval_status='PIC Approval Pending')
+            else :
+                data.update(
+                suggested_split=split['split'],
+                approval_flag=split['flag'],
+                split_type='Manual',
+                manual_split=0 if data[0].manual_split==None else data[0].manual_split,
+                )
+                if data[0].approval_status_PIC != 'Approved':
+                    data.update(approval_status_PIC='Approval Pending')
+        std=std_generator(RFX.objects.filter(id__in=for_std))
+        
+
+class Split_award(models.Model):
+    ''' 
+    This is a Model
+    Which have the value for Supplier allocated split
+    '''
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
+    share_award=models.BooleanField(default=False)
+    share_time=models.DateTimeField(auto_now=True)
+       
 
 class RFX(models.Model):
     ''' 
@@ -106,6 +356,7 @@ class RFX(models.Model):
 
     #######for validation variables
     val_Inco_Term=[None,"CFR","CIF","CIP","CPT","DAF","DAP","DAT","DDP","DDU","DEQ","DES","EXG","EXW","FAS","FCA","FH","FOB","FOC","FOR","FOT","FRD","HC",'N/A' ]
+    val_COO=[None,"Mexico","China","USA","Vietnam","Indonesia","Malasiya","Philippines","Austria","Taiwan","Hungary","Singapore","Japan","Hong Kong","Korea","Thailand","Morocco","Germany","India","New Zealand","Texas","FR","DE","CR","SUZHOU","CN","N/A"]
     val_Life_Cycle=[None,"-","EOL","Active","Obsolete"]
     val_NCNR=[None,'-','Yes','No']
     val_PO_Delivery=['PO','Delivery']
@@ -113,6 +364,63 @@ class RFX(models.Model):
     val_Region=[None,"-","Taiwan","Hungary","Guadalajara",'Penang']
     val_Geo=[None,"-","APC","EMA","MEM"]
     objects = DataFrameManager()
+
+    @property
+    def award_debug(self):
+        '''This will return final Split decided for this instance of RFX,This def is for internal'''
+        from MasterPricing.models import MP_download_table,master_temp
+        logic_BP,created=master_temp.objects.get_or_create(Team='BP Team',quarter=Current_quarter())
+        user=User.objects.annotate(full_name=Concat('first_name', V(' '), 'last_name')).filter(full_name=self.portfolio.Arista_PIC.split('/')[0])
+        if logic_BP.lift_logic=='enable':
+            if user:
+                pic=user[0]
+                award,created=Split_award.objects.get_or_create(user=pic) 
+                if award.share_award and self.Shareable and self.portfolio.Team=='GSM Team':
+                    if self.approval_status=='Approved':
+                        if self.portfolio.cm=='Global':
+                            MP_data = MP_download_table.objects.filter(Quarter=Current_quarter()).filter(Part_Number=self.Part_Number).filter(current_qtr_decision__isnull=False)
+                            if MP_data.exists():
+                                if self.split_type=='Manual':
+                                    return self.manual_split,self.manual_split
+                                else:
+                                    return self.suggested_split,self.suggested_split
+                            else:
+                                return 'Descion pending in MP (Global)',None
+                                # return None
+                                    
+                        else:
+                            MP_data = MP_download_table.objects.filter(Quarter=Current_quarter()).filter(Part_Number=self.Part_Number).filter(current_qtr_decision__isnull=False,CM_download=self.cm)
+                            if MP_data.exists():
+                                if self.split_type=='Manual':
+                                    return self.manual_split,self.manual_split
+                                else:
+                                    return self.suggested_split,self.suggested_split
+                            else:
+                                return f'Descion pending in MP ({self.cm})',None
+                                # return None
+                    else:
+                        return 'PIC Approval Pending',None
+                else:
+                    return 'PIC Not Shared',None
+                    # return None
+            else:
+                return 'PIC Name is not valid',None
+                # return None
+        else:
+            return 'Mp need to lock',None
+            # return None
+    @property
+    def award(self):
+        '''This will return final Split decided for this instance of RFX,This def is for only Supplier'''
+        debug,split=self.award_debug
+        return split
+    @property
+    def award_pid(self):
+        '''This will return final Split decided for this instance of RFX,This def is for only Customer'''
+        debug,split=self.award_debug
+        return debug
+
+
 
     def save(self,user=None,Quote=False, *args, **kwargs):
         '''
@@ -161,9 +469,9 @@ class RFX(models.Model):
                 if not (self.Inco_Term in self.val_Inco_Term):
                     '''Check if this is valid based on the predefined values'''
                     raise ValueError('Invalid Data for Inco Term')
-        #if not (self.Life_Cycle in self.val_Life_Cycle or  self.Life_Cycle==None):
-        #    '''Check if this is valid based on the predefined values'''
-        #    raise ValueError('Invalid Data for Lifecycle_Phase')
+        if not (self.Life_Cycle in self.val_Life_Cycle or  self.Life_Cycle==None):
+            '''Check if this is valid based on the predefined values'''
+            raise ValueError('Invalid Data for Lifecycle_Phase')
         if not (self.NCNR in self.val_NCNR or  self.NCNR==None):
             '''Check if this is valid based on the predefined values'''
             raise ValueError('Invalid Data for NCNR')
@@ -231,12 +539,12 @@ class RFX(models.Model):
                 self.std_cost=float(self.std_cost)
             except:
                 self.std_cost=None
-        from Slate_CMT.templatetags import masterprice_helper
+
         if self.portfolio.Ownership=='Arista':
             '''for Customer part we make some calculation for po_delivery based on the count of po and delivery
              If count of delivery is greater than deivery than delivery will be returned else PO
             '''
-            self.po_delivery=masterprice_helper.get_po_delivery_calc(self.id)
+            self.po_delivery=get_po_delivery_calc(self.id)
         else:
             self.po_delivery=self.PO_Delivery
         ###acessing the original function and save them using super class with current post save calculation 
@@ -258,7 +566,6 @@ class RFX(models.Model):
                 create_history(model_name='RFX',model_id=data,data_dict=str(old_data),comment=f'Changed values :{data_new}',user=user)
 
 
-
 class send_fx_queue_logger(models.Model):
     to_create_count=models.IntegerField(null=True)
     Created_count=models.IntegerField(null=True)
@@ -268,7 +575,6 @@ class send_fx_queue_logger(models.Model):
     error=models.TextField(max_length=1000,default='No Error')
     def __str__(self):
         return f'''to_create_count: {self.to_create_count}   Created_count: {self.Created_count}   created_by: {self.created_by} Error: {False if self.error == 'No Error' else True }'''
-
 
 def create_history(model_name=None,model_id=None,key=None,data_dict=None,value=None,comment=None,user=None):
     '''This will create the history of the rfx based on the data dict'''

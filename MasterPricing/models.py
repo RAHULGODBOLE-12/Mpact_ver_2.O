@@ -15,7 +15,7 @@ from django.conf import settings
 from pytz import timezone
 from datetime import timedelta
 import datetime
-
+from rfx.models import *
 
 class MPTemplate(models.Model):
     cm_partno = models.CharField(max_length=100, blank=True, null=True)
@@ -243,7 +243,7 @@ except Exception as e:
 
 
 class Processing_list_MP(models.Model):
-    from rfx.models import RFX
+   
     Part_Number=models.TextField(null=False)
     cm=models.TextField(null=False)
     # class Meta:

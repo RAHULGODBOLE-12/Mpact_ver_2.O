@@ -1,395 +1,366 @@
 {% load cmt_helper %}
-
-<div class="card-content">
-
-    <div class=" test card-header pb-0">
-        <p class=" font-medium-1">
-            <span class="text-bold-600">Arista Part :</span> {{Quotes.0.Part_Number|default_if_none:'' }},
-            <span class="text-bold-600">Mfr. Part : </span>{{Quotes.0.portfolio.Mfr_Part_Number|default_if_none:'' }}
-            <span class="text-bold-600">RFQ Id : </span>{{Quotes.0.id|default_if_none:'' }}
-           
-            {%if Quotes.0.sent_to == 'supplier' or Quotes.0.sent_to == 'cm'%}
-            {%else%}
-            <span class="text-bold-600">Distributor :</span>{{Quotes.0.sent_to}}
-            {%endif%}
-            {%comment%}
-            {%if not Quotes.0.award is None%}
-            <span class="text-bold-600 btn btn-square btn-success float-right">Split Award: {{Quotes.0.award|default_if_none:'Not Alloted' }}</span>
-            {%endif%}
-            {%endcomment%}
-
-            <!-- <span class="text-bold-600">RFQ id : </span>{{Quotes.0.RFX_id|default_if_none:'' }} -->
-
-        </p>
-        <div class="table-responsive-sm">
-            <table class="table  table-sm table-borderless font-small-3 bg-grey bg-lighten-5" cellspacing="0" id="smtable">
-                <tbody>
-                    <tr>
-                        <th class="pb-0">Contract Manufacturer</th>
-                        <th class="pb-0">Lifecycle Phase </th>
-                        <th class="pb-0">Rev </th>
-                        <th class="pb-0">Mfr Name </th>
-                    </tr>
-                    <tr>
-                        <td> {{Quotes.0.portfolio.cm}} </td>
-                        <td> {{Quotes.0.portfolio.Lifecycle_Phase}} </td>
-                        <td> {{Quotes.0.portfolio.Rev}} </td>
-                        <td> {{Quotes.0.portfolio.Mfr_Name}} </td>
-                    </tr>
-                    <tr>
-                        <th class="pb-0">Mfr Part Lifecycle Phase </th>
-                        <th class="pb-0">Qualification Status </th>
-                        <!-- <th class="pb-0">Contract Mfr Part Number </th> -->
-                        <th class="pb-0">PO / Delivery </th>
-
-                        <th class="pb-0">Arista PIC </th>
-                    </tr>
-                    <tr>
-                        <td> {{Quotes.0.portfolio.Mfr_Part_Lifecycle_Phase}} </td>
-                        <td> {{Quotes.0.portfolio.Qualification_Status}} </td>
-                        <!-- <td> {{Quotes.0.portfolio.cm_Part_Number}} </td> -->
-                        <td> {{Quotes.0.portfolio.Original_PO_Delivery_sent_by_Mexico}} </td>
-                        <td> {{Quotes.0.portfolio.Arista_PIC}} </td>
-                    </tr>
-                    <tr>
-
-                        <th class="pb-0">Cust Consign </th>
-                        <th class="pb-0">Parts controlled by </th>
-                        <th class="pb-0">Item Desc </th>
-                        
-
-                    </tr>
-                    <tr>
-                        <td> {{Quotes.0.portfolio.Cust_consign}} </td>
-                        <td> {{Quotes.0.portfolio.Parts_controlled_by}} </td>
-                        <td> {{Quotes.0.portfolio.Item_Desc}} </td>
-                        
-
-
-                    </tr>
-                    <tr>
-
-                        <th class="pb-0">Quarterly Demand</th>
-                        <th class="pb-0">Annual Demand</th>
-                        <th class="pb-0">Required Quantity</th>
-
-
-                    </tr>
-                    <tr>
-                        <td> {{Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand}} </td>
-                        <td> {%sum Quotes.0.portfolio.CQ_ARIS_FQ_sum_1_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_3_ARIS_FQ_SANM_Demand|default_if_none:0 %} </td>
-                        <td> {% if Quotes.0.portfolio.Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista >= 0%} 0 {%else%} {{Quotes.0.portfolio.Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista|stringformat:"+d"|slice:"1:"}} {%endif%} </td> 
-                    </tr>
-
-
-                </tbody>
-            </table>
-        </div>
-
-        {% comment %} <!--<button id='Make_single' class="btn btn-sm btn-green m-1">Copy the changes for all the Quarter</button>-->  {% endcomment %}
-        <button id='Make_all' style="display: none;" class="btn btn-sm btn-green m-1">Stop auto copy</button>
-        <form class="col-12" id='Quote_form' action="{%url 'make_quote' 'quote'%}" method="post">
-            {%csrf_token%}
-
-            <div class="card {%if not Quotes.0.quote_is_writable%}block_it {%endif%}  border-info border-lighten-3">
-                <div class="col-12 p-0"> <button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-info float-right">No BID</button></div>
-
-                <input type="hidden" name="quote_count" id="quote_count" value=3>
-                {%for quarter in Quotes%}
-                <input type="hidden" value="{{quarter.id|default_if_none:'' }}" name='id'>
-                <div id="container_{{quarter.id}}" class="card-content">
-                    <div class="row">
-
-
-                        <div class="col-12 modal-body m-1 font-small-3">
-                            <span class="row text-bold-700 ml-1" >
-                                <span class="text-bold-500 text-secondary square shadow-lg bg-warning bg-lighten-2  p-1 font-medium-1 ">
-
-                                    <b>Quote For</b>: {{quarter.quarter|default_if_none:'' }} {%if quarter.quarter in Required%} {%else%} {%endif%}
-                                </span>
-                                {%comment%}
-                                {%if request.user.is_superuser%}
-                                <br>
-                                Quote Writable: {{quarter.quote_is_writable}}
-                                <br>
-                                Quote Freezed: {{quarter.quote_freeze}}
-                                {%endif%}
-                                {%endcomment%}
-                            </span>
-                            <div class="row">
-                                <div class="col-md-12">
-                                <span class="text-bold-700 mb-1 text-muted border-bottom-info float-right font-medium-2">
-                                    Due Date : <span class="danger ">{{quarter.due_date | default_if_none:'No Due date'}}</span>
-                                </span>
-                            </div>
-                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Previous Quarter Item Price ($)</label>
-                                        <input type="number" value="{{previous_Quotes.Item_Price|default_if_none:''}}" class="form-control input-sm"
-                                            readonly="">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Item Price ($) {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%} </label>
-                                        <input min="0.0001" type="text" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" {%if quarter.quarter in Required%} required {%else%} {%endif%} pattern="^(\d*\.[0-9]{0,5}|\d+(,\d{3})*(\.[0-9]{0,5})?)$"
-                                            class="form-control input-sm" oninput="check(this)" name="Item_Price" id="Item_Price_{{quarter.id|default_if_none:'' }}"
-                                            value="{{quarter.Item_Price|default_if_none:'' }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Previous Quarter MFG Lead Time</label>
-                                        <input  type="number" class="form-control input-sm" value='{{previous_Quotes.Lead_Time|default_if_none:'' }}'
-                                            readonly="">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>MFG Lead Time (In Weeks){%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
-                                        <input min="1" type="number" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" oninput="check(this)"  pattern="^([0-9]+(?:[0-9]*)?|[0-9]+)$" class="form-control input-sm" name="Lead_Time" id='Lead_Time_{{quarter.id|default_if_none:'' }}'
-                                            value='{{quarter.Lead_Time|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Previous Quarter MOQ</label>
-                                        <input type="number" class="form-control input-sm"   value="{{previous_Quotes.MOQ|default_if_none:'' }}" readonly="">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>MOQ {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
-                                        <input min="1" type="number" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" oninput="check(this)"  pattern="^([0-9]+(?:[0-9]*)?|[0-9]+)$" class="form-control input-sm" name="MOQ" id='MOQ_{{quarter.id|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}
-                                            value="{{quarter.MOQ|default_if_none:'' }}">
-                                    </div>
-                                </div>
-                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Suggested MOQ </label>
-                                        
-                                        <!-- <input type="number" class="form-control input-sm" value="{%suggested_moq Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand%}"
-                                            readonly=""> -->
-                                        <input type="number" class="form-control input-sm" 
-                                            readonly="">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>PO/ Delivery {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
-                                        <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
-                                            name="PO_Delivery" id="PO_Delivery_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='{{quarter.PO_Delivery|default_if_none:'' }}'>
-
-                                            <option  disabled>select</option>
-                                            <option value="PO">PO</option>
-                                            <option value="Delivery">Delivery</option>
-
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                               
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>COO {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}{{quarter.COO|default_if_none:'' }}</label>
-                                        <select class="select2 form-control input-sm" value="{{quarter.COO|default_if_none:'' }}" name="COO" id='COO_{{quarter.id|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}>
-                                            <option disabled>Select COO</option>
-                                            <option>Mexico</option>
-                                            <option>China</option>
-                                            <option>USA</option>
-                                            <option>Vietnam</option>
-                                            <option>Indonesia</option>
-                                            <option>Malasiya</option>
-                                            <option>Philippines</option>
-                                            <option>Austria</option>
-                                            <option>Taiwan</option>
-                                            <option>Hungary</option>
-                                            <option>Singapore</option>
-                                            <option>Japan</option>
-                                            <option>Hong Kong</option>
-                                            <option>Korea</option>
-                                            <option>Thailand</option>
-                                            <option>Morocco</option>
-                                            <option>Germany</option>
-                                            <option>India</option>
-                                            <option>New Zealand</option>
-                                            <option>Texas</option>
-                                            <option>FR</option>
-                                            <option>DE</option>
-                                            <option>CR</option>
-                                            <option>SUZHOU</option>
-                                            <option>CN</option>
-                                            <option>N/A</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                  <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Freight cost ($) </label>
-                                        <input type="number" data-toggle="tooltip" title="Enter the value >/= 0" data-placement="bottom" pattern="^(\d*\.[0-9]{0,5}|\d+(,\d{3})*(\.[0-9]{0,5})?)$"
-                                            class="form-control input-sm" name="Freight_cost" id='Freight_cost_{{quarter.id|default_if_none:'' }}'
-                                            value="{{quarter.Freight_cost|default_if_none:'' }}">
-
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Inco Term {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
-                                        <select {%if quarter.quarter in Required%} required {%else%} {%endif%} placeholder='Select an Option' class="select2 form-control input-sm"
-                                            name="Inco_Term" id='Inco_Term_{{quarter.id|default_if_none:'' }}'  value='{{quarter.Inco_Term|default_if_none:'' }}'>
-                                            <option disabled >select</option>
-                                            <option>CFR</option>
-                                            <option>CIF</option>
-                                            <option>CIP</option>
-                                            <option>CPT </option>
-                                            <option>DAF</option>
-                                            <option>DAP</option>
-                                            <option>DAT</option>
-                                            <option>DDP</option>
-                                            <option>DDU</option>
-                                            <option>DEQ </option>
-                                            <option>DES</option>
-                                            <option>EXG</option>
-                                            <option>EXW</option>
-                                            <option>FAS</option>
-                                            <option>FCA</option>
-                                            <option>FH</option>
-                                            <option>FOB</option>
-                                            <option>FOC</option>
-                                            <option>FOR</option>
-                                            <option>FOT</option>
-                                            <option>FRD</option>
-                                            <option>HC</option>
-                                            <option>N/A</option>
-                                        </select>
-                                    </div>
-                                </div>
-                              
-                                 <div class="col-md-3 ">
-                                    <div class="form-group">
-                                        <label>Life Cycle </label>
-                                        <select placeholder='Select an Option' class="select2 form-control input-sm"
-                                            name="Life_Cycle" id="Life_Cycle_{{quarter.id|default_if_none:'' }}"  value='{{quarter.Life_Cycle|default_if_none:'' }}'>
-                                            <option selected  value='-'>select</option>
-                                            <option value="EOL">EOL</option>
-                                            <option value="Active">Active</option>
-                                            <option value="Obsolete">Obsolete</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>List</label>
-                                        <input type="text" class="form-control input-sm" name="List" id="List_{{quarter.id|default_if_none:'' }}"
-                                            value="{{quarter.List|default_if_none:'' }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Tariff</label>
-                                        <div >
-                                            <input type="text" class="form-control input-sm" name="tarrif"
-                                                id="tarrif_{{quarter.id|default_if_none:'' }}"  value='{{quarter.tarrif|default_if_none:'' }}'>
-                                        </div>
-                                    </div>
-                                </div>
-                                 <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>NCNR </label>
-                                        <select placeholder='Select an Option'  class="select2 form-control input-sm"
-                                            name="NCNR" id="NCNR_{{quarter.id|default_if_none:'' }}"  value='{{quarter.NCNR|default_if_none:'' }}'>
-                                            <option selected value="-">Select</option>
-                                            <option value="Yes">Yes</option>
-                                            <option value="No">No</option>
-
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Soft/ Hard Tool</label>
-                                        <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
-                                            name="soft_hard_tool" id="soft_hard_tool_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='{{quarter.soft_hard_tool|default_if_none:'' }}'>
-                                            <option selected value="-">Select</option>
-                                            <option value="Soft Tool">Soft Tool</option>
-                                            <option value="Hard Tool">Hard Tool</option>
-                                            <option value="Hybrid tool">Hybrid tool</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-
-                                <!-- {%if quarter.Quote_Type == 'Regional'%}
-                                <div class="col-md-3 ">
-                                    <div class="form-group">
-                                        <label>Region {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
-                                        <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
-                                            name="Region" id="Region_{{quarter.id|default_if_none:'' }}" value='{{quarter.Region|default_if_none:'' }}'>
-
-                                            <option selected value="-">Select</option>
-                                            <option value="Taiwan">Taiwan</option>
-                                            <option value="Hungary">Hungary</option>
-                                            <option value="Guadalajara">Guadalajara</option>
-                                            <option value="Penang">Penang</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 ">
-                                    <div class="form-group">
-                                        <label>Geo {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%} </label>
-                                        <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
-                                            name="Geo" id="Geo_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='Regional'>
-
-                                            <option selected value="-">Select</option>
-                                            <option value="APC">APC</option>
-                                            <option value="EMA">EMA</option>
-                                            <option value="MEM">MEM</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                {%endif%} -->
-                               
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Comments </label>
-                                        <textarea type="text" class="form-control input-sm" name="Comments"
-                                            id="Comments_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%}>{{quarter.Comments|default_if_none:'' }}</textarea>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Arista PIC Comments</label>
-                                        <textarea type="text" class="form-control input-sm"
-                                            disabled >{{quarter.portfolio.Arista_pic_comment|default_if_none:'No Comment' }}</textarea>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-                {%endfor%}
-        </div>
-            {%if Quotes.0.quote_is_writable%}
-            <button type="submit" class="btn btn-sm btn-success">Submit Quote</button>
-            <button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-info">No BID</button>
-            {%endif%}
-        </form>
-
-
+<div class="card">
+    <div class="card-header justify-content-center ribbon ribbon-top">
+        <div class="ribbon-label bg-primary"><button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-primary">No BID</button></div>
+        <div class="card-title">RFX ID: {{Quotes.0.id|default_if_none:'' }},&nbsp;&nbsp; Arista Part:&nbsp; <span>{{Quotes.0.Part_Number|default_if_none:'' }} </span>,&nbsp;&nbsp;Mfr. Part :<span>{{Quotes.0.portfolio.Mfr_Part_Number|default_if_none:'' }}</span> </div>
+    </div>
+    <div class="card-body">
+            <input type="hidden" name="quote_id" id="quote_id" value="{{ data.id }}"> 
+            <div class="table-responsive-sm">
+                <table class="table  table-sm table-borderless font-small-3 bg-grey bg-lighten-5" cellspacing="0" id="smtable">
+                    <tbody>
+                        <tr>
+                            <th class="pb-0 fw-semibold text-gray-900 ">Contract Manufacturer</th>
+                            <th class="pb-0 fw-semibold text-gray-900">Lifecycle Phase </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Rev </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Mfr Name </th>
+                        </tr>
+                        <tr>
+                            <td> {{Quotes.0.portfolio.cm}} </td>
+                            <td> {{Quotes.0.portfolio.Lifecycle_Phase}} </td>
+                            <td> {{Quotes.0.portfolio.Rev}} </td>
+                            <td> {{Quotes.0.portfolio.Mfr_Name}} </td>
+                        </tr>
+                        <tr>
+                            <th class="pb-0 fw-semibold text-gray-900">Mfr Part Lifecycle Phase </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Qualification Status </th>
+                            <!-- <th class="pb-0 fw-semibold text-gray-900">Contract Mfr Part Number </th> -->
+                            <th class="pb-0 fw-semibold text-gray-900">PO / Delivery </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Arista PIC </th>
+                        </tr>
+                        <tr>
+                            <td> {{Quotes.0.portfolio.Mfr_Part_Lifecycle_Phase}} </td>
+                            <td> {{Quotes.0.portfolio.Qualification_Status}} </td>
+                            <!-- <td> {{Quotes.0.portfolio.cm_Part_Number}} </td> -->
+                            <td> {{Quotes.0.portfolio.Original_PO_Delivery_sent_by_Mexico}} </td>
+                            <td> {{Quotes.0.portfolio.Arista_PIC}} </td>
+                        </tr>
+                        <tr>
+    
+                            <th class="pb-0 fw-semibold text-gray-900">Cust Consign </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Parts controlled by </th>
+                            <th class="pb-0 fw-semibold text-gray-900">Item Desc </th>
+                        </tr>
+                        <tr>
+                            <td> {{Quotes.0.portfolio.Cust_consign}} </td>
+                            <td> {{Quotes.0.portfolio.Parts_controlled_by}} </td>
+                            <td> {{Quotes.0.portfolio.Item_Desc}} </td>
+                        </tr>
+                        <tr>
+                            <th class="pb-0 fw-semibold text-gray-900">Quarterly Demand</th>
+                            <th class="pb-0 fw-semibold text-gray-900">Annual Demand</th>
+                            <th class="pb-0 fw-semibold text-gray-900">Required Quantity</th>
+                        </tr>
+                        <tr>
+                            <td> {{Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand}} </td>
+                            <td> {%sum Quotes.0.portfolio.CQ_ARIS_FQ_sum_1_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand|default_if_none:0 Quotes.0.portfolio.CQ_sum_3_ARIS_FQ_SANM_Demand|default_if_none:0 %} </td>
+                            <td> {% if Quotes.0.portfolio.Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista >= 0%} 0 {%else%} {{Quotes.0.portfolio.Delta_OH_and_Open_PO_DD_CQ_sum_CQ_sum_1_Arista|stringformat:"+d"|slice:"1:"}} {%endif%} </td> 
+                        </tr>
+    
+    
+                    </tbody>
+                </table>
+            </div>
+            <button id='Make_all' style="display: none;" class="btn btn-sm btn-green m-1">Stop auto copy</button>
 
     </div>
+</div>
+<div class="card card-bordered border border-hover border-info">
+    <div class="card-body">
+        <div class="row">
+            <form id='Quote_form' action="{%url 'make_quote' 'quote'%}" method="post"> 
+                {%csrf_token%}
+        
+                <div class=" {%if not Quotes.0.quote_is_writable%}block_it {%endif%} ">    
+        
+                    <input type="hidden" name="quote_count" id="quote_count" value=3>
+                    {%for quarter in Quotes%}
+                    <div class="card-header justify-content-end ribbon ribbon-start">
+                        <div class="ribbon-label bg-primary"><b>Quote For</b>: {{quarter.quarter|default_if_none:'' }} {%if quarter.quarter in Required%} {%else%} {%endif%}</div>
+                        <div class="card-title fs-6"><span class="text-bold-700 mb-1 text-muted border-bottom-info float-right font-medium-2">
+                            Due Date : <span class="danger ">{{quarter.due_date | default_if_none:'No Due date'}}</span>
+                        </span>
+                    </div>
+                    </div>
+                    <input type="hidden" value="{{quarter.id|default_if_none:'' }}" name='id'>
+                    <div id="container_{{quarter.id}}" class="card-content">
+                        <div class="row">
+                            <div class="col-12 modal-body m-1 font-small-3">
+                                <span class="row text-bold-700 ml-1" >
+                                    <!-- <span class="text-bold-500 text-secondary square shadow-lg bg-warning bg-lighten-2  p-1 font-medium-1 ">
+                                        <b>Quote For</b>: {{quarter.quarter|default_if_none:'' }} {%if quarter.quarter in Required%} {%else%} {%endif%}
+                                    </span> -->
+                                </span>
+                                <div class="row">
+                                    <!-- <div class="col-md-12">
+                                    <span class="text-bold-700 mb-1 text-muted border-bottom-info float-right font-medium-2">
+                                        Due Date : <span class="danger ">{{quarter.due_date | default_if_none:'No Due date'}}</span>
+                                    </span>
+                                </div> -->
+                                     <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Previous Quarter Item Price ($)</label>
+                                            <input type="number" value="{{previous_Quotes.Item_Price|default_if_none:''}}" class="form-control input-sm"
+                                                readonly="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Item Price ($) {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%} </label>
+                                            <input min="0.0001" type="text" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" {%if quarter.quarter in Required%} required {%else%} {%endif%} pattern="^(\d*\.[0-9]{0,5}|\d+(,\d{3})*(\.[0-9]{0,5})?)$"
+                                                class="form-control input-sm" oninput="check(this)" name="Item_Price" id="Item_Price_{{quarter.id|default_if_none:'' }}"
+                                                value="{{quarter.Item_Price|default_if_none:'' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Previous Quarter MFG Lead Time</label>
+                                            <input  type="number" class="form-control input-sm" value='{{previous_Quotes.Lead_Time|default_if_none:'' }}'
+                                                readonly="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>MFG Lead Time (In Weeks){%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
+                                            <input min="1" type="number" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" oninput="check(this)"  pattern="^([0-9]+(?:[0-9]*)?|[0-9]+)$" class="form-control input-sm" name="Lead_Time" id='Lead_Time_{{quarter.id|default_if_none:'' }}'
+                                                value='{{quarter.Lead_Time|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Previous Quarter MOQ</label>
+                                            <input type="number" class="form-control input-sm"   value="{{previous_Quotes.MOQ|default_if_none:'' }}" readonly="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>MOQ {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
+                                            <input min="1" type="number" data-toggle="tooltip" title="Enter only Numerics > 0" data-placement="bottom" oninput="check(this)"  pattern="^([0-9]+(?:[0-9]*)?|[0-9]+)$" class="form-control input-sm" name="MOQ" id='MOQ_{{quarter.id|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}
+                                                value="{{quarter.MOQ|default_if_none:'' }}">
+                                        </div>
+                                    </div>
+                                     <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Suggested MOQ </label>
+                                            
+                                            <!-- <input type="number" class="form-control input-sm" value="{%suggested_moq Quotes.0.portfolio.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand%}"
+                                                readonly=""> -->
+                                            <input type="number" class="form-control input-sm" 
+                                                readonly="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>PO/ Delivery {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
+                                            <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="form-select input-sm" data-control="select2"
+                                                name="PO_Delivery" id="PO_Delivery_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='{{quarter.PO_Delivery|default_if_none:'' }}'>
+        
+                                                <option  disabled>select</option>
+                                                <option value="PO">PO</option>
+                                                <option value="Delivery">Delivery</option>
+        
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                   
+        
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>COO {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}{{quarter.COO|default_if_none:'' }}</label>
+                                            <select class="form-select input-sm" data-control="select2" value="{{quarter.COO|default_if_none:'' }}" name="COO" id='COO_{{quarter.id|default_if_none:'' }}' {%if quarter.quarter in Required%} required {%else%} {%endif%}>
+                                                <option disabled>Select COO</option>
+                                                <option>Mexico</option>
+                                                <option>China</option>
+                                                <option>USA</option>
+                                                <option>Vietnam</option>
+                                                <option>Indonesia</option>
+                                                <option>Malasiya</option>
+                                                <option>Philippines</option>
+                                                <option>Austria</option>
+                                                <option>Taiwan</option>
+                                                <option>Hungary</option>
+                                                <option>Singapore</option>
+                                                <option>Japan</option>
+                                                <option>Hong Kong</option>
+                                                <option>Korea</option>
+                                                <option>Thailand</option>
+                                                <option>Morocco</option>
+                                                <option>Germany</option>
+                                                <option>India</option>
+                                                <option>New Zealand</option>
+                                                <option>Texas</option>
+                                                <option>FR</option>
+                                                <option>DE</option>
+                                                <option>CR</option>
+                                                <option>SUZHOU</option>
+                                                <option>CN</option>
+                                                <option>N/A</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                      <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Freight cost ($) </label>
+                                            <input type="number" data-toggle="tooltip" title="Enter the value >/= 0" data-placement="bottom" pattern="^(\d*\.[0-9]{0,5}|\d+(,\d{3})*(\.[0-9]{0,5})?)$"
+                                                class="form-control input-sm" name="Freight_cost" id='Freight_cost_{{quarter.id|default_if_none:'' }}'
+                                                value="{{quarter.Freight_cost|default_if_none:'' }}">
+        
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Inco Term {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
+                                            <select {%if quarter.quarter in Required%} required {%else%} {%endif%} placeholder='Select an Option' class=" form-select input-sm" data-control="select2"
+                                                name="Inco_Term" id='Inco_Term_{{quarter.id|default_if_none:'' }}'  value='{{quarter.Inco_Term|default_if_none:'' }}'>
+                                                <option disabled >select</option>
+                                                <option>CFR</option>
+                                                <option>CIF</option>
+                                                <option>CIP</option>
+                                                <option>CPT </option>
+                                                <option>DAF</option>
+                                                <option>DAP</option>
+                                                <option>DAT</option>
+                                                <option>DDP</option>
+                                                <option>DDU</option>
+                                                <option>DEQ </option>
+                                                <option>DES</option>
+                                                <option>EXG</option>
+                                                <option>EXW</option>
+                                                <option>FAS</option>
+                                                <option>FCA</option>
+                                                <option>FH</option>
+                                                <option>FOB</option>
+                                                <option>FOC</option>
+                                                <option>FOR</option>
+                                                <option>FOT</option>
+                                                <option>FRD</option>
+                                                <option>HC</option>
+                                                <option>N/A</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                  
+                                     <div class="col-md-3 ">
+                                        <div class="form-group">
+                                            <label>Life Cycle </label>
+                                            <select placeholder='Select an Option' class=" form-select input-sm" data-control="select2"
+                                                name="Life_Cycle" id="Life_Cycle_{{quarter.id|default_if_none:'' }}"  value='{{quarter.Life_Cycle|default_if_none:'' }}'>
+                                                <option selected  value='-'>select</option>
+                                                <option value="EOL">EOL</option>
+                                                <option value="Active">Active</option>
+                                                <option value="Obsolete">Obsolete</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                     <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>List</label>
+                                            <input type="text" class="form-control input-sm" name="List" id="List_{{quarter.id|default_if_none:'' }}"
+                                                value="{{quarter.List|default_if_none:'' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Tariff</label>
+                                            <div>
+                                                <input type="text" class="form-control input-sm" name="tarrif"
+                                                    id="tarrif_{{quarter.id|default_if_none:'' }}"  value='{{quarter.tarrif|default_if_none:'' }}'>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>NCNR </label>
+                                            <select placeholder='Select an Option'  class=" form-select input-sm" data-control="select2"
+                                                name="NCNR" id="NCNR_{{quarter.id|default_if_none:'' }}"  value='{{quarter.NCNR|default_if_none:'' }}'>
+                                                <option selected value="-">Select</option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+        
+                                            </select>
+                                        </div>
+                                    </div>
+        
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Soft/ Hard Tool</label>
+                                            <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="form-select input-sm" data-control="select2"
+                                                name="soft_hard_tool" id="soft_hard_tool_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='{{quarter.soft_hard_tool|default_if_none:'' }}'>
+                                                <option selected value="-">Select</option>
+                                                <option value="Soft Tool">Soft Tool</option>
+                                                <option value="Hard Tool">Hard Tool</option>
+                                                <option value="Hybrid tool">Hybrid tool</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+        
+                                    <!-- {%if quarter.Quote_Type == 'Regional'%}
+                                    <div class="col-md-3 ">
+                                        <div class="form-group">
+                                            <label>Region {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%}</label>
+                                            <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
+                                                name="Region" id="Region_{{quarter.id|default_if_none:'' }}" value='{{quarter.Region|default_if_none:'' }}'>
+        
+                                                <option selected value="-">Select</option>
+                                                <option value="Taiwan">Taiwan</option>
+                                                <option value="Hungary">Hungary</option>
+                                                <option value="Guadalajara">Guadalajara</option>
+                                                <option value="Penang">Penang</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 ">
+                                        <div class="form-group">
+                                            <label>Geo {%if quarter.quarter in Required%}<span class="red">*</span>{%else%} {%endif%} </label>
+                                            <select placeholder='Select an Option' {%if quarter.quarter in Required%} required {%else%} {%endif%} class="select2 form-control input-sm"
+                                                name="Geo" id="Geo_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%} value='Regional'>
+        
+                                                <option selected value="-">Select</option>
+                                                <option value="APC">APC</option>
+                                                <option value="EMA">EMA</option>
+                                                <option value="MEM">MEM</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {%endif%} -->
+                                   
+        
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Comments </label>
+                                            <textarea type="text" class="form-control input-sm" name="Comments"
+                                                id="Comments_{{quarter.id|default_if_none:'' }}" {%if quarter.quarter in Required%} required {%else%} {%endif%}>{{quarter.Comments|default_if_none:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Arista PIC Comments</label>
+                                            <textarea type="text" class="form-control input-sm"
+                                                disabled >{{quarter.portfolio.Arista_pic_comment|default_if_none:'No Comment' }}</textarea>
+                                        </div>
+                                    </div>
+        
+                                </div>
+                            </div>
+        
+                        </div>
+        
+                    </div>
+                    {%endfor%}
+                </div>
+                {%if Quotes.0.quote_is_writable%}
+                <button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-info float-end">No BID</button>
+                <button type="submit" class="btn btn-sm btn-success float-end">Submit Quote</button>
+                {%endif%}
+            </form>
 
-    <div id='blockmessage' class='container' style="display: none;position: relative;width: 500px; height: 400px;" >
-        <div class="semibold" style="position: absolute;top: 20%;left: 45%;"><span class="ft-refresh-cw spinner-border text-center"></span></div>
+        </div>
     </div>
 
 </div>
+
 <script>
        $(document).ready(function() {
         $(".block_it").hide({
@@ -432,6 +403,7 @@
        });
     $("#Quote_form").submit(function (e) {
         e.preventDefault();
+
         var form = $(this);
         var url = form.attr('action');
         var formData = new FormData(this);
@@ -443,22 +415,22 @@
             success: function (data) {
                 console.log(data)
                 if (data.status==200){
-                swal(data.message, {
+                swal.fire(data.message, {
                     icon: 'success',
                 })
-                notify_sound()
                 loading()
 
             }
             else{
-                swal('Quote Not updated, Something went wrong Refresh your page', {
+                swal.fire('Quote Not updated, Something went wrong Refresh your page', {
                     icon: 'error',
                     button: true,
                 })
             }
+            location.reload()
             },
             error: function (exception) {
-                swal('Quote Not updated, Something went wrong Refresh your page', {
+                swal.fire('Quote Not updated, Something went wrong Refresh your page', {
                     icon: 'error',
                     button: true,
                 })
@@ -473,29 +445,45 @@
 
 function not_to_quote(ids){
         console.log(ids)
-        swal("Enter the Reason for No BID", {
-    content: "input",
-    buttons: true,
-    cancel:'cancel'
-
-    })
-     .then((value) => {
-        if (value !== null && value!==''){
-            $.post( "{%url 'make_quote' 'Not_quote' %}", {id:ids,Comment:value,csrfmiddlewaretoken:"{{csrf_token|default_if_none:'' }}"},
-            function(data,status){
-                swal('Updated', {icon: 'success'})
-                });
-                $.get("{%url 'his_parts'%}", function(data){
-
-                    $('#masterpartlistsidebar').html(data)
-                });
-                loading()
-
-        }
-
-        else{
-            swal('Nothing has been saved', {icon: 'error',timer: 1000})
-        }
+        Swal.fire({
+        title: 'Enter the Reason for No BID',
+        input: 'textarea',
+        inputAttributes: {
+            autocapitalize: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: 'Submit',
+        showLoaderOnConfirm: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                    if (result.value !== null && result.value !== '') {
+                        $.post( "{%url 'make_quote' 'Not_quote' %}", {id:ids,Comment:result.value,csrfmiddlewaretoken:"{{csrf_token|default_if_none:'' }}"},
+                        function(data,status){
+                            swal.fire({
+                                icon: 'success',
+                                text:'Updated',
+                                title:'Success'
+                            })
+                            });
+                            $.get("{%url 'his_parts'%}", function(data){
+                                $('#masterpartlistsidebar').html(data)
+                            });
+                            loading()
+                    }
+                    else{
+                        swal.fire({
+                                icon: 'error',
+                                text:'Nothing has been saved',
+                                title:'Success'
+                        })
+                    }
+            } else {
+                    Swal.fire({
+                        text:'Cancelled',
+                        icon: 'error',
+                        timer: 1000
+                    })
+                }
     })
 }
 

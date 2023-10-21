@@ -3,21 +3,18 @@
     <div class="card-content">
         <div class="card-body px-0 py-0 ">
             <div id="part_for_supplier">
-                
-
-                GSM Parts:{{parts.0.count }}
-                CMM Parts:{{parts.1.count }}
+                <!-- GSM Parts:{{parts.0.count }} -->
+                <!-- CMM Parts:{{parts.1.count }} -->
                 {%is_distributor user as permission%}
                 {%if Mfr_names and permission or request.user.is_superuser%}
                 <div id="FilterAccordion" role="tablist" aria-multiselectable="true">
                     <div class="card  my-0">
                         <div id="heading21" class="card-header p-0">
-                            <a data-toggle="collapse" data-parent="#FilterAccordion" href="#Mfr_filter_accordion" aria-expanded="false" aria-controls="Mfr_filter_accordion" class="card-title lead info">Manufacturer Filter</a>
+                            <a data-toggle="collapse" data-parent="#FilterAccordion" href="#Mfr_filter_accordion" aria-expanded="false" aria-controls="Mfr_filter_accordion" class="card-title lead info px-1 fs-6">Manufacturer Filter</a>
+                            <span class="card-title badge badge-light-info fs-7">GSM Parts : {{parts.0.count }}</span>
                         </div>
                         <div id="Mfr_filter_accordion" role="tabpanel" aria-labelledby="heading21" class="collapse show py-1">
                             <div class="card-content">
-
-
                                     <select class="form-control select2  " style="width: 100%;" onchange="$('.tab_filter_tab.active').click()" name="Mfr_filter" id="Mfr_filter">
                                         <option selected value=''>All Manufacturer</option>
                                         {%for x in Mfr_names%}
@@ -26,22 +23,19 @@
                                     </select>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
                 {%endif%}
-                <input class="search form-control round border-info mb-1 align-items-center" type="text" placeholder="Search" />
-                
-                <ul class="list-group list  auto-scroll" style="max-height: 1500px; overflow-y: scroll;">
+                <input class="search form-control round border-info mb-1 align-items-center" type="text" placeholder="Search" />                
+                <ul class="list-group list  auto-scroll" style="max-height:  600px; overflow-y: scroll;">
                 {%if parts.0%}
-                    <span class=" font-small-4 text-bold-600 " style="padding : 5px 0px 5px 0px"><span class=" px-1 float-left parts">Arista GSM Team</span>
-                </span>
+                    <span class=" fs-6 fw-bold mb-2"><span class=" px-1">Arista GSM Team</span></span>
                 {%endif%}
                     {%for part in parts.0%}
-                    <a class="list-group-item p-0 font-small-4 detail_id list-group-item-action " part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
-                        {% if part.2 == 'Quoted' %}<span class="float-right badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
-                         {% elif part.2 == 'Non Quoted' %}<span class="float-right badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
-                         {% else %}<span class="float-right badge badge-warning white font-small-1 status"><b>No BID </b></span>
+                        <a class="list-group-item p-0 fs-6 detail_id list-group-item-action " part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
+                        {% if part.2 == 'Quoted' %}<span class="float-end badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
+                         {% elif part.2 == 'Non Quoted' %}<span class="float-end badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
+                         {% else %}<span class="float-end badge badge-warning white font-small-1 status"><b>No BID </b></span>
                          {% endif %}
                          {%if not part.3 %}<span class="badge badge-striped  square bg-lighten-2 font-small-1"><b> <i class="fa fa-clipboard"></i> Closed</b></span>{% endif %}    
                         </a>
@@ -51,21 +45,22 @@
                     {%endif%}
 
                         {%for part in parts.1%}
-                        <a class="list-group-item p-0 font-small-4 detail_id list-group-item-action " part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
-                            {% if part.2 == 'Quoted' %}<span class="float-right badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
-                             {% elif part.2 == 'Non Quoted' %}<span class="float-right badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
-                             {% else %}<span class="float-right badge badge-warning white font-small-1 status"><b>No BID</b></span>
+                        <a class="list-group-item p-0 font-small-4 detail_id list-group-item-action" part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
+                            {% if part.2 == 'Quoted' %}<span class="float-end badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
+                             {% elif part.2 == 'Non Quoted' %}<span class="float-end badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
+                             {% else %}<span class="float-end badge badge-warning white font-small-1 status"><b>No BID</b></span>
                              {% endif %}
                              {%if not part.3 %}<span class="badge badge-striped  square bg-lighten-2 font-small-1"><b> <i class="fa fa-clipboard"></i> Closed</b></span>{% endif %}    
-                            </a> {%endfor%}
+                            </a> 
+                        {%endfor%}
                         {%if parts.2%}
                         <span class=" font-small-4 text-bold-600  " style="padding : 5px 0px 5px 0px"><span class=" px-1 float-left parts">Arista GSM Team Off-Cycle</span></span>
                         {%endif%}
                         {%for part in parts.3%}
                         <a class="list-group-item p-0 font-small-4 detail_id list-group-item-action " part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
-                            {% if part.2 == 'Quoted' %}<span class="float-right badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
-                            {% elif part.2 == 'Non Quoted' %}<span class="float-right badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
-                            {% else %}<span class="float-right badge badge-warning white font-small-1 status"><b>No BID</b></span>
+                            {% if part.2 == 'Quoted' %}<span class="float-end badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
+                            {% elif part.2 == 'Non Quoted' %}<span class="float-end badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
+                            {% else %}<span class="float-end badge badge-warning white font-small-1 status"><b>No BID</b></span>
                             {% endif %}
                             {%if not part.3 %}<span class="badge badge-striped  square bg-lighten-2 font-small-1"><b> <i class="fa fa-clipboard"></i> Closed</b></span>{% endif %}    
                             </a>
@@ -75,13 +70,13 @@
                             {%endif%}
                             {%for part in parts.2%}
                             <a class="list-group-item p-0 font-small-4 detail_id list-group-item-action " part_id="{{part.1}}"><span class=" px-1 float-left parts">{{part.0}} <span class="badge bg-cyan bg-lighten-4 black square font-small-1 ml-1" style="width: 35px;">{{ part.4 }}</span></span>
-                                {% if part.2 == 'Quoted' %}<span class="float-right badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
-                                {% elif part.2 == 'Non Quoted' %}<span class="float-right badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
-                                {% else %}<span class="float-right badge badge-warning white font-small-1 status"><b>No BID </b></span>
+                                {% if part.2 == 'Quoted' %}<span class="float-end badge badge-success font-small-1 status"><b>{{part.2}} </b></span>
+                                {% elif part.2 == 'Non Quoted' %}<span class="float-end badge badge-info font-small-1 status"><b>{{part.2}} </b></span>
+                                {% else %}<span class="float-end badge badge-warning white font-small-1 status"><b>No BID </b></span>
                                 {% endif %}
                                 {%if not part.3 %}<span class="badge badge-striped  square bg-lighten-2 font-small-1"><b> <i class="fa fa-clipboard"></i> Closed</b></span>{% endif %}    
-                                </a>
-                                {%endfor%}
+                            </a>
+                       {%endfor%}
 
 
                 </ul>

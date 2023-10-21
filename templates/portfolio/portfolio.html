@@ -20,13 +20,92 @@
         </ul>
         <h1 class="page-heading d-flex flex-column justify-content-center text-dark fw-bolder fs-1 lh-0">Portfolio</h1>
     </div>
-    <a  id="portfolio_drawer" class="btn btn-sm btn-outline  btn-light-primary"><span class="grey-blue loadUploadComponent"><span class="font-small-1"> <i class="fa ft-upload-cloud font-medium-1"></i> Load Kickstart /Offcycle  File</span>  </button>  </span></a>
+    <div class="card-toolbar">
+        <ul class="nav" id="kt_chart_widget_8_tabs">
+
+            <li class="nav-item">
+                <button class="btn btn-sm btn-light-primary justify-content-end  dropdown-toggle " 
+                data-kt-menu-trigger="click" 
+                data-kt-menu-placement="bottom-end" 
+                data-kt-menu-overflow="true">   
+                Actions     
+                                    
+            </button>   
+            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
+                <!-- <div class="menu-item px-3">
+                    <div class="menu-content fs-6 text-dark fw-bold px-3 py-4">Quick Actions</div>
+                </div> -->
+                <div class="separator mb-3 opacity-75"></div>
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Category</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-200px py-4">
+                        
+                        <div class="menu-item px-3">
+                            {% if request.user.is_superuser or request.user|has_group:"BP JPE Manager"  or request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP HBG Manager"  %}
+                            <button type="button" class="btn btn-float btn-square btn-light-info fs-8" data-bs-toggle="modal" data-bs-target="#offcycle_excel_import"> <span class="font-small-2">Add Parts for Non-AVL</span> </button>
+                            {% endif %}
+                        
+                        </div>
+                 
+                        <div class="menu-item px-3">
+                            <button type="button" class="btn btn-square btn-light-info width-300 mt-1 fs-8" data-bs-toggle="modal" data-bs-target="#Pic_comment"><i class='ft-plus'></i>Add PIC Comment</button>
+                        </div> 
+                 
+                    </div>
+                </div>
+   
+
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Export</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                        </div>
+                        <div class="menu-item px-3">
+                            <a  onclick="download_filtered_excel()"> <button type="button" class="btn btn-float btn-light-success mr-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export Filtered parts </span></button></a>                        </div>        
+                        <div class="menu-item px-3">
+                            <a href="{%url 'download_portfolio' 'portfolio_SS'%}"> <button type="button" class="btn btn-float btn-light-success mt-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export All</span></button> </a>
+                        </div>
+                    </div>
+                </div>               
+                 <div class="menu-item px-3 justify-content-center">
+                    <div class="menu-content px-3 py-3">
+                        <button type="button" class="btn btn-square btn-sm btn-success mt-1 fs-8  px-3" onclick="agile_refresh()"><span class="font-small-1">Agile Refresh</span></button>
+                </div>
+                </div>
+<!-- 
+    <button class="btn btn-sm float-right btn-square btn-info mr-2 mt-2" onclick="$('#Analysis_table').DataTable().draw(false)"> <i class="fa fa-refresh"></i> Refresh Data</button>
+    <a class="btn btn-sm float-right btn-square btn-warning black mr-2 mt-2" href="{% if 'GSM' in request.path %}{%url 'file_serve'%}?file=GSM Team Quote Analysis- Instructions.pdf {% elif 'CMM' in request.path %} {%url 'file_serve'%}?file=CMM Team Quote Analysis- Instructions.pdf{% endif %}"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+    -->
+                <!-- <div class="separator mt-3 opacity-75"></div>
+                <div class="menu-item px-3">
+                    <div class="menu-content px-3 py-3">
+                        <a class="btn btn-primary  btn-sm px-4" href="#">
+                            Generate Reports
+                        </a>
+                    </div>
+                </div> -->
+            </div>
+        
+            </li>
+            <li class="nav-item">
+                <a  id="portfolio_drawer" class="btn btn-sm btn-outline  btn-light-primary"><span class="grey-blue loadUploadComponent"><span class="font-small-1"> <i class="fa ft-upload-cloud font-medium-1"></i> Load Kickstart /Offcycle  File</span>  </button>  </span></a>
+            </li>
+        </ul>
+    </div>
 </div>
 {% endblock %}
 {% block content %}
 <div class="card">
     <div class="row match-height mb-2">
-        <div class='col-3'>
+        <div class='col-9'>
+            
             <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-center border-2 h-md-100 mb-5 mb-xl-10" >
                 <div class="card-header pt-5">
                     <div class="card-title d-flex flex-column">
@@ -38,84 +117,97 @@
                         <button id='send_rfq_button_main' class="btn btn-light-info btn-sm float-end" type="button" onclick="send_rfx_model_initial()"><i class="fas fs-8 fa-paper-plane"></i> Send RFQ</button>
                     </div>
                 </div>
-                <div class="card-body d-flex align-items-end pt-0">
-                    <div class="d-flex align-items-center flex-column mt-3 w-100">
-                        <div class="d-flex justify-content-between fw-bold fs-6 text-white w-100 mt-auto mb-2">
-                            <span>
-                                <div class="media">
-                                    <div class="card-body pt-2 pb-4 px-4">                 
-                                        <div class="d-flex flex-stack">
-                                            <div class="text-gray-700 fw-semibold fs-6 me-2">RFQ Raised</div>
-                                            <div class="d-flex align-items-senter">
-                                                <span class="badge badge-light-dark" style="min-width: 120px;">
-                                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M15.43 8.56949L10.744 15.1395C10.6422 15.282 10.5804 15.4492 10.5651 15.6236C10.5498 15.7981 10.5815 15.9734 10.657 16.1315L13.194 21.4425C13.2737 21.6097 13.3991 21.751 13.5557 21.8499C13.7123 21.9488 13.8938 22.0014 14.079 22.0015H14.117C14.3087 21.9941 14.4941 21.9307 14.6502 21.8191C14.8062 21.7075 14.9261 21.5526 14.995 21.3735L21.933 3.33649C22.0011 3.15918 22.0164 2.96594 21.977 2.78013C21.9376 2.59432 21.8452 2.4239 21.711 2.28949L15.43 8.56949Z" fill="currentColor"/>
-                                                            <path opacity="0.3" d="M20.664 2.06648L2.62602 9.00148C2.44768 9.07085 2.29348 9.19082 2.1824 9.34663C2.07131 9.50244 2.00818 9.68731 2.00074 9.87853C1.99331 10.0697 2.04189 10.259 2.14054 10.4229C2.23919 10.5869 2.38359 10.7185 2.55601 10.8015L7.86601 13.3365C8.02383 13.4126 8.19925 13.4448 8.37382 13.4297C8.54839 13.4145 8.71565 13.3526 8.85801 13.2505L15.43 8.56548L21.711 2.28448C21.5762 2.15096 21.4055 2.05932 21.2198 2.02064C21.034 1.98196 20.8409 1.99788 20.664 2.06648Z" fill="currentColor"/>
-                                                        </svg>
-                                                    </span>
-                                                    <span class="text-gray-900 fw-bolder fs-6">{{RFQ_data.3}}</span> 
-                                                </span>
-                                                
-                                            </div>   
-                                        </div>
-                                        <div class="separator separator-dashed my-3"></div>
-                                        <div class="d-flex flex-stack">
-                                            <div class="text-gray-700 fw-semibold fs-6 me-2">APN COUNT: Total</div>     
-                                            <div class="d-flex align-items-senter">
-                                                <span class="badge badge-light-dark" style="min-width: 120px;">
-                                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
-                                                            <path d="M10.0813 3.7242C10.8849 2.16438 13.1151 2.16438 13.9187 3.7242V3.7242C14.4016 4.66147 15.4909 5.1127 16.4951 4.79139V4.79139C18.1663 4.25668 19.7433 5.83365 19.2086 7.50485V7.50485C18.8873 8.50905 19.3385 9.59842 20.2758 10.0813V10.0813C21.8356 10.8849 21.8356 13.1151 20.2758 13.9187V13.9187C19.3385 14.4016 18.8873 15.491 19.2086 16.4951V16.4951C19.7433 18.1663 18.1663 19.7433 16.4951 19.2086V19.2086C15.491 18.8873 14.4016 19.3385 13.9187 20.2758V20.2758C13.1151 21.8356 10.8849 21.8356 10.0813 20.2758V20.2758C9.59842 19.3385 8.50905 18.8873 7.50485 19.2086V19.2086C5.83365 19.7433 4.25668 18.1663 4.79139 16.4951V16.4951C5.1127 15.491 4.66147 14.4016 3.7242 13.9187V13.9187C2.16438 13.1151 2.16438 10.8849 3.7242 10.0813V10.0813C4.66147 9.59842 5.1127 8.50905 4.79139 7.50485V7.50485C4.25668 5.83365 5.83365 4.25668 7.50485 4.79139V4.79139C8.50905 5.1127 9.59842 4.66147 10.0813 3.7242V3.7242Z" fill="currentColor"/>
-                                                            <path d="M14.8563 9.1903C15.0606 8.94984 15.3771 8.9385 15.6175 9.14289C15.858 9.34728 15.8229 9.66433 15.6185 9.9048L11.863 14.6558C11.6554 14.9001 11.2876 14.9258 11.048 14.7128L8.47656 12.4271C8.24068 12.2174 8.21944 11.8563 8.42911 11.6204C8.63877 11.3845 8.99996 11.3633 9.23583 11.5729L11.3706 13.4705L14.8563 9.1903Z" fill="white"/>
-                                                        </svg>
-                                                    </span>
-                                                    <span class="text-gray-900 fw-bolder fs-6">{{RFQ_data.5}}</span> 
-                                                </span>
-                                            </div>         
-                                        </div>
-                                        <div class="separator separator-dashed my-3"></div>
-                                        <div class="d-flex flex-stack">
-                                            <div class="text-gray-700 fw-semibold fs-6 me-2">APN COUNT: Sent</div>
-                                            <div class="d-flex align-items-senter">
-                                                <span class="badge badge-light-dark" style="min-width: 120px;">
-                                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path opacity="0.3" d="M21 13H15V11H21C21.6 11 22 10.6 22 10C22 9.4 21.6 9 21 9H15V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V9H11V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V9H3C2.4 9 2 9.4 2 10C2 10.6 2.4 11 3 11H9V13H3C2.4 13 2 13.4 2 14C2 14.6 2.4 15 3 15H9V21C9 21.6 9.4 22 10 22C10.6 22 11 21.6 11 21V15H13V21C13 21.6 13.4 22 14 22C14.6 22 15 21.6 15 21V15H21C21.6 15 22 14.6 22 14C22 13.4 21.6 13 21 13Z" fill="currentColor"/>
-                                                            <path d="M16 17H8C7.4 17 7 16.6 7 16V8C7 7.4 7.4 7 8 7H16C16.6 7 17 7.4 17 8V16C17 16.6 16.6 17 16 17ZM14 10H10V14H14V10Z" fill="currentColor"/>
-                                                        </svg>
-                                                    </span>          
-                                                    <span class="text-gray-900 fw-bolder fs-6">{{RFQ_data.6}}</span> 
-                                                </span>
-                                            </div>      
-                                        </div>
-                                        <div class="separator separator-dashed my-3"></div>
-                                        <div class="d-flex flex-stack">
-                                            <div class="text-gray-700 fw-semibold fs-6 me-2">Total MPN in Portfolio  <span class="muted font-small-1">(Global + Regional)</span> </div>
-                                            <div class="d-flex align-items-senter">
-                                                <span class="badge badge-light-dark" style="min-width: 120px;">
-                                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
-                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path opacity="0.3" d="M21 13H15V11H21C21.6 11 22 10.6 22 10C22 9.4 21.6 9 21 9H15V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V9H11V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V9H3C2.4 9 2 9.4 2 10C2 10.6 2.4 11 3 11H9V13H3C2.4 13 2 13.4 2 14C2 14.6 2.4 15 3 15H9V21C9 21.6 9.4 22 10 22C10.6 22 11 21.6 11 21V15H13V21C13 21.6 13.4 22 14 22C14.6 22 15 21.6 15 21V15H21C21.6 15 22 14.6 22 14C22 13.4 21.6 13 21 13Z" fill="currentColor"/>
-                                                            <path d="M16 17H8C7.4 17 7 16.6 7 16V8C7 7.4 7.4 7 8 7H16C16.6 7 17 7.4 17 8V16C17 16.6 16.6 17 16 17ZM14 10H10V14H14V10Z" fill="currentColor"/>
-                                                        </svg>
-                                                    </span>          
-                                                    <span class="text-gray-900 fw-bolder fs-6">{{RFQ_data.2}}</span> 
-                                                </span>
-                                            </div>      
-                                        </div>
-                                    </div>
-                                    </div>
-                                    <div class="progress mt-1 mb-0" style="height: 7px;">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width:{{RFQ_data.4}}%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </span>    
+                <div class="d-flex flex-wrap flex-stack m-5">
+                    <!--begin::Wrapper-->
+                    <div class="d-flex flex-column flex-grow-1 pe-8">
+                        <div class="d-flex flex-wrap">
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+       
+                                <div class="d-flex align-items-center">
+                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M15.43 8.56949L10.744 15.1395C10.6422 15.282 10.5804 15.4492 10.5651 15.6236C10.5498 15.7981 10.5815 15.9734 10.657 16.1315L13.194 21.4425C13.2737 21.6097 13.3991 21.751 13.5557 21.8499C13.7123 21.9488 13.8938 22.0014 14.079 22.0015H14.117C14.3087 21.9941 14.4941 21.9307 14.6502 21.8191C14.8062 21.7075 14.9261 21.5526 14.995 21.3735L21.933 3.33649C22.0011 3.15918 22.0164 2.96594 21.977 2.78013C21.9376 2.59432 21.8452 2.4239 21.711 2.28949L15.43 8.56949Z" fill="currentColor"/>
+                                            <path opacity="0.3" d="M20.664 2.06648L2.62602 9.00148C2.44768 9.07085 2.29348 9.19082 2.1824 9.34663C2.07131 9.50244 2.00818 9.68731 2.00074 9.87853C1.99331 10.0697 2.04189 10.259 2.14054 10.4229C2.23919 10.5869 2.38359 10.7185 2.55601 10.8015L7.86601 13.3365C8.02383 13.4126 8.19925 13.4448 8.37382 13.4297C8.54839 13.4145 8.71565 13.3526 8.85801 13.2505L15.43 8.56548L21.711 2.28448C21.5762 2.15096 21.4055 2.05932 21.2198 2.02064C21.034 1.98196 20.8409 1.99788 20.664 2.06648Z" fill="currentColor"/>
+                                        </svg>
+                                    </span>
+                                    {%rfq_raise_count request=request Team='GSM Team' as RFQ_data%}
+                                       <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{RFQ_data.3}}" data-kt-countup-prefix="">{{RFQ_data.3}}</div>
+                                </div>
+                                <div class="fw-semibold fs-6 text-gray-800">RFQ Raised</div>
+                            
+                            </div>
+    
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                    
+                                <div class="d-flex align-items-center">
+                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24">
+                                            <path d="M10.0813 3.7242C10.8849 2.16438 13.1151 2.16438 13.9187 3.7242V3.7242C14.4016 4.66147 15.4909 5.1127 16.4951 4.79139V4.79139C18.1663 4.25668 19.7433 5.83365 19.2086 7.50485V7.50485C18.8873 8.50905 19.3385 9.59842 20.2758 10.0813V10.0813C21.8356 10.8849 21.8356 13.1151 20.2758 13.9187V13.9187C19.3385 14.4016 18.8873 15.491 19.2086 16.4951V16.4951C19.7433 18.1663 18.1663 19.7433 16.4951 19.2086V19.2086C15.491 18.8873 14.4016 19.3385 13.9187 20.2758V20.2758C13.1151 21.8356 10.8849 21.8356 10.0813 20.2758V20.2758C9.59842 19.3385 8.50905 18.8873 7.50485 19.2086V19.2086C5.83365 19.7433 4.25668 18.1663 4.79139 16.4951V16.4951C5.1127 15.491 4.66147 14.4016 3.7242 13.9187V13.9187C2.16438 13.1151 2.16438 10.8849 3.7242 10.0813V10.0813C4.66147 9.59842 5.1127 8.50905 4.79139 7.50485V7.50485C4.25668 5.83365 5.83365 4.25668 7.50485 4.79139V4.79139C8.50905 5.1127 9.59842 4.66147 10.0813 3.7242V3.7242Z" fill="currentColor"/>
+                                            <path d="M14.8563 9.1903C15.0606 8.94984 15.3771 8.9385 15.6175 9.14289C15.858 9.34728 15.8229 9.66433 15.6185 9.9048L11.863 14.6558C11.6554 14.9001 11.2876 14.9258 11.048 14.7128L8.47656 12.4271C8.24068 12.2174 8.21944 11.8563 8.42911 11.6204C8.63877 11.3845 8.99996 11.3633 9.23583 11.5729L11.3706 13.4705L14.8563 9.1903Z" fill="white"/>
+                                        </svg>
+                                    </span>
+                                    
+                                    <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{RFQ_data.5}}">{{RFQ_data.5}}</div>
+                                </div>
+    
+                                <div class="fw-semibold fs-6 text-gray-800">APN COUNT: Total</div>
+                            
+                            </div>
+    
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.3" d="M21 13H15V11H21C21.6 11 22 10.6 22 10C22 9.4 21.6 9 21 9H15V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V9H11V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V9H3C2.4 9 2 9.4 2 10C2 10.6 2.4 11 3 11H9V13H3C2.4 13 2 13.4 2 14C2 14.6 2.4 15 3 15H9V21C9 21.6 9.4 22 10 22C10.6 22 11 21.6 11 21V15H13V21C13 21.6 13.4 22 14 22C14.6 22 15 21.6 15 21V15H21C21.6 15 22 14.6 22 14C22 13.4 21.6 13 21 13Z" fill="currentColor"/>
+                                            <path d="M16 17H8C7.4 17 7 16.6 7 16V8C7 7.4 7.4 7 8 7H16C16.6 7 17 7.4 17 8V16C17 16.6 16.6 17 16 17ZM14 10H10V14H14V10Z" fill="currentColor"/>
+                                        </svg>
+                                    </span>  
+                                    
+                                    <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{RFQ_data.6}}" data-kt-countup-prefix="">{{RFQ_data.6}}</div>
+                                </div>
+                                <!--end::Number-->                                
+    
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-800">APN COUNT: Sent</div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
+    
+                            <!--begin::Stat-->
+                            <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                <!--begin::Number-->
+                                <div class="d-flex align-items-center">
+                                    <span class="svg-icon svg-icon-2 svg-icon-primary me-2">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path opacity="0.3" d="M21 13H15V11H21C21.6 11 22 10.6 22 10C22 9.4 21.6 9 21 9H15V3C15 2.4 14.6 2 14 2C13.4 2 13 2.4 13 3V9H11V3C11 2.4 10.6 2 10 2C9.4 2 9 2.4 9 3V9H3C2.4 9 2 9.4 2 10C2 10.6 2.4 11 3 11H9V13H3C2.4 13 2 13.4 2 14C2 14.6 2.4 15 3 15H9V21C9 21.6 9.4 22 10 22C10.6 22 11 21.6 11 21V15H13V21C13 21.6 13.4 22 14 22C14.6 22 15 21.6 15 21V15H21C21.6 15 22 14.6 22 14C22 13.4 21.6 13 21 13Z" fill="currentColor"/>
+                                            <path d="M16 17H8C7.4 17 7 16.6 7 16V8C7 7.4 7.4 7 8 7H16C16.6 7 17 7.4 17 8V16C17 16.6 16.6 17 16 17ZM14 10H10V14H14V10Z" fill="currentColor"/>
+                                        </svg>
+                                    </span>      
+                                    
+                                    <div class="fs-2 fw-bold" data-kt-countup="true" data-kt-countup-value="{{RFQ_data.2}}" data-kt-countup-prefix="">{{RFQ_data.2}}</div>
+                                </div>
+                                <!--end::Number-->                                
+    
+                                <!--begin::Label-->
+                                <div class="fw-semibold fs-6 text-gray-800">Total MPN in Portfolio  <span class="muted font-small-1">(Global + Regional)</span> </div>
+                                <!--end::Label-->
+                            </div>
+                            <!--end::Stat-->
                         </div>
+                        <!--end::Stats-->
                     </div>
+                    <!--end::Wrapper-->
+    
+                    <!--begin::Progress-->
+                    <div class="d-flex align-items-center w-200px w-sm-300px flex-column mt-3">
+
+                    </div>
+                    <!--end::Progress-->
                 </div>
             </div>
         </div>
-        <div class='col-3'>
+        <!-- <div class='col-3'>
             <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-center border-2 mb-5 mb-xl-10" >
                 <div class="card-header pt-5">
                     <div class="card-title d-flex flex-column">
@@ -137,8 +229,8 @@
                     </div>    
                 </div>
             </div>
-        </div>
-        <div class='col-3'>
+        </div> -->
+        <!-- <div class='col-3'>
             <div class="card card-flush bgi-no-repeat bgi-size-contain bgi-position-x-center border-2 mb-5 mb-xl-10">
                 <div class="card-header pt-5">
                     <div class="card-title d-flex flex-column">
@@ -146,7 +238,7 @@
                     </div>
                 </div>
                 <div class="card-body d-flex align-items-end pt-0">
-                    <!--begin::Progress-->
+                
                     <div class="d-flex align-items-center flex-column  w-100">
                         <div class="d-flex m-3">
                             <div class="d-flex align-items-center flex-column w-100">
@@ -155,10 +247,10 @@
                                     <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
                                         <div class="menu-item px-3"> <a  onclick="download_filtered_excel()"> <button type="button" class="btn btn-float btn-light-success mr-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export Filtered parts </span></button></a></div>
                                         <div class="menu-item px-3"><a href="{%url 'download_portfolio' 'portfolio_SS'%}"> <button type="button" class="btn btn-float btn-light-success mt-1 fs-8"><i class="fa fa-file-excel-o"></i><span class="font-small-1">Export All</span></button> </a></div>
-                                    </div>
+                                    </div> -->
                                     <!-- <button class="btn btn-square btn-sm btn-light-info fs-8 width-100 m-1" onclick="$('#Portfolio_table').DataTable().draw()"><i class="fa fa-refresh font-small-1"></i><span class="font-small-1"> Refresh</span></button> -->
                                     <!-- <button class="btn btn-square btn-sm btn-light-danger fs-8  width-100 m-1 float-left" onclick="window.location.reload()"> <i class="fa fa-remove font-small-1"></i><span class="font-small-1"> Clear Filters</span></button> -->
-                                    {% if request.user.username == 'superadmin'%}
+                                    <!-- {% if request.user.username == 'superadmin'%}
                                     <button type="button" class="btn btn-square btn-sm btn-success mt-1 fs-8  px-3" onclick="agile_refresh()"><span class="font-small-1">Agile Refresh</span></button>
                                     {%endif%}
                                     </div>
@@ -170,13 +262,13 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class='col-3'>
             <div class="card border-2">
                 <div class="card-header">
                     <h3 class="card-title">Master Search</h3>
                     <div class="card-toolbar">
-                      <a href="#kt_accordion_1">  <button class="btn btn-sm btn-link px-2" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="false" aria-controls="kt_accordion_1_body_1">
+                      <a href="#kt_accordion_1">  <button class="btn btn-sm px-3 bg-light-info fs-8" type="button" data-bs-toggle="collapse" data-bs-target="#kt_accordion_1_body_1" aria-expanded="false" aria-controls="kt_accordion_1_body_1">
                             Advance Filter <i class="fas fa-circle-chevron-down"></i>
                         </button></a>
                     </div>

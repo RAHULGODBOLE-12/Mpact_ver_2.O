@@ -1,7 +1,7 @@
 {% load cmt_helper %}
 <div class="card">
     <div class="card-header justify-content-center ribbon ribbon-top">
-        <div class="ribbon-label bg-primary"><button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-primary">No BID</button></div>
+        <!-- <div class="ribbon-label bg-primary"><button type="button" onclick="not_to_quote(['{{Quotes.0.id|default_if_none:'' }}','{{Quotes.1.id|default_if_none:'' }}','{{Quotes.2.id|default_if_none:'' }}'])" class="btn btn-sm btn-info float-end">No BID</button></div> -->
         <div class="card-title">RFX ID: {{Quotes.0.id|default_if_none:'' }},&nbsp;&nbsp; Arista Part:&nbsp; <span>{{Quotes.0.Part_Number|default_if_none:'' }} </span>,&nbsp;&nbsp;Mfr. Part :<span>{{Quotes.0.portfolio.Mfr_Part_Number|default_if_none:'' }}</span> </div>
     </div>
     <div class="card-body">
@@ -464,6 +464,7 @@ function not_to_quote(ids){
                                 text:'Updated',
                                 title:'Success'
                             })
+                            location.reload()
                             });
                             $.get("{%url 'his_parts'%}", function(data){
                                 $('#masterpartlistsidebar').html(data)

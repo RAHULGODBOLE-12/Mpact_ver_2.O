@@ -145,23 +145,13 @@
                             {%csrf_token%}
                             <input type="hidden" class="input-sm" value='{{Team}} Team' name='Team'>
                             <div class="col-6 form-group"><label>Supplier Name<span class="red"> *</span></label> 
-                                <!-- <select placeholder='Select Supplier' required  id='Supplier_Name_list' class=" form-control input-sm  border-info select2  font-small-2" style="width: 100%;"
-                                    name="Supplier_Name" >
-                                    <option disabled  selected value="">select</option>
-                                    {% for i in mfr_name %}
-                                    <option  value="{{i.mfr_name}}">{{i.mfr_name}}</option>
-                                    {% endfor %}
-                                </select> -->
-                                <select class="form-select" data-hide-search="true" name="Supplier_Name"  data-control="select2" data-placeholder="Select Supplier">
+                                <select  class="form-select" data-control="select2" data-placeholder="Select an Supplier" name="Supplier_Name" >
                                     <option disabled  selected value="">select</option>
                                     {% for i in mfr_name %}
                                     <option  value="{{i.mfr_name}}">{{i.mfr_name}}</option>
                                     {% endfor %}
                                 </select>
-                            
-                                <!-- <input required class="form-control border-info" type="text" placeholder="Supplier_Name" name='Supplier_Name' value=''> -->
                             </div>
-
                             <div class="col-3 form-group"><label>Distributor</label><input class="form-control " type="text" placeholder="Distributor" name='Distributor' value=''></div>
                             <div class="col-3 form-group"><label>Arista Commodity Manager</label><input class="form-control " type="text" placeholder="Arista Commodity Manager" name='Arista_Commodity_Manager' value=''></div>
                             <div class="col-3 form-group"><label>Commodity</label><input class="form-control " type="text" placeholder="Commodity" name='Commodity' value=''></div>

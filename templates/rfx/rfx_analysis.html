@@ -85,7 +85,7 @@
                 {% if shared_status.share_award %}
                 <div class="menu-item px-3">
                     <button type="button" onclick="shared_status_change(false)"
-                    class=" menu-link px-3 btn btn-square font-small-2 btn-sm btn-warning black float-right text-bold-600">
+                    class=" menu-link px-3 btn btn-square font-small-2 btn-sm btn-light-warning black float-right text-bold-600">
                     <i class="fa fa-share-alt"></i><span
                         class="menu-title"> Level 2:<br> Stop Shared Split % with Supplier </span></button>
                 </div>
@@ -926,7 +926,7 @@
 
 <!-- history table model -->
 <div class="modal fade" id="history_modal" role="dialog">
-    <div class="modal-dialog  modal-lg">
+    <div class="modal-dialog  modal-xl">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -1807,7 +1807,7 @@
                         button: false,
                         timer: 1000
                     })
-                    notify_sound()
+                    
                     $('#download_flag').val("false")
                     var a = document.createElement('a');
                     a.href = "{%url 'download_rfx' Team%}";
@@ -1987,7 +1987,7 @@
                         button: false,
                         timer: 1000
                     })
-                    notify_sound()
+                    
                 },
                 error: function (exception) {
                     swal.fire('Upload a valid excel which has been downloaded !', {
@@ -2192,7 +2192,7 @@
                                             button: false,
                                             timer: 1000
                                         })
-                                        notify_sound()
+                                        
                                         select_all('')
                                         $('#Analysis_table').DataTable().draw(false);
                                     }
@@ -2294,7 +2294,7 @@
     }
     function shared_status_change(status){
         if (status==true){
-            swal({
+            swal.fire({
             title: "Are you sure to share?",
             text: 'This process will notify supplier and split alloted will be visible to supplier',
             icon: "warning",
@@ -2304,12 +2304,12 @@
             .then((change) => {
                 if (change) {
                     
-                    $.get("{%url 'shared_status_change'%}", {
+                    $.get("{%url 'shared_status_change' %}", {
                         shared_status: 'share_it'
                     }, function (data, status) {
 
                         if (data.status == 200) {
-                            swal(data.message, {
+                            swal.fire(data.message, {
                                 icon: 'success',
                                 timer: 1000
                             });
@@ -2321,7 +2321,7 @@
 
 
                 } else {
-                    swal("Cancelled ", {
+                    swal.fire("Cancelled ", {
                         icon: 'error',
                         timer: 1000
                     });
@@ -2329,7 +2329,7 @@
             });
         }
         else{
-            swal({
+            swal.fire({
             title: "Are you sure to Unshare?",
             text: 'This process will notify supplier and split alloted will not be visible to supplier',
             icon: "warning",
@@ -2344,18 +2344,18 @@
                     }, function (data, status) {
 
                         if (data.status == 200) {
-                            swal(data.message, {
+                            swal.fire(data.message, {
                                 icon: 'success',
                                 timer: 1000
                             });
-                            notify_sound()
+                            
                             window.location.reload()
                         } else {
                             $('#Analysis_table').DataTable().draw(false)
                         }
                     });
                 } else {
-                    swal("Cancelled ", {
+                    swal.fire("Cancelled ", {
                         icon: 'error',
                         timer: 1000
                     });
@@ -2390,7 +2390,7 @@
                                 icon: 'success',
                                 timer: 1000
                             });
-                            notify_sound()
+                            
                             $('#Analysis_table').DataTable().draw(false)
                         } else {
                             $('#Analysis_table').DataTable().draw(false)
@@ -2426,7 +2426,7 @@
         }, function (data, status) {
 
             if (data.status == 200) {
-                swal(data.message, {
+                swal.fire(data.message, {
                     icon: 'success',
                 });
                 
@@ -2463,7 +2463,7 @@
                                 icon: 'success',
                                 timer: 1000
                             });
-                            notify_sound()
+                            
                             $('#Analysis_table').DataTable().draw(false)
                         } else {
                             $('#Analysis_table').DataTable().draw(false)
@@ -2684,7 +2684,7 @@
                         }
 
                         select_all('')
-                        notify_sound()
+                        
                         $('#Analysis_table').DataTable().draw(false)
 
                     });

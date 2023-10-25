@@ -602,7 +602,7 @@
             <table class="table table-bordered table-responsive" id="Portfolio_table">
                 <thead class="bg-light-info text-center text-dark font-s">
                     <tr>
-                        <th class="bg-light-info" id='add_checkbox'><input class="form-check-input" type="checkbox" onclick="select_all(this)" id="select_all_checkbox"></th>
+                            <th class="bg-light-info text-center " id='add_checkbox'><input class="form-check-input" type="checkbox" onclick="select_all(this)" id="select_all_checkbox"></th>
                             <th class="px-5 text-nowrap bg-light-info">{{columns_name|dict_key:"cm"}}</th>
                             <th class="px-5 text-nowrap bg-light-info">{{columns_name|dict_key:"Number"}}</th>
                             <th class="px-5 text-nowrap bg-light-info">{{columns_name|dict_key:"cm_Part_Number"}}</th>
@@ -1181,7 +1181,6 @@
                             Swal.fire(data.message, {
                             icon: "error",
                             buttons: true
-                        
                     });
                     check_re_render()
                     window.location.reload();
@@ -1340,11 +1339,8 @@
                            return data
                        }
                        else if (data[4].sent_all==false) {
-                           var render_data = `<input type="checkbox" class="selection" onclick="checkbox(this)" value='${data[1]}'  name="select_checkbox" ${data[0]} id="${data[1]}_checkbox" >`;
+                           var render_data = `<input type="checkbox" class="selection form-check-input" onclick="checkbox(this)" value='${data[1]}'  name="select_checkbox" ${data[0]} id="${data[1]}_checkbox" >`;
                        }
-                       
-                       
-                           
                        else if(data[4].partial){
                            console.log('partial')
                            let q=data[4]

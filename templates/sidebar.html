@@ -8,7 +8,7 @@
             <!--begin:Menu item-->
             <div class="menu-item">
                 <!--begin:Menu link-->
-                <a class="menu-link" href="{% url 'portfolio' 'GSM' %}">
+                <a class="menu-link {% if 'portfolio' in request.path %} active {% endif %}" href="{% url 'portfolio' 'GSM' %}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-element-11 fs-1">
                             <span class="path1"></span>

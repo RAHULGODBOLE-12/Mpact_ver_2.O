@@ -1748,8 +1748,6 @@ def make_quote(request, action):
             save_quote_notified_data(request, value=id, status='Quoted')
         except:
             LOGGER.error("LOG_MESSAGE", exc_info=1)
-
-
         return JsonResponse({'message':'Quote Updated','status':200}) if permission_denied_quote==[] else JsonResponse({'message':'You have no permission to quote','status':403})
     elif action=='Not_quote':
         ids=request.POST.getlist("id[]")
@@ -2132,10 +2130,11 @@ def Analysis_page(request, team):
 
             if state=='true':
                 ids=request.session['Check_box_analysis']
-
+                print(ids,'msmsnsnsnsn')
                 for id in ids:
                     data=RFX.objects.get(pk=id)
                     RFX_base_id=data.RFX_id[15:]
+                    print(data.approval_status,data.quote_freeze,'aakkakaak')
 
                     data=RFX.objects.filter(RFX_id__icontains=RFX_base_id).filter(sent_quater=Current_quarter(),quarter=data.quarter,)
                     data.exclude(approval_status='Approved').filter(quote_freeze=False).update(
@@ -2378,8 +2377,6 @@ def Analysis_page(request, team):
                     2)Please approve only one MPN per APN<br>
                     </div>
                     ''', 'error_table':error_table})
-
-                    
             # elif request.user.is_superuser:
             #     data=RFX.objects.filter(Team=request.GET.get('Team'))
             #     if ids:
@@ -2453,15 +2450,19 @@ def Analysis_page(request, team):
                         quote_freeze=True,
                         quote_is_writable=False,
                     )
+                    print('sabeee')
                     part.approval_status_PIC = 'Approved'
                     # part.approval_status='Approved'
                     part.quote_freeze = True
                     part.quote_is_writable = False
                     part.save(user=request.user)
+                    print('a')
                     approval_status_set(part.id)
+                    print('b')
                     save_approval_status_notified_data(request,[part.id], status='Approved', role='PIC')
-
+                    print('c')
                     save_lock_access_notified_data(request, [part.id], bool=False)
+                    print('all done')
                 # elif request.GET.get('role')=='Manager':
                 #     if str(part.approval_flag)=='20' :
                 #         part.approval_status_Manager='Approved'
@@ -2535,7 +2536,6 @@ def Analysis_page(request, team):
                             quote_freeze=False,
                             approval_status_PIC=None,
                             approval_status=None,
-
                             )
 
                         RFX.objects.filter(cm=part.cm,sent_quater=Current_quarter(),quarter=part.quarter).filter(Quote_status__in=['Quoted'],Part_Number=part.Part_Number).update(
@@ -2640,7 +2640,6 @@ def Analysis_page(request, team):
                         quote_freeze=False,
                         approval_status_PIC=None,
                         approval_status=None,
-
                         )
 
                     RFX.objects.filter(cm=part.cm,sent_quater=Current_quarter(),quarter=part.quarter).filter(Quote_status__in=['Quoted'],Part_Number=part.Part_Number).update(
@@ -2771,7 +2770,7 @@ def manual_split_set(request):
         #print(datas)
         return render(request, 'rfx/components/split_form.html', {'data': datas,'instance':data})
     if request.method == 'POST':
-        from CMT.masterprice_helper import get_po_delivery_calc
+        from Slate_CMT.templatetags.masterprice_helper import get_po_delivery_calc
         #print(request.POST)
         id = request.POST.getlist('id')
         split_value = [float(x) for x in request.POST.getlist('split_value')]
@@ -4520,7 +4519,7 @@ def download_award(request,partnumber,supplier=True):
                 
            
 
-            writer.save()
+            writer.close()
 
             server=request.get_host()
             server=server.replace('arista-mpat','').replace('.inesssolutions.net','')

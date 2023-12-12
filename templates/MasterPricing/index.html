@@ -3,6 +3,284 @@
 
 {% load cmt_helper %}
 {% block title %}
+<div class="app-toolbar-wrapper d-flex flex-stack flex-wrap gap-4 w-100">
+    <div class="page-title d-flex flex-column gap-1 me-3 mb-2">
+        <ul class="breadcrumb breadcrumb-separatorless fw-semibold mb-6">
+            <li class="breadcrumb-item text-gray-700 fw-bold lh-1">
+                <a href="" class="text-gray-500 text-hover-primary">
+                    <i class="ki-duotone ki-home fs-3 text-gray-400 me-n1"></i>
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <i class="ki-duotone ki-right fs-4 text-gray-700 mx-n1"></i>
+            </li>
+            <li class="breadcrumb-item text-gray-700 fw-bold lh-1">Dashboards</li>
+            <li class="breadcrumb-item">
+                <i class="ki-duotone ki-right fs-4 text-gray-700 mx-n1"></i>
+            </li>
+            <li class="breadcrumb-item text-gray-700">Master Pricing</li>
+        </ul>
+        <h1 class="page-heading d-flex flex-column justify-content-center text-dark fw-bolder fs-1 lh-0">Master Pricing</h1>
+    </div>
+    <div class="card-toolbar">
+        <ul class="nav" id="kt_chart_widget_8_tabs">
+            {%if Team == 'GSM Team'%}
+            <li class="nav-item">
+                <button class="btn  btn-light-info btn-sm" onclick='$("#Upload_Excel_field").click()' data-bs-toggle="modal" data-bs-target="#Split_up"><i class="fa fa-upload"></i> Split Upload</button>
+                <div class="modal fade text-left" id="Split_up" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+                    <div class="modal-dialog modal-xs" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel20">Split Upload</h4>
+    
+                                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                                </div>
+                            </div>
+    
+                            <form id='upload_spilt' class="form form-horizontal float-right" method="POST" enctype="multipart/form-data" action="{%url 'Analysis_upload_split'%}">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <input type="file" id='Upload_Excel_field' required name='Upload_Excel'>
+                                </div>
+                                <div class="modal-footer text-right">
+                                    <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+                <button class="btn btn-sm btn-light-primary justify-content-end  dropdown-toggle" 
+                data-kt-menu-trigger="click" 
+                data-kt-menu-placement="bottom-end" 
+                data-kt-menu-overflow="true">   
+                                
+                Actions     
+                                    
+            </button>   
+            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px" data-kt-menu="true">
+                <!-- <div class="menu-item px-3">
+                    <div class="menu-content fs-6 text-dark fw-bold px-3 py-4">Quick Actions</div>
+                </div> -->
+                <div class="separator mb-3 opacity-75"></div>
+                {% if request.user.username == 'superadmin'%}
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Refresh</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                         
+                          <button class="btn btn-sm font-small-1 btn-outline-danger text-bold-600 report_download" href="{%url 'MP_Updater_status'%}?update_all=update">Manual Refresh all</button>
+                          <button class="btn btn-sm font-small-1 btn-outline-danger text-bold-600 report_download" href="{%url 'MP_Updater_status'%}?update_portfolio=update">Manual Refresh with portfolio</button>
+                          
+                        </div>  
+                    </div>
+                </div>
+                {%endif%}
+                {% if request.user.is_superuser or request.user|has_group:"BP SGD Manager"  %}
+                <div class="menu-item px-3">
+                  <button type="button"
+                  class="menu-link px-3 btn btn-square btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#sgd_receipt"><i class="fa fa-upload"></i>
+                  <span
+                      class="menu-title">Import SGD Receipt</span></button>
+
+                      <div class="modal fade text-left" id="sgd_receipt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+                        <div class="modal-dialog modal-md" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h4 class="modal-title" id="myModalLabel20">Import SGD Receipt File</h4>
+                        <a class="mt-0 ml-1 btn btn-sm btn-info float-left" href="{%url 'download_receipt_template' 'SGD'%}">Download SGD Receipt Template</a>
+                            <div class="btn btn-icon btn-sm btn-active-light-primary " data-bs-dismiss="modal" aria-label="Close">
+                              <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                          </div>
+                               
+                          </button>
+                        </div>
+                        <form class="float-right" id='upload_po_receipt' action="{%url 'upload_po_receipt'%}" method="post">
+                            {% csrf_token %}
+                          <div class="modal-body">
+                            <input type="file" class="ml-2" required name='Upload_Excel_po_receipt'>
+                            </div>
+                          <div class="modal-footer text-right">
+                            <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                      </div>
+                      
+              </div>
+              {% endif %}
+
+              <div class="menu-item px-3">
+                <button type="button"
+                class="menu-link px-3 btn btn-square btn-sm btn-outline-primary" onclick="$('#Upload_Excel').click()" data-bs-toggle="modal" data-bs-target="#MP"><i class="fa fa-upload"></i>
+                <span
+                    class="menu-title">Import Master Pricing</span></button>
+
+                    <div class="modal fade text-left" id="sgd_receipt" tabindex="-1" role="dialog" aria-labelledby="myModalLabel20" aria-hidden="true">
+                      <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h4 class="modal-title" id="myModalLabel20">Import SGD Receipt File</h4>
+                      <a class="mt-0 ml-1 btn btn-sm btn-info float-left" href="{%url 'download_receipt_template' 'SGD'%}">Download SGD Receipt Template</a>
+                          <div class="btn btn-icon btn-sm btn-active-light-primary " data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                        </div>
+                        </button>
+                      </div>
+                      <form class="float-right" id='upload_po_receipt' action="{%url 'upload_po_receipt'%}" method="post">
+                          {% csrf_token %}
+                        <div class="modal-body">
+                          <input type="file" class="ml-2" required name='Upload_Excel_po_receipt'>
+                          </div>
+                        <div class="modal-footer text-right">
+                          <button type="button" class="btn btn-sm grey btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" class="btn btn-sm btn-success">Upload file</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                    </div>
+                    
+            </div>
+
+
+
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Export MPAT History</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                          {% for Quarter in Quarter_History %}
+                          <a href="{%url 'MP_instance_download' 'SGD'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} SGD</a>
+                          <a href="{%url 'MP_instance_download' 'JPE'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JPE</a>
+                          <a href="{%url 'MP_instance_download' 'FGN'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} FGN</a>
+                          <a href="{%url 'MP_instance_download' 'HBG'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} HBG</a>
+                          <a href="{%url 'MP_instance_download' 'JSJ'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JSJ</a>
+                          <a href="{%url 'MP_instance_download' 'JMX'%}?Quarter={{Quarter}}" class="menu-link px-3">{%get_Next_quarter 1 Quarter as q%} {{q.0}} JMX</a>
+                          {% empty %}
+                        <a class="menu-item px-3 disabled" disabled href="#">No History available</a>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="menu-item px-3" data-kt-menu-trigger="hover" data-kt-menu-placement="right-start">
+                    <a href="#" class="menu-link px-3">
+                        <span class="menu-title">Export</span>
+                        <span class="menu-arrow"></span>
+                    </a>
+                    <div class="menu-sub menu-sub-dropdown w-175px py-4">
+                        <div class="menu-item px-3">
+                            <a href=""><button class="menu-link px-3 btn btn-sm btn-outline-success bg-glow"><i class="fa fa-download"></i> Export Award Letter Filtered</button></a>
+                        </div>
+                        <div class="menu-item px-3">
+                            <a onclick="download_filtered_excel()"><button class="menu-link px-3 btn btn-sm btn-outline-info"><i class="fa fa-download"></i> Export custom Filtered Excel</button></a>
+                        </div>        
+                        <!-- <div class="menu-item px-3">
+                            {% if request.user|has_group:"CMM Team" or request.user|has_group:"Admin" %}      
+                            <a href="" class="btn btn-sm btn-outline-info menu-link px-3"><i class="fa fa-download"></i> Export CM Quotes</a> 
+                            {% endif %}
+                        </div> -->
+                    </div>
+                </div>
+
+<!-- 
+    <button class="btn btn-sm float-right btn-square btn-info mr-2 mt-2" onclick="$('#Analysis_table').DataTable().draw(false)"> <i class="fa fa-refresh"></i> Refresh Data</button>
+    <a class="btn btn-sm float-right btn-square btn-warning black mr-2 mt-2" href="{% if 'GSM' in request.path %}{%url 'file_serve'%}?file=GSM Team Quote Analysis- Instructions.pdf {% elif 'CMM' in request.path %} {%url 'file_serve'%}?file=CMM Team Quote Analysis- Instructions.pdf{% endif %}"><i class="fa fa-question-circle font-medium-1"> </i><b> Instructions</b></a>
+    -->
+                <!-- <div class="separator mt-3 opacity-75"></div>
+                <div class="menu-item px-3">
+                    <div class="menu-content px-3 py-3">
+                        <a class="btn btn-primary  btn-sm px-4" href="#">
+                            Generate Reports
+                        </a>
+                    </div>
+                </div> -->
+            </div>
+        
+            </li>
+
+            <li class="nav-item">
+              <div>
+          
+                {% if request.user|has_group:"SGD Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'SGD'%}">Download for Bulk Approval SGD</a>
+                  {% elif request.user|has_group:"JPE Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JPE'%}">Download for Bulk Approval JPE</a>
+                  {% elif request.user|has_group:"FGN Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'FGN'%}">Download for Bulk Approval FGN</a>
+                  {% elif request.user|has_group:"HBG Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'HBG'%}">Download for Bulk Approval HBG</a>
+                  {% elif request.user|has_group:"JSJ Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JSJ'%}">Download for Bulk Approval JSJ</a>
+                  {% elif request.user|has_group:"JMX Contract Manufacturer" %}
+                  <a class="btn btn-sm btn-outline-success text-bold-600 mb-1 ml-1 float-left" href="{%url 'MP_instance_download' 'JMX'%}">Download for Bulk Approval JMX</a>
+                  
+                  {%else%}
+                    <div class="btn-group  ml-1 float-left " role="group">
+                      <button type="button" class="btn btn-sm btn-outline btn-light-primary " data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Download for Bulk Approval  <i class="fas fa-download"></i></button>
+                      <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg-light-primary fw-semibold w-200px py-3" data-kt-menu="true">
+                          {% if request.user|has_group:"SGD" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'SGD'%}" class="menu-link px-3">Sanmina</a></div>
+                          {% endif %}
+                          {% if request.user|has_group:"SSN" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JPE'%}" class="menu-link px-3">Jabil</a></div>
+                          {% endif %}
+                          {% if request.user|has_group:"JSJ" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'FGN'%}" class="menu-link px-3">Flextronics</a></div>
+                          {% endif %}
+                          {% if request.user|has_group:"JPE" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'HBG'%}" class="menu-link px-3">Foxconn</a></div>
+                          {% endif %}
+                          {% if request.user|has_group:"JMX" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JSJ'%}" class="menu-link px-3">Jabil San Jose</a></div>
+                          {% endif %}
+                          {% if request.user|has_group:"FGN" %}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JMX'%}" class="menu-link px-3">Jabil Mexico</a></div>
+                          {% endif %}
+                          {% if not request.user|has_group:"BP Team" %}
+                          {%has_permission request.user 'PIC' as per%}
+                          {%if per%}
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'SGD'%}?PIC_MP=my_parts" class="menu-link px-3">Sanmina (Your Parts only)</a></div>
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JPE'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil (Your Parts only)</a></div>
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'FGN'%}?PIC_MP=my_parts" class="menu-link px-3">Flextronics (Your Parts only)</a></div>
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'HBG'%}?PIC_MP=my_parts" class="menu-link px-3">Foxconn (Your Parts only)</a></div>
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JSJ'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil San Jose (Your Parts only)</a></div>
+                          <div class="menu-item px-3"><a href="{%url 'MP_instance_download' 'JMX'%}?PIC_MP=my_parts" class="menu-link px-3">Jabil Mexico (Your Parts only)</a></div>
+                          {% endif %}
+                          {%endif%}
+                      </div>
+                  </div>
+                  
+                  
+                {%endif%}
+                
+                   
+             </div>
+            </li>
+
+        </ul>
+    </div>
+
+
+
+</div>
+{% endblock %}
+
 <!-- <div class="content-header-left col-md-4 col-12 mb-2">
   <h3 class="content-header-title mb-0">Master Pricing</h3>
 </div> -->
@@ -229,7 +507,7 @@
         
           </div>
            </div>
-        </form>
+           </form>
         </div>
         <div class="col-2">
           <button type="button" class="btn btn-sm btn-outline btn-light-primary " data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Export MPAT History  <i class="fas fa-download"></i></button>
@@ -283,9 +561,58 @@
 </div>
 </div>
 </div>
-{% endblock %}
 
 {% block content %}
+<div class="card">
+  <div class="card-body py-1">         
+      <div class="row justify-content-start">
+          <div class="col-6 d-flex justify-content-start">
+                {%if logic_BP.lift_logic == 'disable'%}
+                    <span  class="btn btn-sm btn-success text-bold-600 square" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
+
+                {%else%} 
+                    <span  class="btn btn-sm btn-danger text-bold-600 square" disabled>  <i class="fa fa-lock"></i> MP Status : Locked </span>
+
+                {%endif%}
+
+                {% if request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" or request.user.is_superuser %}
+                {%if logic_BP.lift_logic == 'disable'%}
+                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-light-info lift_logic float-left'> <i class="fa fa-lock"></i> Lock</span>
+                {%else%} 
+                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic float-left'><i class="fa fa-unlock"></i> Unlock</span>
+                {%endif%}
+                {%endif%}
+          </div>
+          <div class="col-6 d-flex justify-content-end">
+              <form method="POST" action="{% url 'download_excel' 'file_name' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p}}
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-6">
+                        <select name="quarter_file" class="form-select form-select-sm ">
+                          <option value="" selected disabled>Choose Quarter file</option>
+                          {% for file in files %}
+                          <option value ="{{file}}" name="{{file}}">{{file}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-6">
+                        <button type="submit" class="btn btn-sm btn-info "><i class="fa fa-download"></i> Export History</button>
+                      </div>
+                  </div>
+                  </div>
+              </form>
+
+          </div>
+
+      </div>
+      
+  </div>
+
+</div>
+
+
 <div class="row">
 <div class="col-12 card-content">
  <div class="row">

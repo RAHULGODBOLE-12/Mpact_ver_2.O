@@ -1,4 +1,3 @@
-{% load org_details %}
 {% load cmt_helper %}
 {% load static %}
 <div class="card py-0">
@@ -9,9 +8,9 @@
                         <li class="nav-item">
                             <a class="nav-link px-0 active font-small-2" id="base-Arista_controlled" data-toggle="tab" aria-controls="Arista_controlled" href="#Arista_controlled" aria-expanded="true"><i class="ft-user"></i> Arista Controlled</a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link px-0 font-small-2" id="base-cm-controlled" data-toggle="tab" aria-controls="cm-controlled" href="#cm-controlled" aria-expanded="false"><i class="ft-users"></i> CM Controlled</a>
-                        </li>
+                        </li> -->
                     </ul>
                     <div class="tab-content p-0 ">
                         <div role="tabpanel" class=" tab-pane active " id="Arista_controlled" aria-expanded="true" aria-labelledby="base-Arista_controlled">
@@ -19,32 +18,32 @@
                             <ul class="nav nav-tabs nav-underline no-hover-bg">
                                 {% if request.is_superuser or request.user|has_group:"SGD Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP SGD Manager"   %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 active font-small-1" id="base-Pending_arista" data-toggle="tab" aria-controls="Pending_arista" href="#Pending_arista" aria-expanded="true"><i class="ft-edit-3"></i> SGD</a>
+                                    <a class="arista_tab nav-link px-0 active font-small-1" id="base-Pending_arista" data-bs-toggle="tab" aria-controls="Pending_arista" href="#Pending_arista" aria-expanded="true"><i class="ft-edit-3"></i> SGD</a>
                                 </li>
                                 {% endif %}
                                 {% if request.is_superuser or request.user|has_group:"JPE Contract Manufacturer"  or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JPE Manager"     %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista" href="#WIP_arista" aria-expanded="false"><i class="ft-settings"></i> JPE</a>
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-bs-toggle="tab" aria-controls="WIP_arista" href="#WIP_arista" aria-expanded="false"><i class="ft-settings"></i> JPE</a>
                                 </li>
                                 {% endif %}
                                 {% if request.is_superuser or request.user|has_group:"FGN Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP FGN Manager"   %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_FGN" href="#WIP_arista_FGN" aria-expanded="false"><i class="ft-settings"></i> FGN</a>
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-bs-toggle="tab" aria-controls="WIP_arista_FGN" href="#WIP_arista_FGN" aria-expanded="false"><i class="ft-settings"></i> FGN</a>
                                 </li>
                                 {% endif %}
                                 {% if request.is_superuser or request.user|has_group:"HBG Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP HBG Manager"   %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_HBG" href="#WIP_arista_HBG" aria-expanded="false"><i class="ft-settings"></i> HBG</a>
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-bs-toggle="tab" aria-controls="WIP_arista_HBG" href="#WIP_arista_HBG" aria-expanded="false"><i class="ft-settings"></i> HBG</a>
                                 </li>
                                 {% endif %}
                                 {% if request.is_superuser or request.user|has_group:"JSJ Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JSJ Manager"   %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_JSJ" href="#WIP_arista_JSJ" aria-expanded="false"><i class="ft-settings"></i> JSJ</a>
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-bs-toggle="tab" aria-controls="WIP_arista_JSJ" href="#WIP_arista_JSJ" aria-expanded="false"><i class="ft-settings"></i> JSJ</a>
                                 </li>
                                 {% endif %}
                                 {% if request.is_superuser or request.user|has_group:"JMX Contract Manufacturer" or request.user|has_group:"Director,CMM Team,BP Team,CMM Manager,BP Manager,Super User,GSM Manager,GSM Team,Iness,BP JMX Manager"   %}
                                 <li class="nav-item">
-                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-toggle="tab" aria-controls="WIP_arista_JMX" href="#WIP_arista_JMX" aria-expanded="false"><i class="ft-settings"></i> JMX</a>
+                                    <a class="arista_tab nav-link px-0 font-small-1" id="base-WIP_arista" data-bs-toggle="tab" aria-controls="WIP_arista_JMX" href="#WIP_arista_JMX" aria-expanded="false"><i class="ft-settings"></i> JMX</a>
                                 </li>
                                 {% endif %}
                             </ul>
@@ -62,11 +61,10 @@
                                             {%endfor%}
                                         </ul>
                                     </div>
-                                    
                                 </div>
                                 {% endif %}
                                 {% if not request.user|has_group:"SGD Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
-                                <div class="tab-pane" role="tabpanel" id="WIP_arista" aria-expanded="true" aria-labelledby="base-WIP_arista">
+                                <div class="tab-pane" role="tabpanel" id="WIP_arista" >
                                     <div id='JPE_ARISTA'>
                                         <input class="search_box search form-control input-sm border-info my-1" type="text" placeholder="Search JPE" />
                                     
@@ -138,7 +136,7 @@
                             </div>
                             
                         </div>
-                        <div class="tab-pane  " id="cm-controlled" aria-labelledby="base-cm-controlled">
+                        <!-- <div class="tab-pane  " id="cm-controlled" aria-labelledby="base-cm-controlled">
                             
                             <ul class="nav nav-tabs nav-underline no-hover-bg">
                                 {% if not request.user|has_group:"JPE Contract Manufacturer"  and not request.user|has_group:"FGN Contract Manufacturer" and not request.user|has_group:"HBG Contract Manufacturer" and not request.user|has_group:"JSJ Contract Manufacturer" and not request.user|has_group:"JMX Contract Manufacturer" %}
@@ -258,7 +256,7 @@
                                 </div>
                                 {% endif %}
                             </div>
-                        </div>
+                        </div> -->
                     </div>
         </div>
     </div>

@@ -54,7 +54,7 @@
             </li>
             {% endif %}
             <li class="nav-item">
-                <button class="btn btn-sm btn-light-primary justify-content-end  dropdown-toggle" 
+                <button class="btn btn-sm btn-light-primary justify-content-end  dropdown-toggle m-1" 
                 data-kt-menu-trigger="click" 
                 data-kt-menu-placement="bottom-end" 
                 data-kt-menu-overflow="true">   
@@ -214,7 +214,7 @@
         
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item m-1">
               <div>
           
                 {% if request.user|has_group:"SGD Contract Manufacturer" %}
@@ -466,19 +466,19 @@
 					</div>
 				</div>
         {%if logic_BP.lift_logic == 'disable'%}
-            <span  class=" btn-sm btn-green text-bold-600 mx-1 square" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
+            <span  class=" btn-sm btn-green text-bold-600 mx-1 square m-1" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
 
         {%else%} 
-            <span  class=" btn-sm btn-danger  text-bold-600 mx-1 square" disabled>  <i class="fa fa-lock"></i> MP Status : Locked </span>
+            <span  class=" btn-sm btn-danger  text-bold-600 mx-1 square m-1" disabled>  <i class="fa fa-lock"></i> MP Status : Locked </span>
 
         {%endif%}
 
 
         {% if request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" or request.user.is_superuser %}
         {%if logic_BP.lift_logic == 'disable'%}
-        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-outline-info lift_logic'> <i class="fa fa-lock"></i> Lock</span>
+        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-outline-info lift_logic m-1'> <i class="fa fa-lock"></i> Lock</span>
         {%else%} 
-        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic'><i class="fa fa-unlock"></i> Unlock</span>
+        <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic m-1'><i class="fa fa-unlock"></i> Unlock</span>
         {%endif%}
         {%endif%}
        
@@ -500,6 +500,7 @@
                   {% for file in files %}
                   <option value ="{{file}}" name="{{file}}">{{file}}</option>
                   {% endfor %}
+                  <option value ="sss" name="sss">ssss</option>
                 </select>
               </div>
 
@@ -568,18 +569,18 @@
       <div class="row justify-content-start">
           <div class="col-6 d-flex justify-content-start">
                 {%if logic_BP.lift_logic == 'disable'%}
-                    <span  class="btn btn-sm btn-success text-bold-600 square" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
+                    <span  class="btn btn-sm btn-success text-bold-600 square m-1" disabled>  <i class="fa fa-unlock"></i> MP Status : Unlocked </span>
 
                 {%else%} 
-                    <span  class="btn btn-sm btn-danger text-bold-600 square" disabled>  <i class="fa fa-lock"></i> MP Status : Locked </span>
+                    <span  class="btn btn-sm btn-danger text-bold-600 square m-1" disabled>  <i class="fa fa-lock"></i> MP Status : Locked</span>
 
                 {%endif%}
 
                 {% if request.user|has_group:"BP SGD Manager" or request.user|has_group:"BP JPE Manager" or request.user|has_group:"BP FGN Manager" or request.user|has_group:"BP HBG Manager" or request.user|has_group:"BP JSJ Manager" or request.user|has_group:"BP JMX Manager" or request.user.is_superuser %}
                 {%if logic_BP.lift_logic == 'disable'%}
-                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-light-info lift_logic float-left'> <i class="fa fa-lock"></i> Lock</span>
+                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=enable" type='button' message='This will lock the Decision process' class='btn btn-sm btn-light-info lift_logic float-left m-1'> <i class="fa fa-lock"></i> Lock</span>
                 {%else%} 
-                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic float-left'><i class="fa fa-unlock"></i> Unlock</span>
+                <span href="{%url 'MP_extras'%}?option=lift_logic&Team=BP Team&Action=disable" type='button' message='This will Unlock the Decision process'  class='btn btn-sm btn-info white lift_logic float-left m-1'><i class="fa fa-unlock"></i> Unlock</span>
                 {%endif%}
                 {%endif%}
           </div>
@@ -626,6 +627,7 @@
   <div class="col-9">
     <div class="card box-shadow-5 border border-info">
       <div class="card-body p-0" id='details'>
+       
         <div class="card-body" style="min-height: 600px;">
         </div>
       </div>
@@ -1015,9 +1017,9 @@ $(document).ready(function() {
             $(".detail_id").click(function(e) {
                 var block_ele = $('#details').closest('.card');
                 e.preventDefault();
-                $('.list-group-item').removeClass('bg-info info white');
+                $('.list-group-item').removeClass('bg-primary info white');
                 $('.list-group-item').addClass('bg-transparent ');
-                $(this).closest('.list-group-item').addClass('bg-info white');
+                $(this).closest('.list-group-item').addClass('bg-primary white');
                 $('#details').html('<div class="card-body" style="min-height: 500px;"><h1 class="p-5 text-center"><i class="fa fa-spinner fa-spin"></i> <br> Fetching Data...</h1></div>');
                 $("#Current_url").val($(this).attr('href'))
                 $.get($(this).attr('href'), function(data) {

@@ -134,6 +134,7 @@ def part_details_cm(request,id):
     '''
     from MasterPricing.models import MP_download_table,Processing_list_MP
     ##Check if the parts is in Quoteing portal
+    data = RFX.objects.get(id=id)
     if RFX.objects.filter(id=id).exists():
         data = RFX.objects.get(id=id)
         if Processing_list_MP.objects.filter(Part_Number=data.Part_Number).exists():

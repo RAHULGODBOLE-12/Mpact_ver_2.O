@@ -1,7 +1,405 @@
 {% load cmt_helper %}
  {% load static %}
 {% get_Next_quarter as quote_qtr %}
-<div class="card-content">
+
+<style>
+   .fs-6 {
+        
+  font-size: 0.75rem !important;
+}
+
+
+      table, th, td {
+        font-size: 0.75rem !important;
+}
+    
+</style>
+<div class="col-12">
+    <div class="card box-shadow-5 border border-info">
+      <div class="card-body p-0" id="details"> 
+        <div class="card card-bordered border border-primary border-hover">
+        <div class="card-body ">
+          <div class="table-responsive">
+              <table class="table table-bordered table-striped gy-4 gs-4">
+                <th colspan="8" class="bg-info sorting dtfc-fixed-left min-w-150px text-center "><strong>Supplier Info</strong></th>
+  
+                  <tbody>
+                      <tr>
+                          <th class="fs-6 px-3 py-2"><strong>CM Part Number</strong></th>
+                          <th class="fs-6 px-3 py-2">Arista Part Number</th>
+                          <th class="fs-6 px-3 py-2">Arista PIC</th>
+                          <th class="fs-6 px-3 py-2">Parts controlled by</th>
+                      </tr>
+                      <tr>
+                        <td> {{ portfolio.0.cm_Part_Number }}</td>
+                        <td> {{ portfolio.0.Arista_Part_Number }}</td>
+                        <td> {{ portfolio.0.Arista_PIC }}</td>
+                        <td> {{ portfolio.0.Ownership }}</td>
+                      </tr>
+                      <tr>
+                          <th class="fs-6  px-3 py-2">Item Desc</th>
+                          <th class="fs-6  px-3 py-2">Arista Consigned (Y/N)</th>
+                          
+                      </tr>
+                      <tr>
+                       
+                        <td>{{ portfolio.0.Item_Desc }}</td>
+                        <td>{{ portfolio.0.Cust_consign }}</td>
+                       
+  
+                       
+                        
+                      </tr>
+  
+                      <th colspan="8" class="bg-info sorting dtfc-fixed-left min-w-150px text-center "><strong>PCN Info</strong></th>
+  
+                      <tr>
+                          <th class="fs-6  px-3 py-2">Original PO/Delivery</th>
+                          <th class="fs-6 px-3 py-2">CM Quantity Buffer OH</th>
+                          <th class="fs-6 px-3 py-2">CM Quantity OH</th>
+                          <th class="fs-6 px-3 py-2">CM Open PO due Current Qtr ({{ data.Quarter }})</th>
+                      </tr>
+                      <tr>
+                        {% if data.approval_status == 'Approved' %}
+                        <td>{{ PO_DEL_decision|default_if_none:"PO" }}</td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+  
+                        {%if cm == 'SGD'%}
+                        <td>{{portfolio.0.cm_Quantity_Buffer_On_Hand}}</td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+
+                        <td>{{ portfolio.0.cm_Quantity_On_Hand_CS_Inv|floatformat:"0" }}</td>
+
+                        <td>{{ portfolio.0.Open_PO_due_in_this_quarter|floatformat:"0" }}</td>
+                      </tr>
+                      <tr>
+                          <th class="fs-6  px-3 py-2">CM Open PO due Q+1({{ quote_qtr.0 }})</th>
+                          <th class="fs-6 px-3 py-2">CM Total OH + OPO ({{ data.Quarter }})</th>
+                          <th class="fs-6 px-3 py-2">CM Total OH + OPO ({{ data.Quarter }} & {{ quote_qtr.0 }})</th>
+                          <th class="fs-6 px-3 py-2">CM Current Quarter Demand ({{ data.Quarter }})</th>
+                      </tr>
+                      <tr>
+                          
+                        <td>{{ portfolio.0.Open_PO_due_in_next_quarter|floatformat:"0" }}</td>
+                        <td>{{ portfolio.0.Delivery_Based_Total_OH_sum_OPO_this_quarter|floatformat:"0" }}</td>
+                        <td>{{ portfolio.0.PO_Based_Total_OH_sum_OPO|floatformat:"0" }}</td>
+                        <td>{{ portfolio.0.CQ_ARIS_FQ_sum_1_SANM_Demand|floatformat:"0" }}</td>
+                        
+                          
+                      </tr>
+                      <tr>
+                          <th class="fs-6 px-3 py-2">CM Q+1 Demand ({{ quote_qtr.0 }})</th>
+                          <th class="fs-6 px-3 py-2">CM Q+2 Demand ({{ quote_qtr.1 }})</th>
+                          <th class="fs-6 px-3 py-2">CM Q+3 Demand ({{ quote_qtr.2 }})</th>
+                          <th class="fs-6 px-3 py-2">Delta = OH & Open PO - Demand (Current Qtr + Q+1)</th>
+                      </tr>
+                      <tr>
+                          
+                        <td>{{ portfolio.0.CQ_sum_1_ARIS_FQ_sum_2_SANM_Demand|floatformat:"0" }}</td>
+                        <td>{{ portfolio.0.CQ_sum_2_ARIS_FQ_sum_3_SANM_Demand|floatformat:"0" }}</td>
+                        <td>{{ portfolio.0.CQ_sum_3_ARIS_FQ_SANM_Demand|floatformat:"0" }}</td>
+                        <td>{{ DELTA }}</td>
+                       
+  
+                          
+                      </tr>
+                      <tr>
+                          <th class="fs-6 px-3 py-2">ARIS CQ CM FQ+1 unit price USD +  Current std ($)</th>
+                          <th class="fs-6 px-3 py-2">CQ+1 ARIS FQ+2 CM unit price USD ($)</th>
+                          <th class="fs-6 px-3 py-2">Delta ARIS CQ+1 CM FQ+2 vs ARIS CQ CM FQ+1</th>
+                          <th class="fs-6 px-3 py-2">Blended AVG PO Receipt Price ($)</th>
+                      </tr>
+                      <tr>
+                        <td>{{ portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std }}</td>
+                        <td>{{ portfolio.0.CQ_sum_1_ARIS_FQ_sum_2_SANM_unit_price_USD }}</td>
+                        <td>{{ portfolio.0.Delta_ARIS_CQ_sum_1_SANM_FQ_sum_2_vs_ARIS_CQ_SANM_FQ_sum_1|floatformat:"0" }}</td>
+
+                        {% if cm == 'SGD' %}
+                        <td>{{portfolio.0.Blended_AVG_PO_Receipt_Price|default_if_none:'0'}}</td>
+                        {% else %}
+                        <td></td>
+                        {% endif %}
+
+                      </tr>
+                      <tr>
+                          <th class="fs-6 px-3 py-2">Ownership</th>
+                          <th class="fs-6 px-3 py-2">Demand Coverage</th>
+                          
+                      </tr>
+                      <tr>
+                           
+                            <td>{{ portfolio.0.Ownership }}</td>
+                            <td>{{ mp.Demand_Coverage }}</td>
+                         
+                      </tr>
+                      
+
+                    
+
+
+
+
+
+
+
+
+                      <th colspan="8" class="bg-info sorting dtfc-fixed-left min-w-150px text-center "><strong>PCN Info 2</strong></th>
+                      {% get_user_name request.user as username %}
+                      <tr>
+                          <th class="fs-6  px-3 py-2">Current Qtr Final Std Cost ($)</th>
+                          <th class="fs-6 px-3 py-2">Current Quarter updated  std  Price ($)</th>
+                          <th class="fs-6 px-3 py-2">Q+1 Std Cost(Quoted) ($)</th>
+                          <th class="fs-6 px-3 py-2">Q+1 updated or Flat Price value ($)</th>
+                      </tr>
+                      <tr>
+                       
+                        <td> $ {{ mp.current_final_std_cost }}</td>
+                        
+                        <td>{%if data.approval_status == 'Approved' %} $ {% get_previous_cost data.Part_Number 'std_cost' cm as cost %} {{cost.0|default_if_none:'Cost Not available'}}{%else%} Cost Not available {%endif%}</td>
+                        
+
+                        <td>{%if data.approval_status == 'Approved' %} $ {% if portfolio.0.Cust_consign == "N" %} {{ mp.std_cost|default_if_none:"-" }} {%endif%} {%else%} $ Cost Not available {%endif%}</td>
+
+                        <td>$ {{ mp.standard_price_q1|default_if_none:"-" }}</td>
+                      </tr>
+                      <tr>
+                          <th class="fs-6  px-3 py-2">Q+1 decision</th>
+                          <th class="fs-6 px-3 py-2">Approve / Rejected</th>
+                          <th class="fs-6 px-3 py-2">Arista PIC Q+1 decision comments</th>
+                          <th class="fs-6 px-3 py-2">CM Q+1 decision comments</th>
+                      </tr>
+                      <tr>
+                          
+                        <td>{{ mp.current_qtr_decision|default_if_none:"-" }}</td>
+                        <td>{{mp.approve_reject_std_price|default_if_none:"Not Updated" }}</td>
+                        <td>{{mp.arista_pic_approve_reject|default_if_none:"Not Updated" }}</td>
+                        <td>{{mp.cm_approve_reject|default_if_none:"Not Updated" }}</td>
+                        
+                          
+                      </tr>
+
+                      <form action="{% url 'update_price_decision' %}" class="price_update" method="POST">
+                        {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ data.id }}">
+                            <input type="hidden" name="Part_Number" value="{{ portfolio.0.Arista_Part_Number }}">
+                            <input type="hidden" name="cm_partno" value="{{ portfolio.0.cm_Part_Number }}">
+                            <input type="hidden" name="part_control" value="{{ portfolio.0.Ownership }}">
+                            <input type="hidden" name="q_std_cost" value="{{ portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std}}">
+                            <input type="hidden" name="q+1_std_cost" value="{{ data.std_cost|default_if_none:'-' }}">
+                            <input type="hidden" name="quarter" value="{{ data.quarter }}">
+                            <input type="hidden" name="cm" value="{{cm }}">
+
+                        
+                       
+                      <tr>
+                        {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC %}
+                        {% if portfolio.0.Ownership == "Arista"%}
+                        {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                            
+                          <th class="fs-6 px-3 py-2">Flat or updated price <span class="red">*</span></th>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+
+                        {% if request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                        {% if portfolio.0.Ownership != "Arista"%}
+                        {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+
+                          <th class="fs-6 px-3 py-2">Flat or updated price <span class="red">*</span></th>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                         
+                      </tr>
+                      <tr>
+                          
+                        
+                        {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC %}
+                        {% if portfolio.0.Ownership == "Arista"%}
+                        {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                            
+                        <td>
+                            <select {%if data.approval_status != 'Approved' and logic_BP.lift_logic != 'disable' %} disabled{%endif%} name="current_qtr_decision" class="form-control input-sm mb-1 float-left" required style="width:80%;">
+                                <option value="" selected disabled>Select</option>
+                                <option {% if  previous_cost.0 or portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std %} value="Keep Flat">Keep Flat</option>  {%else%}disabled value="">Keep Flat (Cost Not available)</option> {%endif%}
+                                <option value="Updated Price">Updated Price</option>
+                            </select>
+
+                            {%if data.approval_status == 'Approved'%}
+                            {%if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1%}
+                                <button type="submit" {%if data.approval_status != 'Approved' and logic_BP.lift_logic != 'disable' %} disabled{%endif%} class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+                            {%endif%}
+                            {%endif%}
+                            <textarea name="arista_pic_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+
+                        </td>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                        
+                        {% if request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                        {% if portfolio.0.Ownership != "Arista"%}
+                        {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                        <td>
+                            <select  name="current_qtr_decision" class="form-control input-sm mb-1 float-left" required style="width:80%;">
+                                <option value="" selected disabled>Select</option>
+                                <option {% if  previous_cost.0 or portfolio.0.ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std %} value="Keep Flat">Keep Flat</option>  {%else%}disabled value="">Keep Flat (Cost Not available)</option> {%endif%}
+                                <option value="Updated Price">Updated Price</option>
+                            </select>
+                            <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+                            <button type="button" part='{{data.id}}'  class="btn btn-info btn-sm mb-1 blank_out">Blank New PO</button>
+                            <button type="button" part='{{data.id}}'  decision='{{mp.current_qtr_decision}}' std_cost="{{ mp.std_cost|default_if_none:'' }}" class="btn btn-info btn-sm mb-1 revert_if_flat">Revert</button>
+                            
+                            <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea> 
+
+                        </td>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+                    </form>
+                      </tr>
+
+                      {% if mp.current_qtr_decision != None and  mp.current_qtr_decision != 'Un Approved' %}
+                      <form action="{% url 'price_approval' %}" class="price_update" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ data.id }}">
+                        <input type="hidden" name="Part_Number" value="{{ portfolio.0.Arista_Part_Number }}">
+                        <input type="hidden" name="cm_partno" value="{{ portfolio.0.cm_Part_Number }}">
+                        <input type="hidden" name="part_control" value="{{ portfolio.0.Ownership }}">
+                        <input type="hidden" name="q_std_cost" value="{{mp.current_final_std_cost}}">
+                        <input type="hidden" name="q+1_std_cost" value="{{ mp.std_cost }}">
+                        <input type="hidden" name="quarter" value="{{ data.quarter }}">
+                        <input type="hidden" name="cm" value="{{ cm }}">
+
+                      <tr>
+                        {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC  %}     
+                        {% if portfolio.0.Ownership != "Arista" %}
+                          <th class="fs-6 px-3 py-2">Approve or Reject Std. price <span class="red">*</span></th>
+                        {% endif %}
+                        {% endif %}
+
+
+                        {% if  request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                        {%has_permission request.user 'Contract Manufacturer' as per%}
+                        {% if portfolio.0.Ownership == "Arista" and per %}
+                          <th class="fs-6 px-3 py-2">Approve or Reject Std. price <span class="red">*</span></th>
+                        {% endif %}
+                        {% endif %}
+                      </tr>
+
+                      <tr>
+                        {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC  %}  
+                        {% if portfolio.0.Ownership != "Arista" %}
+                        <td>
+                            <select  name="approve_reject_std_price" class="form-control input-sm float-left mb-1" required style="width:80%;">
+                                <option value="" selected disabled>Select</option>
+                                <option value="Approved">Approve</option>
+                                <option value="Rejected">Reject</option>
+                            </select>
+
+
+                            <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+
+                            <textarea name="arista_pic_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+
+                        </td>
+                        {% endif %}
+                        {% endif %}
+
+
+                        {% if  request.user|has_group:"Contract Manufacturer" or request.user.is_superuser %}
+                        {%has_permission request.user 'Contract Manufacturer' as per%}
+                        {% if portfolio.0.Ownership == "Arista" and per %}
+                        <td>
+                            <select name="approve_reject_std_price" class="form-control input-sm float-left mb-1" required style="width:80%;">
+                                <option value="" selected disabled>Select</option>
+                                <option value="Approved">Approve</option>
+                                <option value="Rejected">Reject</option>
+                            </select>
+                            <button type="submit" class="btn btn-social-icon mx-1 float-right btn-xs btn-outline-success"><i class="ft-check-circle"></i></button>
+
+                            <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea>
+
+                        </td>
+                        {% endif %}
+                        {% endif %}
+
+                      </tr>
+                      </form>
+                      {% endif %}
+
+
+                      <tr>
+                          <th class="fs-6 px-3 py-2">New PO Price for Q+1 ($)</th>
+                          <th class="fs-6 px-3 py-2">BP team Approve/Reject Comments for Q+1</th>
+                          <th class="fs-6 px-3 py-2">Arista PIC Comments to CM for Q+1</th>
+                          <th class="fs-6 px-3 py-2">Arista BP Comments for Q+1</th>
+                          
+                      </tr>
+                      <tr>
+                           
+                            <td>
+                                {{ mp.new_po_price|default_if_none:"-" }}
+                                {%if  logic_BP.lift_logic == 'disable'%}
+                                <button type="button" part='{{data.id}}' class=" badge badge-primary badge-sm m-1 fs-9 blank_out">Blank New PO</button>
+                                <button type="button" part='{{data.id}}'  decision='{{mp.current_qtr_decision}}' std_cost="{{ mp.std_cost}}" class=" badge badge-success badge-sm m-1 fs-9 revert_if_flat"> <i class="fa fa-refresh "></i> Revert</button>
+                                {%endif%}
+                            </td>
+                            <td>
+                                <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%}  cols=30 rows=2 name="BP_team_Approve_Reject_Comments" class="editableFields">{{mp.BP_team_Approve_Reject_Comments|default_if_none:""}}</textarea>
+                            </td>
+                            <td>
+                                <textarea {%has_permission request.user "PIC" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="Arista_PIC_Comments_to_CM" class="editableFields">{{mp.Arista_PIC_Comments_to_CM|default_if_none:""}}</textarea>
+                            </td>
+                            <td>
+                                <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="Arista_BP_Comments" class="editableFields">{{mp.Arista_BP_Comments|default_if_none:""}}</textarea>
+                            </td>
+                         
+                      </tr>
+                    
+                      <tr>
+                        <th class="fs-6 px-3 py-2">CM Additional Notes on Supplier/Distributor for Q+1</th>
+                        <th class="fs-6 px-3 py-2">CM PO/ Delivery Remarks</th>
+                        
+                    </tr>
+                    <tr>
+                         
+                          <td>
+                            <textarea {%has_permission request.user "Contract Manufacturer" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="CM_Additional_Notes_on_Supplier_distributor" class="editableFields">{{mp.CM_Additional_Notes_on_Supplier_distributor|default_if_none:""}}</textarea>
+                          </td>
+                          <td>
+                            <textarea {%has_permission request.user "BP Manager" as per%} {%if not per %} readonly {%endif%} cols=30 rows=2 name="CM_PO_Delivery_Remarks" class="editableFields">{{mp.CM_PO_Delivery_Remarks|default_if_none:""}}</textarea>
+                          </td>
+                         
+                       
+                    </tr>
+                   
+                  </tbody>
+              </table>
+          </div>
+          
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="card-content">
     <div class="card-body p-1">
         <h4 class="text-bold-700">{{data.Arista_Part_Number}}</h4>
         <!-- <div class="row">
@@ -11,7 +409,7 @@
             <div class="col-12">
             </div>
         </div> -->
-        <div class="card bg-info bg-lighten-5 border-info border-lighten-3 square   ">
+        <div class="card bg-info bg-lighten-5 border-info border-lighten-3 square">
             <div class="card-content ">
                 <div class="row " >
                     <div class="col-lg-3 col-sm-12 border-right-info border-right-lighten-3">
@@ -237,7 +635,7 @@
 
                             {% if request.user.is_superuser or request.user|has_group:"CMM Manager" or request.user|has_group:"GSM Manager" or username in portfolio.0.Arista_PIC %}
                             {% if portfolio.0.Ownership == "Arista"%}
-                                {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
+                            {% if logic_BP.lift_logic == 'disable' or not mp.standard_price_q1 %}
                                 <!-- {{data.approval_status}} -->
                                 <!-- {{data.quarter}} -->
                                     <span class="font-small-3 text-bold-600">Flat or updated price <span class="red">*</span></span> <br> <br>
@@ -270,7 +668,8 @@
                                     <button type="button" part='{{data.id}}'  class="btn btn-info btn-sm mb-1 blank_out">Blank New PO</button>
                                     <button type="button" part='{{data.id}}'  decision='{{mp.current_qtr_decision}}' std_cost="{{ mp.std_cost|default_if_none:'' }}" class="btn btn-info btn-sm mb-1 revert_if_flat">Revert</button>
 
-                                <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea> {% endif %}
+                                <textarea name="cm_approve_reject" placeholder="Comments" class="form-control mb-1"></textarea> 
+                            {% endif %}
                             {% endif %}
                             {% endif %}
                         </form>
@@ -655,7 +1054,7 @@
     $(document).ready(function() {
         $(".price_update").submit(function(e) {
             e.preventDefault()
-            window.swal({
+            Swal.fire({
                 title: "Price Updating...",
                 text: "Please wait",
                 icon: "{% static 'images/loader2.gif' %}",
@@ -670,7 +1069,7 @@
                 success: function(data) {
                     swal.close();
                     if (data.status==200){
-                        swal({
+                        Swal.fire({
                             title: "Success!",
                             icon: "success",
                             text: data.message,
@@ -680,7 +1079,7 @@
                         refresh()
                     }
                     else{
-                        swal({
+                        Swal.fire({
                             title: "Error",
                             icon: "error",
                             text: data.message,
@@ -690,7 +1089,7 @@
                     }
                 },error: function(exception) {
                 $.unblockUI();
-                swal("Error please Reload the Page..It may Fix ", {
+                Swal.fire("Error please Reload the Page..It may Fix ", {
                     icon: "error",
                     button: true
                 });
@@ -728,7 +1127,7 @@
             },
 
             error: function(data) {
-                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                Swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
             }
         })
         $(this).blur()
@@ -736,14 +1135,18 @@
 
         });
         $(".blank_out").on("click",function(){
-            swal()
+            Swal.fire({
+                    title: " Blanking New PO",
+                    html: "Please wait...It May Take Some Time"
+                    })
+                    Swal.showLoading()
             $.ajax({
             type: "GET",
             url: "{%url 'MP_extras'%}",
             data: {option:'blank_out',cm:'{{cm}}',part:$(this).attr('part')},
             success: function(data, status, xhr) {
                 if (data.status !== 200) {
-                    swal({
+                    Swal.fire({
                         title: "Error",
                         icon: "error",
                         text: data.message,
@@ -753,7 +1156,7 @@
                 }
                 else{
                     refresh()
-                    swal({
+                    Swal.fire({
                         title: "Success!",
                         icon: "success",
                         text: "Successfully Updated New Po Price",
@@ -765,20 +1168,24 @@
             },
 
             error: function(data) {
-                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                Swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
             }
         })
         })
 
         $(".revert_if_flat").on("click",function(){
-            swal()
+            Swal.fire({
+                    title: " Reverting",
+                    html: "Please wait...It May Take Some Time"
+                    })
+                    Swal.showLoading()
             $.ajax({
             type: "GET",
             url: "{%url 'MP_extras'%}",
             data: {option:'revert_if_flat',cm:'{{cm}}',part:$(this).attr('part'),decision:$(this).attr('decision'),std_cost:$(this).attr('std_cost')},
             success: function(data, status, xhr) {
                 if (data.status !== 200) {
-                    swal({
+                    Swal.fire({
                         title: "Error",
                         icon: "error",
                         text: data.message,
@@ -788,7 +1195,7 @@
                 }
                 else{
                     refresh()
-                    swal({
+                    Swal.fire({
                         title: "Success!",
                         icon: "success",
                         text: data.message,
@@ -800,7 +1207,7 @@
             },
 
             error: function(data) {
-                swal('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
+                Swal.fire('Session Timeout OR No Internet Connection,\n please Reload the page to fix')
             }
         })
         })

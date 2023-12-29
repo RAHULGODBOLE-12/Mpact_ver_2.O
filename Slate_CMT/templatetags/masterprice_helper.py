@@ -20,6 +20,7 @@ from Slate_CMT.templatetags.cmt_helper import *
 
 @register.simple_tag()
 def get_arista_ctl_sgd_parts():
+    from rfx.models import RFX
     currentqtr=Current_quarter()
     print(currentqtr)
     rfx=RFX.objects.filter(portfolio__Parts_controlled_by='Arista').filter(portfolio__cm='SGD')
@@ -33,6 +34,7 @@ def get_po_delivery_calc(id,sent_to=None):
     '''
     print(id)
     print("Inside Actual PO Delivery")
+    from rfx.models import RFX
     try:
         init=RFX.objects.get(id=id)
         decision='PO'
@@ -91,6 +93,7 @@ def get_po_delivery_calc(id,sent_to=None):
 
 @register.simple_tag()
 def mp_po_delivery_calc_logic(Part_Number,quarter,cm):
+    from rfx.models import RFX
     print("Inside MP PO Delivery")
     '''for Customer part we make some calculation for po_delivery based on the count of po and delivery
             If count of delivery is greater than deivery than delivery will be returned else PO
@@ -155,6 +158,7 @@ def mp_po_delivery_calc_logic(Part_Number,quarter,cm):
 
 @register.simple_tag()
 def get_previous_cost(Part_Number,cat,cm):
+    from rfx.models import RFX
     std=RFX.objects.exclude(cm='Global').filter(quarter=Current_quarter(),Part_Number=Part_Number,sent_quater=get_previous_quarter()[0],cm=cm,Quote_status='Quoted').values_list(cat,flat=True)
     portfolio_cost=RFX.objects.filter(quarter=Current_quarter(),Part_Number=Part_Number,sent_quater=Current_quarter(),cm=cm).values_list('portfolio__sgd_jpe_cost',flat=True)
     if not std :
@@ -164,6 +168,7 @@ def get_previous_cost(Part_Number,cat,cm):
     return [std[0],portfolio_cost[0] if portfolio_cost else None]
 
 def get_previous_std_cost(Part_Number,cat,cm):
+    from rfx.models import RFX
     std=RFX.objects.exclude(cm='Global').filter(quarter=Current_quarter(),Part_Number=Part_Number,sent_quater=get_previous_quarter()[0],cm=cm,Quote_status='Quoted').values_list(cat,flat=True)
     portfolio_cost=Portfolio.objects.exclude(cm='Global').filter(Quarter=Current_quarter(),Number=Part_Number,cm=cm).order_by('-ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std').values_list('ARIS_CQ_SANM_FQ_sum_1_unit_price_USD_Current_std',flat=True)
     if not std :
